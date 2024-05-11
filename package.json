@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "ui:add": "bunx --bun shadcn-ui@latest add"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",
