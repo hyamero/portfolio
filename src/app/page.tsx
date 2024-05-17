@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="flex min-h-screen items-center justify-between container">
+    <main className="flex min-h-screen items-center justify-between container bg-background">
       <div className="flex flex-col gap-5">
         <h2 className="text-7xl font-medium tracking-[-0.07em]">
           Crafting ideas into <br /> digital experiences
