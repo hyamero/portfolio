@@ -3,6 +3,7 @@ import mainBg from "/public/img/main-bg.png";
 import globeIcon from "/public/img/icon/globe-icon.png";
 import starIcon from "/public/img/icon/star-icon.png";
 import { Icons } from "@/components/icons";
+import ProjectShowcase from "@/components/project-showcase";
 
 export default function Home() {
   return (
@@ -64,6 +65,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <ProjectShowcase />
     </main>
   );
 }
