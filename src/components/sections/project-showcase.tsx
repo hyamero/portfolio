@@ -1,8 +1,9 @@
 import Image from "next/image";
-import omsThumb from "/public/img/project/omsimos-thumb.png";
-import atomIcon from "/public/img/icon/atom-icon.png";
-import { Icons } from "./icons";
-import { Button } from "./ui/button";
+import { Icons } from "../icons";
+import { Button } from "../ui/button";
+
+import atomIcon from "/public/img/icons/atom-icon.png";
+import omsThumb from "/public/img/projects/omsimos-thumb.png";
 
 export default function ProjectShowcase() {
   return (
