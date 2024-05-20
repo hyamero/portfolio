@@ -8,7 +8,7 @@ export const Icons = {
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"
-      className="h-5 w-5 stroke-[1.5]"
+      className="h-4 w-4 stroke-[1.5] md:h-5 md:w-5"
     >
       <path
         strokeLinecap="round"
