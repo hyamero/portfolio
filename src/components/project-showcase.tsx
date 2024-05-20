@@ -6,10 +6,10 @@ import { Button } from "./ui/button";
 
 export default function ProjectShowcase() {
   return (
-    <section className="container">
-      <div className="grid min-h-screen grid-cols-4 items-center border-x pt-40">
-        <div className="col-span-4 h-full w-full border px-10 py-24">
-          <h2 className=" w-3/4 text-5xl tracking-tighter text-muted-foreground [&>span]:font-medium [&>span]:text-foreground">
+    <section className="gradient-to-b border-y from-black to-[#111111]">
+      <div className="container grid min-h-screen grid-cols-4 items-center border-x pt-40">
+        <div className="col-span-4 h-full w-full border-y px-10 py-24">
+          <h2 className=" w-3/4 text-5xl leading-[1.1] tracking-tighter text-muted-foreground [&>span]:font-medium [&>span]:text-foreground">
             I specialize in crafting <span>high-quality</span> websites using{" "}
             <span>cutting-edge</span> technologies, seamlessly blending creative
             design with <span>top-tier</span> performance.
@@ -17,10 +17,15 @@ export default function ProjectShowcase() {
         </div>
 
         <div className="col-span-3 p-24">
-          <Image alt="OMSIMOS Thumbnail" src={omsThumb} className="w-full" />
+          <Image
+            alt="OMSIMOS Thumbnail"
+            src={omsThumb}
+            className="w-full"
+            placeholder="blur"
+          />
         </div>
 
-        <div className="col-start-4 flex h-full flex-col items-center justify-center border-x px-5">
+        <div className="col-start-4 flex h-full flex-col items-center justify-center border-l px-5">
           <Image alt="Atom Icon" src={atomIcon} className="scale-75" />
 
           <p className="text-2xl tracking-tight text-muted-foreground">
@@ -33,8 +38,8 @@ export default function ProjectShowcase() {
 
         <div className="col-span-4 grid h-full w-full grid-cols-4 grid-rows-2 border-t">
           <div className="h-full">
-            <div className="flex h-full flex-col items-start gap-5 p-5">
-              <p className="text-2xl font-medium tracking-tight text-muted-foreground">
+            <div className="flex h-full flex-col items-start gap-5 p-10">
+              <p className="text-2xl font-medium leading-[1.1] tracking-tight text-muted-foreground">
                 <span className="font-semibold text-foreground">Omsimos</span>{" "}
                 is a community driven open source developer collective.
               </p>
@@ -43,7 +48,7 @@ export default function ProjectShowcase() {
                 <Icons.arrowUpRight />
               </Button>
             </div>
-            <div className="h-full border" />
+            <div className="h-full border-t" />
           </div>
 
           <div className="col-span-2 col-start-2">
@@ -61,7 +66,7 @@ export default function ProjectShowcase() {
                 <span>UI/UX Design, Front-End Engineer</span>
               </li>
             </ul>
-            <div className="h-full border" />
+            <div className="h-full border border-b-0" />
           </div>
         </div>
       </div>
