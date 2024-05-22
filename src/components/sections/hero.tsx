@@ -30,7 +30,7 @@ export default function Hero() {
               </a>
             </div>
 
-            <h2 className="text-8xl text-[clamp(3rem,10vw,6rem)] font-medium tracking-[-0.07em]">
+            <h2 className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]">
               Crafting ideas into <br /> digital experiences
             </h2>
           </div>
