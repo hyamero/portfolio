@@ -7,9 +7,9 @@ import omsThumb from "/public/img/projects/omsimos-thumb.png";
 
 export default function ProjectShowcase() {
   return (
-    <section className="border-y bg-gradient-to-b from-black to-[#111] pb-10">
+    <section className="pointer-events-none relative z-10 border-y">
       <div className="container grid min-h-screen grid-cols-4 items-center gap-y-20 border-x pt-40 sm:gap-y-10 lg:gap-y-0">
-        <div className="col-span-4 col-start-1 row-start-1 h-full w-full border-y px-0 py-10 lg:py-24 2xl:px-10">
+        <div className="col-span-4 col-start-1 row-start-1 h-full w-full border-y px-0 py-10 backdrop-blur-sm lg:py-24 2xl:px-10">
           <h2 className="w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
             I specialize in crafting <span>high-quality</span> websites using{" "}
             <span>cutting-edge</span> technologies, seamlessly blending creative
@@ -26,7 +26,7 @@ export default function ProjectShowcase() {
           />
         </div>
 
-        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 px-5 sm:flex-row lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-l">
+        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 px-5 backdrop-blur-sm sm:flex-row lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-l">
           <Image
             alt="Atom Icon"
             src={atomIcon}
@@ -36,10 +36,8 @@ export default function ProjectShowcase() {
           />
 
           <p className="text-center text-xl tracking-tight text-muted-foreground xl:text-xl 2xl:text-left 2xl:text-2xl">
-            <span className="font-medium text-foreground">
-              Powered by React
-            </span>
-            , Typescript, Next.js, Tailwind, and GSAP.
+            <span className="font-medium text-foreground">Powered by </span>
+            React, Typescript, Next.js, Tailwind, and GSAP.
           </p>
         </div>
 
@@ -50,7 +48,7 @@ export default function ProjectShowcase() {
                 <span className="font-semibold text-foreground">Omsimos</span>{" "}
                 is a community driven open source developer collective.
               </p>
-              <Button className="flex gap-3 rounded-full px-7">
+              <Button className="pointer-events-auto flex gap-3 rounded-full px-7">
                 <span>Visit</span>
                 <Icons.arrowUpRight />
               </Button>

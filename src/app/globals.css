@@ -43,4 +43,12 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  .block-item {
+    @apply size-8 border-[0.5px] border-transparent  transition-all duration-300 md:size-9 lg:size-10 2xl:size-12;
+  }
+
+  .highlight {
+    @apply border-blue-400/45;
+  }
 }
