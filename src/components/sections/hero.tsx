@@ -1,8 +1,8 @@
 import Image from "next/image";
+import { Icons } from "@/components/icons";
 import mainBg from "/public/img/main-bg.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import starIcon from "/public/img/icons/star-icon.png";
-import { Icons } from "@/components/icons";
 
 export default function Hero() {
   return (
