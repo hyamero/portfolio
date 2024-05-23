@@ -6,8 +6,6 @@ export function GridHighlight() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    console.log("test");
-
     const blockContainer = document.getElementById("blocks");
     const blockSize = 50;
     const screenWidth = window.innerWidth;
@@ -24,8 +22,6 @@ export function GridHighlight() {
         block.addEventListener("mousemove", highlightRandomNeighbors);
         blockContainer?.appendChild(block);
       }
-
-      console.log("done");
     }
 
     function highlightRandomNeighbors(this: HTMLElement) {

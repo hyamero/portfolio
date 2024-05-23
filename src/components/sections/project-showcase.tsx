@@ -7,7 +7,7 @@ import omsThumb from "/public/img/projects/omsimos-thumb.png";
 
 export default function ProjectShowcase() {
   return (
-    <section className="pointer-events-none relative z-10 border-y">
+    <section className="pointer-events-none relative z-10 border-y pb-14 lg:pb-0">
       <div className="container grid min-h-screen grid-cols-4 items-center gap-y-20 border-x pt-40 sm:gap-y-10 lg:gap-y-0">
         <div className="col-span-4 col-start-1 row-start-1 h-full w-full border-y px-0 py-10 backdrop-blur-sm lg:py-24 2xl:px-10">
           <h2 className="w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
@@ -17,7 +17,7 @@ export default function ProjectShowcase() {
           </h2>
         </div>
 
-        <div className="col-span-4 col-start-1 row-start-2 sm:p-16 lg:col-span-3 lg:p-24">
+        <div className="col-span-4 col-start-1 row-start-2 backdrop-blur-[1.5px] sm:p-16 lg:col-span-3 lg:p-24">
           <Image
             alt="OMSIMOS Thumbnail"
             src={omsThumb}
@@ -53,7 +53,7 @@ export default function ProjectShowcase() {
                 <Icons.arrowUpRight />
               </Button>
             </div>
-            <div className="hidden h-full border-t lg:block" />
+            <div className="hidden h-full border-t backdrop-blur-[1.5px] lg:block" />
           </div>
 
           <div className="col-span-4 border-t bg-[#111] md:col-span-3 md:col-start-3 md:border-t-0 lg:col-span-2">
@@ -71,7 +71,7 @@ export default function ProjectShowcase() {
                 <span>UI/UX Design, Front-End Engineer</span>
               </li>
             </ul>
-            <div className="hidden h-full border border-b-0 lg:block" />
+            <div className="hidden h-full border border-b-0 backdrop-blur-[1.5px] lg:block" />
           </div>
         </div>
       </div>
