@@ -70,7 +70,7 @@ export function GridHighlight() {
   }, []);
 
   return (
-    <div className="blocks-container point fixed left-0 top-0 h-screen w-screen overflow-hidden">
+    <div className="gradient-to-b blocks-container point fixed left-0 top-0 h-screen w-screen overflow-hidden border-y from-black to-[#111111]">
       <div
         id="blocks"
         className="flex h-screen w-[105vw] flex-wrap content-center justify-start overflow-hidden"
