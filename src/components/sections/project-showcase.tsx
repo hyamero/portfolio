@@ -3,24 +3,22 @@ import { Icons } from "../icons";
 import { Button } from "../ui/button";
 
 import atomIcon from "/public/img/icons/atom-icon.png";
-import omsThumb from "/public/img/projects/omsimos-thumb.png";
+import { type Project } from "@/lib/projects";
 
-export default function ProjectShowcase() {
+export default function ProjectShowcase({ ...props }: Project) {
+  const { Subtitle, image, description, company, year, role, techs } = props;
+
   return (
     <section className="pointer-events-none relative z-10 border-y pb-14 lg:pb-0">
       <div className="container grid min-h-screen grid-cols-4 items-center gap-y-20 border-x pt-40 sm:gap-y-10 lg:gap-y-0">
         <div className="col-span-4 col-start-1 row-start-1 h-full w-full border-y px-0 py-10 backdrop-blur-sm lg:py-24 2xl:px-10">
-          <h2 className="w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
-            I specialize in crafting <span>high-quality</span> websites using{" "}
-            <span>cutting-edge</span> technologies, seamlessly blending creative
-            design with <span>top-tier</span> performance.
-          </h2>
+          <Subtitle />
         </div>
 
         <div className="col-span-4 col-start-1 row-start-2 backdrop-blur-[1.5px] sm:p-16 lg:col-span-3 lg:p-24">
           <Image
             alt="OMSIMOS Thumbnail"
-            src={omsThumb}
+            src={image}
             className="w-full"
             placeholder="blur"
           />
@@ -37,7 +35,7 @@ export default function ProjectShowcase() {
 
           <p className="text-center text-xl tracking-tight text-muted-foreground xl:text-xl 2xl:text-left 2xl:text-2xl">
             <span className="font-medium text-foreground">Powered by </span>
-            React, Typescript, Next.js, Tailwind, and GSAP.
+            {techs}
           </p>
         </div>
 
@@ -45,8 +43,8 @@ export default function ProjectShowcase() {
           <div className="col-span-4 h-full bg-[#111] md:col-span-2 lg:col-span-1">
             <div className="flex h-full flex-col items-start gap-5 p-10">
               <p className="text-lg font-medium tracking-tight text-muted-foreground md:text-xl lg:text-2xl lg:leading-[1.1]">
-                <span className="font-semibold text-foreground">Omsimos</span>{" "}
-                is a community driven open source developer collective.
+                <span className="font-semibold text-foreground">{company}</span>{" "}
+                {description}
               </p>
               <Button className="pointer-events-auto flex gap-3 rounded-full px-7">
                 <span>Visit</span>
@@ -60,15 +58,15 @@ export default function ProjectShowcase() {
             <ul className="flex h-full flex-col justify-between border-x text-sm text-muted-foreground md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
               <li>
                 <span>Company</span>
-                <span>Omsimos</span>
+                <span>{company}</span>
               </li>
               <li>
                 <span>Year</span>
-                <span>2023</span>
+                <span>{year}</span>
               </li>
               <li>
                 <span>Role</span>
-                <span>UI/UX Design, Front-End Engineer</span>
+                <span>{role}</span>
               </li>
             </ul>
             <div className="hidden h-full border border-b-0 backdrop-blur-[1.5px] lg:block" />
