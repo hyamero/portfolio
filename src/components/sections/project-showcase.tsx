@@ -21,6 +21,7 @@ export default function ProjectShowcase({ ...props }: Project) {
             src={image}
             className="w-full"
             placeholder="blur"
+            priority
           />
         </div>
 
