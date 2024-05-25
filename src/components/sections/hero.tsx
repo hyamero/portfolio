@@ -13,6 +13,7 @@ export default function Hero() {
             src={mainBg}
             alt="Main Background"
             className="h-full w-full object-cover object-center"
+            priority
           />
         </div>
 
