@@ -9,9 +9,9 @@ export default function ProjectShowcase({ ...props }: Project) {
   const { Subtitle, image, description, company, year, role, techs } = props;
 
   return (
-    <section className="border-b-none pointer-events-none relative z-10 pb-14 lg:border-y lg:pb-0">
+    <section className="border-b-none pointer-events-none  relative z-10 pb-14 lg:border-y lg:pb-0">
       <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
-        <div className="col-span-4 col-start-1 row-start-1 h-full w-full rounded-lg border-x border-y px-5 py-10 backdrop-blur-sm sm:px-10 lg:py-24 xl:rounded-br-none">
+        <div className="col-span-4 col-start-1 row-start-1 h-full w-full rounded-lg py-10 backdrop-blur-sm sm:px-10 lg:border lg:py-24 xl:rounded-br-none">
           <Subtitle />
         </div>
 
@@ -65,9 +65,9 @@ export default function ProjectShowcase({ ...props }: Project) {
                 <span>Year</span>
                 <span>{year}</span>
               </li>
-              <li>
+              <li className="gap-10">
                 <span>Role</span>
-                <span>{role}</span>
+                <span className="text-right">{role}</span>
               </li>
             </ul>
             <div className="hidden h-full border-l border-t backdrop-blur-[1.5px] lg:block" />
