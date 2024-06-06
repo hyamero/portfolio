@@ -51,4 +51,30 @@
   .highlight {
     @apply border-blue-400/45;
   }
+
+  /*
+ Hover Effect
+ */
+
+  .hover-effect {
+    position: relative;
+  }
+
+  .hover-effect:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0.5px;
+    display: block;
+    right: 0;
+    bottom: 0;
+    background: rgb(183, 183, 183);
+    -webkit-transition: 0.4s ease;
+    transition: 0.4s ease;
+  }
+
+  .hover-effect:hover:after {
+    width: 100%;
+    left: 0;
+  }
 }
