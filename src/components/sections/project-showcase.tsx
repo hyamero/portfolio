@@ -34,7 +34,7 @@ export default function ProjectShowcase({ ...props }: Project) {
             width={200}
           />
 
-          <p className="text-center text-lg tracking-tight text-muted-foreground sm:text-xl xl:text-xl 2xl:text-left 2xl:text-2xl">
+          <p className="pointer-events-auto text-center text-lg tracking-tight text-muted-foreground sm:text-xl xl:text-xl 2xl:text-left 2xl:text-2xl">
             <span className="font-medium text-foreground">Powered by </span>
             {techs}
           </p>
@@ -42,12 +42,12 @@ export default function ProjectShowcase({ ...props }: Project) {
 
         <div className="col-span-4 row-start-3 grid h-full w-full grid-cols-4 overflow-hidden rounded-t-lg border md:grid-cols-5 lg:grid-cols-3 lg:grid-rows-2 lg:rounded-none lg:rounded-tl-lg lg:border-b-0 xl:col-span-3">
           <div className="col-span-4 h-full bg-[#111] md:col-span-2 lg:col-span-1">
-            <div className="flex h-full flex-col items-start gap-5 px-7 py-10 sm:px-10">
+            <div className="pointer-events-auto flex h-full flex-col items-start gap-5 px-7 py-10 sm:px-10">
               <p className="text-lg font-medium tracking-tight text-muted-foreground sm:text-xl lg:text-2xl lg:leading-[1.1]">
                 <span className="font-semibold text-foreground">{company}</span>{" "}
                 {description}
               </p>
-              <Button className="pointer-events-auto flex gap-3 rounded-full px-7">
+              <Button className="flex gap-3 rounded-full px-7">
                 <span>Visit</span>
                 <Icons.arrowUpRight />
               </Button>
@@ -56,7 +56,7 @@ export default function ProjectShowcase({ ...props }: Project) {
           </div>
 
           <div className="col-span-4 bg-[#111] md:col-span-3 md:col-start-3 lg:col-span-2">
-            <ul className="flex h-full flex-col justify-between border-l text-sm text-muted-foreground md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
+            <ul className="pointer-events-auto flex h-full flex-col justify-between border-l text-sm text-muted-foreground md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
               <li>
                 <span>Company</span>
                 <span>{company}</span>
