@@ -53,7 +53,7 @@ export default function Hero() {
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
+              className="hover-effect relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
             >
               <p>View Resume</p>
               <Icons.arrowUpRight />
