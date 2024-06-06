@@ -16,7 +16,7 @@ export type Project = {
 export const projects: Project[] = [
   {
     Subtitle: () => (
-      <h2 className="w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground lg:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground lg:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
         I specialize in crafting <span>high-quality</span> websites using{" "}
         <span>cutting-edge</span> technologies, seamlessly blending creative
         design with <span>top-tier</span> performance.
@@ -31,7 +31,7 @@ export const projects: Project[] = [
   },
   {
     Subtitle: () => (
-      <h2 className="w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
         Reached over <span>2.5 million unique users</span> and generated{" "}
         <span>14 million+ page visits</span>. Attained over 700K users in less
         than a week during the initial launch.
@@ -42,6 +42,6 @@ export const projects: Project[] = [
     company: "Umamin",
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
-    techs: "React, Typescript, Next.js, Tailwind, Drizzle, and tRPC.",
+    techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
   },
 ];
