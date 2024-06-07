@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Icons } from "@/components/icons";
-import mainBg from "/public/img/main-bg.png";
+import heroBg from "/public/img/main-bg.jpg";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import starIcon from "/public/img/icons/star-icon.png";
 
@@ -10,7 +10,7 @@ export default function Hero() {
       <div className="container flex h-screen pb-10 pt-32 md:h-auto lg:pt-56">
         <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
           <Image
-            src={mainBg}
+            src={heroBg}
             alt="Main Background"
             className="h-full w-full object-cover object-center"
             priority
