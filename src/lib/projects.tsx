@@ -1,6 +1,7 @@
 import { type StaticImageData } from "next/image";
-import omsThumb from "/public/img/projects/omsimos-thumb.png";
-import umaminLogo from "/public/img/projects/umamin-logo.png";
+import omsThumb from "/public/img/projects/omsimos.jpg";
+import umaminThumb from "/public/img/projects/umamin.jpg";
+import foliageThumb from "/public/img/projects/foliage.jpg";
 import React from "react";
 
 export type Project = {
@@ -15,6 +16,8 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    company: "omsimos",
+    description: "is a community driven open source developer collective",
     Subtitle: () => (
       <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground lg:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
         I specialize in crafting <span>high-quality</span> websites using{" "}
@@ -23,13 +26,13 @@ export const projects: Project[] = [
       </h2>
     ),
     image: omsThumb,
-    description: "is a community driven open source developer collective",
-    company: "Omsimos",
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
   },
   {
+    company: "umamin",
+    description: "is an open-source platform for anonymous messages.",
     Subtitle: () => (
       <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
         Reached over <span>2.5 million unique users</span> and generated{" "}
@@ -37,11 +40,24 @@ export const projects: Project[] = [
         than a week during the initial launch.
       </h2>
     ),
-    image: umaminLogo,
-    description: "is an open-source platform for anonymous messages.",
-    company: "Umamin",
+    image: umaminThumb,
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
+  },
+  {
+    company: "foliage",
+    description: "is an open-source platform for anonymous messages.",
+    Subtitle: () => (
+      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+        Excels in crafting <span>clean</span> and{" "}
+        <span>interactive websites</span>, seamlessly blending minimalist design
+        with <span>modern technology</span> for exceptional user experiences.
+      </h2>
+    ),
+    image: foliageThumb,
+    year: 2023,
+    role: "UI/UX Design, Front-End Engineer",
+    techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
   },
 ];
