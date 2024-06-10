@@ -4,28 +4,9 @@ import { useEffect, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
-const navItems = [
-  {
-    text: "Home",
-    href: "home",
-  },
-  {
-    text: "Featured",
-    href: "potd",
-  },
-  {
-    text: "Showcase",
-    href: "showcase",
-  },
-  {
-    text: "Discover",
-    href: "discover",
-  },
-  {
-    text: "Contact",
-    href: "footer",
-  },
-];
+const navItems = ["tools", "design", "contact"];
+
+const navProjects = ["omsimos", "umamin", "foliage"];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -68,8 +49,8 @@ export default function Navbar() {
           y: 0,
           opacity: 1,
           skewX: 0,
-          duration: 0.7,
-          stagger: -0.2,
+          duration: 0.4,
+          stagger: 0.1,
           ease: "power4.out",
         },
         "-=0.1",
@@ -83,13 +64,11 @@ export default function Navbar() {
         {
           y: 0,
           opacity: 1,
-          skewX: 0,
         },
         {
-          skewX: -10,
           opacity: 0,
           y: -150,
-          duration: 0.7,
+          duration: 0.4,
           stagger: 0.1,
           ease: "power4.out",
         },
@@ -195,21 +174,40 @@ const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
 
   return (
     <div className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 bg-[#111] text-secondary [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
-      <div className="flex flex-col gap-5">
-        {navItems.map(({ text, href }) => (
-          <button
-            type="button"
-            key={text}
-            className="menu-item text-5xl font-light tracking-tighter opacity-0"
-            onClick={() => {
-              scrollToSection(href, 0);
-            }}
-          >
-            <div className="col-start-2 row-start-2 flex font-light tracking-tighter">
-              <span className="menu-item-text">{text}</span>
-            </div>
-          </button>
-        ))}
+      <div className="flex flex-col gap-3 sm:flex-row sm:gap-28 md:gap-5">
+        <div className="flex flex-col gap-3 md:gap-5">
+          {navItems.map((item) => (
+            <button
+              type="button"
+              key={item}
+              className="menu-item text-4xl font-light tracking-tighter opacity-0 md:text-5xl"
+              onClick={() => {
+                scrollToSection(item, 0);
+              }}
+            >
+              <div className="col-start-2 row-start-2 flex font-light tracking-tighter">
+                <span className="menu-item-text capitalize">{item}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-3 md:gap-5">
+          {navProjects.map((item) => (
+            <button
+              type="button"
+              key={item}
+              className="menu-item text-4xl font-light tracking-tighter opacity-0 md:text-5xl"
+              onClick={() => {
+                scrollToSection(item, 0);
+              }}
+            >
+              <div className="col-start-2 row-start-2 flex font-light tracking-tighter">
+                <span className="menu-item-text capitalize">{item}</span>
+              </div>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
