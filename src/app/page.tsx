@@ -13,6 +13,7 @@ export default function Home() {
       <OSShowcase />
       <ProjectShowcase {...projects[1]} />
       <DesignShowcase />
+      <ProjectShowcase {...projects[2]} />
     </main>
   );
 }
