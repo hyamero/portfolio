@@ -39,7 +39,7 @@ export default function Navbar() {
         "<",
       )
       .fromTo(
-        ".menu-item",
+        ".menu-item, .menu-item-title",
         {
           y: -150,
           opacity: 0,
@@ -60,7 +60,7 @@ export default function Navbar() {
   const closeMenu = () => {
     menuClose
       .fromTo(
-        ".menu-item",
+        ".menu-item, .menu-item-title",
         {
           y: 0,
           opacity: 1,
@@ -173,9 +173,18 @@ const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
   };
 
   return (
-    <div className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 bg-[#111] text-secondary [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-28">
-        <div className="flex flex-col gap-3 md:gap-5">
+    <div className="menu p-y-5 fixed left-0 top-0  z-30 grid min-h-[65vh] w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-35 text-secondary backdrop-blur-lg [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
+      <div className="flex flex-col gap-14 sm:flex-row sm:gap-28">
+        <div className="flex flex-col items-start gap-3 md:gap-5">
+          <button
+            onClick={() => {
+              scrollToSection("home", 0);
+            }}
+            type="button"
+            className="menu-item-title cursor-pointer text-left text-xs font-medium uppercase text-muted-foreground opacity-0"
+          >
+            Home
+          </button>
           {navItems.map((item) => (
             <button
               type="button"
@@ -192,7 +201,16 @@ const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
           ))}
         </div>
 
-        <div className="flex flex-col gap-3 md:gap-5">
+        <div className="flex flex-col items-start gap-3 md:gap-5">
+          <button
+            onClick={() => {
+              scrollToSection("omsimos", 0);
+            }}
+            type="button"
+            className="menu-item-title cursor-pointer text-left text-xs font-medium uppercase text-muted-foreground opacity-0"
+          >
+            Projects
+          </button>
           {navProjects.map((item) => (
             <button
               type="button"
