@@ -174,7 +174,7 @@ const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
 
   return (
     <div className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 bg-[#111] text-secondary [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-28 md:gap-5">
+      <div className="flex flex-col gap-3 sm:flex-row sm:gap-28">
         <div className="flex flex-col gap-3 md:gap-5">
           {navItems.map((item) => (
             <button
