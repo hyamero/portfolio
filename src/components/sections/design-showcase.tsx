@@ -1,4 +1,4 @@
-export function DesignShowcase() {
+export default function DesignShowcase() {
   return (
     <section
       id="design"

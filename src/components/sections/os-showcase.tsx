@@ -1,4 +1,4 @@
-export function OSShowcase() {
+export default function OSShowcase() {
   return (
     <section
       id="tools"
