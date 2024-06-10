@@ -2,8 +2,9 @@ import { GridHighlight } from "@/components/grid-highlight";
 import {
   Hero,
   OSShowcase,
-  DesignShowcase,
   ProjectShowcase,
+  DesignShowcase,
+  Footer,
 } from "@/components/sections";
 import { projects } from "@/lib/projects";
 
@@ -17,6 +18,7 @@ export default function Home() {
       <ProjectShowcase {...projects[1]} />
       <DesignShowcase />
       <ProjectShowcase {...projects[2]} />
+      <Footer />
     </main>
   );
 }
