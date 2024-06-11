@@ -7,7 +7,7 @@ import starIcon from "/public/img/icons/star-icon.png";
 export default function Hero() {
   return (
     <section id="home" className="relative z-20">
-      <div className="container flex min-h-screen pb-10 pt-32 lg:pt-56">
+      <div className="container flex min-h-screen pb-10 pt-40 lg:pt-56">
         <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
           <Image
             src={heroBg}
@@ -21,10 +21,10 @@ export default function Hero() {
           <div className="space-y-4">
             <div className="inline-block">
               <a
-                href="#"
+                href="https://github.com/omsimos"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-full border border-border px-6 py-2 text-base font-light text-zinc-500 sm:text-lg md:text-xl"
+                className="flex items-center gap-3 rounded-full border border-border px-4 py-1 text-base font-light text-zinc-500 sm:text-lg md:px-6 md:py-2 md:text-xl"
               >
                 <p>omsimos</p>
                 <Icons.arrowUpRight />
