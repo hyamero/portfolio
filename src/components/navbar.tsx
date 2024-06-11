@@ -5,14 +5,80 @@ import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
 const navItems = ["tools", "design", "contact"];
-
 const navProjects = ["omsimos", "umamin", "foliage"];
+
+const menuOpen: GSAPTimeline = gsap.timeline();
+const menuClose: GSAPTimeline = gsap.timeline();
+
+const openMenu = () => {
+  menuOpen
+    .to(".menu", {
+      clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
+      ease: "power2.easeInOut",
+      duration: 0.5,
+    })
+    .to(
+      "body",
+      {
+        overflowY: "hidden",
+      },
+      "<",
+    )
+    .fromTo(
+      ".menu-item, .menu-item-title",
+      {
+        y: -150,
+        opacity: 0,
+        skewX: -10,
+      },
+      {
+        y: 0,
+        opacity: 1,
+        skewX: 0,
+        duration: 0.4,
+        stagger: 0.1,
+        ease: "power4.out",
+      },
+      "-=0.1",
+    );
+};
+
+const closeMenu = () => {
+  menuClose
+    .fromTo(
+      ".menu-item, .menu-item-title",
+      {
+        y: 0,
+        opacity: 1,
+      },
+      {
+        opacity: 0,
+        y: -150,
+        duration: 0.4,
+        stagger: 0.1,
+        ease: "power4.out",
+      },
+    )
+    .to(
+      "body",
+      {
+        overflowY: "auto",
+      },
+      "<",
+    )
+    .to(
+      ".menu",
+      {
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
+        ease: "power2.easeInOut",
+        duration: 0.5,
+      },
+      "-=0.4",
+    );
+};
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-
-  const menuOpen: GSAPTimeline = gsap.timeline();
-  const menuClose: GSAPTimeline = gsap.timeline();
 
   const handleMenu = () => {
     setIsOpen(!isOpen);
@@ -24,73 +90,6 @@ export default function Navbar() {
     }
   };
 
-  const openMenu = () => {
-    menuOpen
-      .to(".menu", {
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-        ease: "power2.easeInOut",
-        duration: 0.5,
-      })
-      .to(
-        "body",
-        {
-          overflowY: "hidden",
-        },
-        "<",
-      )
-      .fromTo(
-        ".menu-item, .menu-item-title",
-        {
-          y: -150,
-          opacity: 0,
-          skewX: -10,
-        },
-        {
-          y: 0,
-          opacity: 1,
-          skewX: 0,
-          duration: 0.4,
-          stagger: 0.1,
-          ease: "power4.out",
-        },
-        "-=0.1",
-      );
-  };
-
-  const closeMenu = () => {
-    menuClose
-      .fromTo(
-        ".menu-item, .menu-item-title",
-        {
-          y: 0,
-          opacity: 1,
-        },
-        {
-          opacity: 0,
-          y: -150,
-          duration: 0.4,
-          stagger: 0.1,
-          ease: "power4.out",
-        },
-      )
-      .to(
-        "body",
-        {
-          overflowY: "auto",
-        },
-        "<",
-      )
-      .to(
-        ".menu",
-        {
-          clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-          ease: "power2.easeInOut",
-          duration: 0.5,
-        },
-        "-=0.4",
-      );
-  };
-
   const scrollTo = (scrollElement: string, offsetY: number) => {
     gsap.to(window, {
       duration: 1,
@@ -99,8 +98,32 @@ export default function Navbar() {
     });
   };
 
+  /**
+   * Close nav when clicked outside
+   */
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        divRef.current &&
+        !divRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+        closeMenu();
+        console.log("run this");
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
+
   return (
-    <>
+    <div ref={divRef}>
       <nav className="container fixed left-0 right-0 top-0 z-50 mx-auto mt-10 flex justify-between text-foreground mix-blend-difference">
         <button
           className="nav-item text-xl font-normal tracking-tighter"
@@ -137,18 +160,12 @@ export default function Navbar() {
       {/**
        * MENU COMPONENT
        */}
-      <Menu handleMenu={handleMenu} isOpen={isOpen} />
-    </>
+      <Menu handleMenu={handleMenu} />
+    </div>
   );
 }
 
-const Menu = ({
-  handleMenu,
-  isOpen,
-}: {
-  handleMenu: () => void;
-  isOpen: boolean;
-}) => {
+const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
   useEffect(() => {
     const menuItems = Array.from(document.querySelectorAll(".menu-item"));
     menuItems.forEach((item: any) => {
@@ -178,33 +195,8 @@ const Menu = ({
     });
   };
 
-  /**
-   * Close nav when clicked outside
-   */
-  const divRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen &&
-        divRef.current &&
-        !divRef.current.contains(event.target as Node)
-      ) {
-        handleMenu();
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen, handleMenu]);
-
   return (
-    <div
-      ref={divRef}
-      className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-35 text-secondary backdrop-blur-lg [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)] sm:h-[65vh]"
-    >
+    <div className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-35 text-secondary backdrop-blur-lg [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)] sm:h-[65vh]">
       <div className="flex flex-col gap-14 sm:flex-row sm:gap-28">
         <div className="flex flex-col items-start gap-3 md:gap-5">
           <button
