@@ -19,7 +19,7 @@ export const projects: Project[] = [
     company: "omsimos",
     description: "is a community driven open source developer collective",
     Subtitle: () => (
-      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground lg:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+      <h2 className="pointer-events-auto w-full  2xl:w-4/5 [&>span]:font-medium [&>span]:text-foreground">
         I specialize in crafting <span>high-quality</span> websites using{" "}
         <span>cutting-edge</span> technologies, seamlessly blending creative
         design with <span>top-tier</span> performance.
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     company: "umamin",
     description: "is an open-source platform for anonymous messages.",
     Subtitle: () => (
-      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+      <h2 className="pointer-events-auto w-full  2xl:w-4/5 [&>span]:font-medium [&>span]:text-foreground">
         Reached over <span>2.5 million unique users</span> and generated{" "}
         <span>14 million+ page visits</span>. Attained over 700K users in less
         than a week during the initial launch.
@@ -47,9 +47,10 @@ export const projects: Project[] = [
   },
   {
     company: "foliage",
-    description: "is an open-source platform for anonymous messages.",
+    description:
+      "is an experimental e-commerce website design for luxurious plants.",
     Subtitle: () => (
-      <h2 className="pointer-events-auto w-full text-[clamp(1.5rem,3.3vw,3rem)] leading-[1.1] tracking-tighter text-muted-foreground md:w-3/4 [&>span]:font-medium [&>span]:text-foreground">
+      <h2 className="pointer-events-auto w-full  2xl:w-4/5 [&>span]:font-medium [&>span]:text-foreground">
         Excels in crafting <span>clean</span> and{" "}
         <span>interactive websites</span>, seamlessly blending minimalist design
         with <span>modern technology</span> for exceptional user experiences.
