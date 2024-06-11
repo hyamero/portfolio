@@ -7,7 +7,7 @@ import starIcon from "/public/img/icons/star-icon.png";
 export default function Hero() {
   return (
     <section id="home" className="relative z-20">
-      <div className="container flex min-h-screen pb-10 pt-40 lg:pt-56">
+      <div className="container flex min-h-screen pb-10 pt-40 lg:pt-48">
         <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
           <Image
             src={heroBg}
