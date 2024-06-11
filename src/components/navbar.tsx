@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
@@ -137,12 +137,18 @@ export default function Navbar() {
       {/**
        * MENU COMPONENT
        */}
-      <Menu handleMenu={handleMenu} />
+      <Menu handleMenu={handleMenu} isOpen={isOpen} />
     </>
   );
 }
 
-const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
+const Menu = ({
+  handleMenu,
+  isOpen,
+}: {
+  handleMenu: () => void;
+  isOpen: boolean;
+}) => {
   useEffect(() => {
     const menuItems = Array.from(document.querySelectorAll(".menu-item"));
     menuItems.forEach((item: any) => {
@@ -172,8 +178,33 @@ const Menu = ({ handleMenu }: { handleMenu: () => void }) => {
     });
   };
 
+  /**
+   * Close nav when clicked outside
+   */
+  const divRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        divRef.current &&
+        !divRef.current.contains(event.target as Node)
+      ) {
+        handleMenu();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen, handleMenu]);
+
   return (
-    <div className="menu p-y-5 fixed left-0 top-0  z-30 grid min-h-[65vh] w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-35 text-secondary backdrop-blur-lg [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
+    <div
+      ref={divRef}
+      className="menu fixed left-0 top-0 z-30 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-35 text-secondary backdrop-blur-lg [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)] sm:h-[65vh]"
+    >
       <div className="flex flex-col gap-14 sm:flex-row sm:gap-28">
         <div className="flex flex-col items-start gap-3 md:gap-5">
           <button
