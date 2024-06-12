@@ -6,7 +6,8 @@ import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
 
 export default function ProjectShowcase({ ...props }: Project) {
-  const { Subtitle, image, description, company, year, role, techs } = props;
+  const { Subtitle, image, description, company, year, role, techs, url } =
+    props;
 
   return (
     <section
@@ -54,9 +55,16 @@ export default function ProjectShowcase({ ...props }: Project) {
                 </span>{" "}
                 {description}
               </p>
-              <Button className="flex gap-3 rounded-full px-7">
-                <span>Visit</span>
-                <Icons.arrowUpRight />
+              <Button asChild className=" rounded-full">
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-7"
+                >
+                  <span>Visit</span>
+                  <Icons.arrowUpRight />
+                </a>
               </Button>
             </div>
             <div className="hidden h-full border-t backdrop-blur-[1.5px] lg:block" />
