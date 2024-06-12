@@ -12,6 +12,7 @@ export type Project = {
   year: number;
   role: string;
   techs: string;
+  url: string;
 };
 
 const SubtitleWrapper = ({ children }: { children: React.ReactNode }) => (
@@ -35,6 +36,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
+    url: "https://omsimos.com",
   },
   {
     company: "umamin",
@@ -50,6 +52,7 @@ export const projects: Project[] = [
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
+    url: "https://umamin.link",
   },
   {
     company: "foliage",
@@ -66,5 +69,6 @@ export const projects: Project[] = [
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
+    url: "https://foliage.omsimos.com",
   },
 ];
