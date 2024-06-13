@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Icons } from "@/components/icons";
-import heroBg from "/public/img/main-bg.jpg";
+import gradientBlob from "/public/img/gradient-blob.jpg";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import starIcon from "/public/img/icons/star-icon.png";
 
@@ -8,15 +8,26 @@ export default function Hero() {
   return (
     <section id="home" className="relative z-20 border-b">
       <div className="container flex min-h-screen pb-10 pt-40 lg:pt-48">
-        <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
+        {/* <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
           <Image
             src={heroBg}
             alt="Main Background"
             className="h-full w-full object-cover object-center"
             priority
           />
-        </div>
+          </div> */}
+        <Image
+          src={gradientBlob}
+          alt="gradient blob"
+          className="absolute inset-0 -z-10 bg-[35%_top] bg-no-repeat object-cover sm:bg-[38%_top] md:bg-[40%_top] lg:bg-[44%_top] xl:bg-top forced-colors:hidden"
+          fill
+          priority
+        />
 
+        <div
+          className="absolute inset-0 -z-10 bg-top opacity-10 forced-colors:hidden"
+          style={{ backgroundImage: `url(/img/noise.png)` }}
+        />
         <div className="flex flex-col items-start gap-10 md:gap-14">
           <div className="space-y-4">
             <div className="inline-block">
