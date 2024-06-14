@@ -5,18 +5,16 @@ import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
-const menuOpen: GSAPTimeline = gsap.timeline();
-const menuClose: GSAPTimeline = gsap.timeline();
-
-gsap.registerPlugin(useGSAP);
-gsap.registerPlugin(ScrollToPlugin);
+gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
 const navProjects = ["omsimos", "umamin", "foliage"];
 const navItems = ["tools", "design", "contact"];
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  const tl = useRef<GSAPTimeline>();
+  const navRef = useRef<HTMLDivElement>(null);
 
+  const [isOpen, setIsOpen] = useState(false);
   const { contextSafe } = useGSAP();
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
@@ -29,44 +27,16 @@ export default function Navbar() {
     });
   });
 
-  /**
-   * Close nav when clicked outside
-   */
-  const navRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen &&
-        navRef.current &&
-        !navRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isOpen]);
-
   useGSAP(
     () => {
       if (isOpen) {
-        menuOpen
+        tl.current = gsap
+          .timeline()
           .to(".menu", {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
             ease: "power2.easeInOut",
             duration: 0.5,
           })
-          .to(
-            "body",
-            {
-              overflowY: "hidden",
-            },
-            "<",
-          )
           .fromTo(
             ".menu-item, .menu-item-title",
             {
@@ -85,41 +55,31 @@ export default function Navbar() {
             "-=0.1",
           );
       } else {
-        menuClose
-          .fromTo(
-            ".menu-item, .menu-item-title",
-            {
-              y: 0,
-              opacity: 1,
-            },
-            {
-              opacity: 0,
-              y: -150,
-              duration: 0.4,
-              stagger: 0.1,
-              ease: "power4.out",
-            },
-          )
-          .to(
-            "body",
-            {
-              overflowY: "auto",
-            },
-            "<",
-          )
-          .to(
-            ".menu",
-            {
-              clipPath: "polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)",
-              ease: "power2.easeInOut",
-              duration: 0.5,
-            },
-            "-=0.4",
-          );
+        tl.current?.reverse();
       }
     },
     { dependencies: [isOpen], scope: navRef },
   );
+
+  /**
+   * Close nav when clicked outside
+   */
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        navRef.current &&
+        !navRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
     <div ref={navRef}>
