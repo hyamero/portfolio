@@ -70,7 +70,13 @@ export function GridHighlight() {
   }, []);
 
   return (
-    <div className="gradient-to-b blocks-container point fixed left-0 top-0 h-screen w-screen overflow-hidden border-y from-black to-[#111111]">
+    <div className="gradient-to-b blocks-container point fixed left-0 top-0 h-screen w-screen overflow-hidden border-y ">
+      {/* Vignette Effect */}
+      <div className="pointer-events-none absolute  h-full w-screen shadow-[0_60px_300px_150px_rgba(0,0,0,0.9)_inset]" />
+
+      {/* White BG to config Vignette */}
+      {/* <div className="pointer-events-none absolute -z-10 h-full w-screen bg-white" /> */}
+
       <div
         id="blocks"
         className="flex h-screen w-[105vw] flex-wrap content-center justify-start overflow-hidden"
