@@ -72,7 +72,7 @@ export function GridHighlight() {
   return (
     <div className="gradient-to-b blocks-container point fixed left-0 top-0 h-screen w-screen overflow-hidden border-y ">
       {/* Vignette Effect */}
-      <div className="pointer-events-none absolute  h-full w-screen shadow-[0_60px_300px_150px_rgba(0,0,0,0.9)_inset]" />
+      <div className="pointer-events-none absolute  h-full w-screen shadow-[0_0_200px_rgba(0,0,0,0.9)_inset] md:shadow-[0_60px_200px_60px_rgba(0,0,0,0.9)_inset] 2xl:shadow-[0_60px_200px_150px_rgba(0,0,0,0.9)_inset]" />
 
       {/* White BG to config Vignette */}
       {/* <div className="pointer-events-none absolute -z-10 h-full w-screen bg-white" /> */}
