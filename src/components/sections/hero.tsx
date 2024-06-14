@@ -1,36 +1,35 @@
 import Image from "next/image";
 import { Icons } from "@/components/icons";
-import gradientBlob from "/public/img/gradient-blob.jpg";
-import globeIcon from "/public/img/icons/globe-icon.png";
+import heroBg from "/public/img/main-bg.jpg";
 import starIcon from "/public/img/icons/star-icon.png";
+import globeIcon from "/public/img/icons/globe-icon.png";
 
 export default function Hero() {
   return (
-    <section id="home" className="relative z-20 border-b">
-      <div className="container flex min-h-screen pb-10 pt-40 lg:pt-48">
-        {/* <div className="absolute left-0 top-0 z-[-1] h-full w-screen">
+    <section id="home" className="pointer-events-none relative border-b">
+      {/* BG Filter */}
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-black/25 mix-blend-overlay" />
+
+      <div className="container flex min-h-screen pt-40 lg:pt-48">
+        <div className="absolute left-0 top-0 -z-10 h-full w-screen">
           <Image
             src={heroBg}
             alt="Main Background"
-            className="h-full w-full object-cover object-center"
+            className="object-cover object-center"
             priority
+            fill
           />
-          </div> */}
-        <Image
-          src={gradientBlob}
-          alt="gradient blob"
-          className="absolute inset-0 -z-10 bg-[35%_top] bg-no-repeat object-cover sm:bg-[38%_top] md:bg-[40%_top] lg:bg-[44%_top] xl:bg-top forced-colors:hidden"
-          fill
-          priority
-        />
+        </div>
 
+        {/* BG Noise */}
         <div
-          className="absolute inset-0 -z-10 bg-top opacity-10 forced-colors:hidden"
+          className="absolute inset-0 -z-10 bg-top opacity-15 forced-colors:hidden"
           style={{ backgroundImage: `url(/img/noise.png)` }}
         />
-        <div className="flex flex-col items-start gap-10 md:gap-14">
-          <div className="space-y-4">
-            <div className="inline-block">
+
+        <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
+          <div className="pointer-events-auto space-y-4">
+            <div className="inline-block backdrop-blur-sm">
               <a
                 href="https://github.com/omsimos"
                 target="_blank"
@@ -46,7 +45,7 @@ export default function Hero() {
               Crafting ideas into <br /> digital experiences
             </h2>
           </div>
-          <div className="flex gap-3 md:gap-5">
+          <div className="pointer-events-auto flex gap-3 md:gap-5">
             <h1 className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl [&>span]:font-medium [&>span]:text-foreground">
               Joseph Dale Bañares is a <span>Software Engineer</span> and{" "}
               <span> Designer</span> based in the Philippines.
@@ -59,12 +58,12 @@ export default function Hero() {
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-20 md:w-1/3">
+          <div className="flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-sm md:w-1/3 md:pb-10">
             <a
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover-effect relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
+              className="hover-effect pointer-events-auto relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
             >
               <p>View Resume</p>
               <Icons.arrowUpRight />
