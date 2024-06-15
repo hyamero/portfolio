@@ -38,54 +38,59 @@ export function CommandMenu() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  type Commands = {
+    group: string;
+    items: {
+      Icon: React.FC<React.SVGProps<SVGSVGElement>>;
+      title: string;
+      action?: () => void;
+    }[];
+  };
+
+  const commands: Commands[] = [
+    {
+      group: "Sections",
+      items: [
+        { Icon: Home, title: "Home" },
+        { Icon: Laptop2, title: "Projects" },
+        { Icon: ContactRound, title: "Contact" },
+      ],
+    },
+    {
+      group: "Projects",
+      items: [
+        { Icon: Code2Icon, title: "Omsimos" },
+        { Icon: HeartHandshake, title: "Umamin" },
+        { Icon: Leaf, title: "Foliage" },
+      ],
+    },
+    {
+      group: "Links",
+      items: [
+        { Icon: Paperclip, title: "Resume" },
+        { Icon: Github, title: "GitHub" },
+        { Icon: Linkedin, title: "LinkedIn" },
+      ],
+    },
+  ];
+
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
       <CommandInput placeholder="Type a command or search..." />
       <CommandList data-lenis-prevent>
         <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup heading="Sections">
-          <CommandItem>
-            <Home className="mr-2 h-4 w-4" />
-            <span>Home</span>
-          </CommandItem>
-          <CommandItem>
-            <Laptop2 className="mr-2 h-4 w-4" />
-            <span>Projects</span>
-          </CommandItem>
-          <CommandItem>
-            <ContactRound className="mr-2 h-4 w-4" />
-            <span>Contact</span>
-          </CommandItem>
-        </CommandGroup>
-        <CommandSeparator />
-        <CommandGroup heading="Projects">
-          <CommandItem>
-            <Code2Icon className="mr-2 h-4 w-4" />
-            <span>Omsimos</span>
-          </CommandItem>
-          <CommandItem>
-            <HeartHandshake className="mr-2 h-4 w-4" />
-            <span>Umamin</span>
-          </CommandItem>
-          <CommandItem>
-            <Leaf className="mr-2 h-4 w-4" />
-            <span>Foliage</span>
-          </CommandItem>
-        </CommandGroup>
-        <CommandGroup heading="Links">
-          <CommandItem>
-            <Paperclip className="mr-2 h-4 w-4" />
-            <span>Resume</span>
-          </CommandItem>
-          <CommandItem>
-            <Github className="mr-2 h-4 w-4" />
-            <span>GitHub</span>
-          </CommandItem>
-          <CommandItem>
-            <Linkedin className="mr-2 h-4 w-4" />
-            <span>LinkedIn</span>
-          </CommandItem>
-        </CommandGroup>
+
+        {commands.map(({ group, items }) => (
+          <CommandGroup key={group} heading={group}>
+            {items.map(({ Icon, title, action }) => (
+              <CommandItem key={title} onClick={action}>
+                <Icon className="mr-2 size-4" />
+                <span>{title}</span>
+              </CommandItem>
+            ))}
+            <CommandSeparator />
+          </CommandGroup>
+        ))}
       </CommandList>
     </CommandDialog>
   );
