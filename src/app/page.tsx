@@ -1,16 +1,19 @@
+import { CommandMenu } from "@/components/command-menu";
 import { GridHighlight } from "@/components/grid-highlight";
+import { projects } from "@/lib/projects";
+
 import {
   Hero,
-  OSShowcase,
-  ProjectShowcase,
-  DesignShowcase,
   Footer,
+  OSShowcase,
+  DesignShowcase,
+  ProjectShowcase,
 } from "@/components/sections";
-import { projects } from "@/lib/projects";
 
 export default function Home() {
   return (
     <main>
+      <CommandMenu />
       <GridHighlight />
       <Hero />
       <ProjectShowcase {...projects[0]} />
