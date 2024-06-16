@@ -11,7 +11,7 @@ export default function Hero() {
       <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-black/25 mix-blend-overlay" />
 
       <div className="container flex min-h-screen pt-40 lg:pt-48">
-        <div className="absolute left-0 top-0 -z-10 h-full w-screen">
+        <div className="absolute left-0 top-0 -z-10 size-full">
           <Image
             src={heroBg}
             alt="Main Background"
