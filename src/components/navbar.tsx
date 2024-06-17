@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
+import { usePathname, useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 
@@ -11,6 +12,9 @@ const navProjects = ["omsimos", "umamin", "foliage"];
 const navItems = ["tools", "design", "contact"];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const { push } = useRouter();
+
   const tl = useRef<GSAPTimeline>();
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -96,7 +100,11 @@ export default function Navbar() {
         <button
           className="nav-item text-xl font-normal tracking-tighter"
           onClick={() => {
-            scrollTo("home", 0);
+            if (pathname !== "/") {
+              push("/");
+            } else {
+              scrollTo("home", 0);
+            }
           }}
         >
           hyamero.
