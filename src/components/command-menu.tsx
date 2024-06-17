@@ -1,14 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import {
   Home,
   Leaf,
   Github,
-  Laptop2,
   Linkedin,
-  Code2Icon,
-  Paperclip,
-  ContactRound,
+  SquareTerminal,
+  Newspaper,
   HeartHandshake,
 } from "lucide-react";
 
@@ -21,10 +21,68 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { usePathname, useRouter } from "next/navigation";
+import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
-import { useEffect, useState } from "react";
+gsap.registerPlugin(useGSAP, ScrollToPlugin);
+
+type Commands = {
+  group: string;
+  items: {
+    Icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    title: string;
+    action?: () => void;
+    url?: string;
+  }[];
+};
+
+const commands: Commands[] = [
+  {
+    group: "",
+    items: [{ Icon: Home, title: "home" }],
+  },
+  {
+    group: "Projects",
+    items: [
+      { Icon: SquareTerminal, title: "omsimos" },
+      { Icon: HeartHandshake, title: "umamin" },
+      { Icon: Leaf, title: "foliage" },
+    ],
+  },
+  {
+    group: "Contact",
+    items: [
+      { Icon: Newspaper, title: "Resume", url: "https://github.com/hyamero" },
+      { Icon: Github, title: "GitHub", url: "https://github.com/hyamero" },
+      {
+        Icon: Linkedin,
+        title: "LinkedIn",
+        url: "https://linkedin.com/in/daleban",
+      },
+    ],
+  },
+];
 
 export function CommandMenu() {
+  const pathname = usePathname();
+  const { push } = useRouter();
+
+  const { contextSafe } = useGSAP();
+
+  const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
+    if (pathname !== "/") {
+      push("/");
+    }
+
+    gsap.to(window, {
+      duration: 1,
+      scrollTo: { y: `#${scrollElement}`, offsetY },
+      ease: "power2.easeOut",
+    });
+  });
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -38,41 +96,15 @@ export function CommandMenu() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  type Commands = {
-    group: string;
-    items: {
-      Icon: React.FC<React.SVGProps<SVGSVGElement>>;
-      title: string;
-      action?: () => void;
-    }[];
-  };
+  const commandAction = (group: string, title: string) => {
+    group === ""
+      ? scrollTo(title, 0)
+      : group === "Projects"
+        ? push(`/project/${title}`)
+        : null;
 
-  const commands: Commands[] = [
-    {
-      group: "Sections",
-      items: [
-        { Icon: Home, title: "Home" },
-        { Icon: Laptop2, title: "Projects" },
-        { Icon: ContactRound, title: "Contact" },
-      ],
-    },
-    {
-      group: "Projects",
-      items: [
-        { Icon: Code2Icon, title: "Omsimos" },
-        { Icon: HeartHandshake, title: "Umamin" },
-        { Icon: Leaf, title: "Foliage" },
-      ],
-    },
-    {
-      group: "Links",
-      items: [
-        { Icon: Paperclip, title: "Resume" },
-        { Icon: Github, title: "GitHub" },
-        { Icon: Linkedin, title: "LinkedIn" },
-      ],
-    },
-  ];
+    setOpen(false);
+  };
 
   return (
     <CommandDialog open={open} onOpenChange={setOpen}>
@@ -83,9 +115,13 @@ export function CommandMenu() {
         {commands.map(({ group, items }) => (
           <CommandGroup key={group} heading={group}>
             {items.map(({ Icon, title, action }) => (
-              <CommandItem key={title} onClick={action}>
+              <CommandItem
+                onSelect={() => commandAction(group, title)}
+                key={title}
+                className="cursor-pointer"
+              >
                 <Icon className="mr-2 size-4" />
-                <span>{title}</span>
+                <span className="capitalize">{title}</span>
               </CommandItem>
             ))}
             <CommandSeparator />
