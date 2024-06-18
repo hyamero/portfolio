@@ -9,6 +9,7 @@ import { projects } from "@/lib/projects";
 import { Icons } from "@/components/icons";
 import { useParams } from "next/navigation";
 import { ProjectShowcase } from "@/components/sections";
+import { animatePageIn } from "@/components/animations/page-transition";
 
 gsap.registerPlugin(useGSAP);
 
@@ -18,35 +19,34 @@ export default function Project() {
 
   const tl = useRef<GSAPTimeline>();
 
-  useGSAP(
-    () => {
-      tl.current = gsap
-        .timeline()
-        .fromTo(
-          ".project-title",
-          {
-            opacity: 0,
-          },
-          {
-            opacity: 1,
-            duration: 1.5,
-            delay: 0.3,
-            ease: "power4.out",
-          },
-        )
-        .to(
-          ".bg-overlay",
-          {
-            opacity: 0,
-            duration: 1,
-            ease: "power4.out",
-            display: "none",
-          },
-          "<50%",
-        );
-    },
-    { scope: "#project-info" },
-  );
+  useGSAP(() => {
+    animatePageIn();
+
+    tl.current = gsap
+      .timeline()
+      .fromTo(
+        ".project-title",
+        {
+          opacity: 0,
+        },
+        {
+          opacity: 1,
+          duration: 1.5,
+          delay: 0.3,
+          ease: "power4.out",
+        },
+      )
+      .to(
+        ".bg-overlay",
+        {
+          opacity: 0,
+          duration: 1,
+          ease: "power4.out",
+          display: "none",
+        },
+        "<50%",
+      );
+  });
 
   if (!project) {
     return (
@@ -59,10 +59,7 @@ export default function Project() {
   }
 
   return (
-    <div
-      id="project-info"
-      className="pointer-events-none relative z-10 pt-64 lg:pb-0"
-    >
+    <div className="pointer-events-none relative z-10 pt-64 lg:pb-0">
       <h2 className="project-title pointer-events-auto relative z-30 text-center text-[clamp(1.7rem,7vw,6rem)] font-medium capitalize leading-[1.1] tracking-[-0.07em] opacity-0">
         Project {project.company}
       </h2>
