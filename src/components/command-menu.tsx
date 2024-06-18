@@ -103,11 +103,13 @@ export function CommandMenu() {
   }, []);
 
   const commandAction = (group: string, title: string) => {
-    group === ""
-      ? scrollTo(title, 0)
-      : group === "Projects"
-        ? animateOut(`/project/${title}`, router)
-        : null;
+    if (group === "") {
+      scrollTo(title, 0);
+    } else if (group === "Projects") {
+      if (title !== pathname.split("/")[2]) {
+        animateOut(`/project/${title}`, router);
+      }
+    } else return;
 
     setOpen(false);
   };
