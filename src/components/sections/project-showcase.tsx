@@ -5,6 +5,7 @@ import { Button } from "../ui/button";
 import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
 import { BorderBeam } from "../magicui/border-beam";
+import ShineBorder from "../magicui/shine-border";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const { Subtitle, image, description, company, year, role, techs, url } =
@@ -21,16 +22,18 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 backdrop-blur-sm md:p-4">
-            <Image
-              alt={`${company} Showcase`}
-              src={image}
-              className="w-full rounded-lg shadow-md"
-              placeholder="blur"
-              priority
-            />
-            <BorderBeam size={250} duration={12} delay={9} />
-          </div>
+          <ShineBorder color={["#15422c"]} className="backdrop-blur-sm">
+            <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
+              <Image
+                alt={`${company} Showcase`}
+                src={image}
+                className="w-full rounded-lg shadow-md"
+                placeholder="blur"
+                priority
+              />
+              <BorderBeam size={250} duration={12} delay={9} />
+            </div>
+          </ShineBorder>
         </div>
 
         <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b px-10 py-10 backdrop-blur-sm sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
