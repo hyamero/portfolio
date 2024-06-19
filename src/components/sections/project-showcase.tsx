@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 
 import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
+import { BorderBeam } from "../magicui/border-beam";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const { Subtitle, image, description, company, year, role, techs, url } =
@@ -28,6 +29,7 @@ export default function ProjectShowcase({ ...props }: Project) {
               placeholder="blur"
               priority
             />
+            <BorderBeam size={250} duration={12} delay={9} />
           </div>
         </div>
 
