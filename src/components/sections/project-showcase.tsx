@@ -8,8 +8,17 @@ import { BorderBeam } from "@/components/magicui/border-beam";
 import ShineBorder from "@/components/magicui/shine-border";
 
 export default function ProjectShowcase({ ...props }: Project) {
-  const { Subtitle, image, description, company, year, role, techs, url } =
-    props;
+  const {
+    Subtitle,
+    image,
+    description,
+    company,
+    year,
+    role,
+    techs,
+    url,
+    shineColor,
+  } = props;
 
   return (
     <section
@@ -23,7 +32,7 @@ export default function ProjectShowcase({ ...props }: Project) {
 
         <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
           <ShineBorder
-            color={["#15422c"]}
+            color={["#1e1e1e", shineColor[1]]}
             className="overflow-hidden backdrop-blur-sm"
           >
             <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
@@ -34,7 +43,13 @@ export default function ProjectShowcase({ ...props }: Project) {
                 placeholder="blur"
                 priority
               />
-              <BorderBeam size={250} duration={12} delay={9} />
+              <BorderBeam
+                colorFrom={shineColor[0]}
+                colorTo={shineColor[1]}
+                size={250}
+                duration={12}
+                delay={9}
+              />
             </div>
           </ShineBorder>
         </div>

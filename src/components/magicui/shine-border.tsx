@@ -2,12 +2,11 @@
 
 import { cn } from "@/lib/utils";
 
-type TColorProp = `#${string}` | `#${string}`[];
 interface ShineBorderProps {
   borderRadius?: number;
   borderWidth?: number;
   duration?: number;
-  color?: TColorProp;
+  color?: string[] | string;
   className?: string;
   children: React.ReactNode;
 }
