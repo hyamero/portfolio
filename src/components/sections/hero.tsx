@@ -3,6 +3,8 @@ import { Icons } from "@/components/icons";
 import heroBg from "/public/img/main-bg.jpg";
 import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
+import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
+import { ArrowUpRightIcon } from "lucide-react";
 
 export default function Hero() {
   return (
@@ -29,17 +31,17 @@ export default function Hero() {
 
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
           <div className="pointer-events-auto space-y-4">
-            <div className="inline-block backdrop-blur-sm">
-              <a
-                href="https://github.com/omsimos"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-full border border-border px-4 py-1 text-base font-light text-zinc-500 sm:text-lg md:px-6 md:py-2 md:text-xl"
-              >
-                <p>omsimos</p>
-                <Icons.arrowUpRight />
-              </a>
-            </div>
+            <a
+              href="https://github.com/omsimos"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-block rounded-full border border-white/5 bg-neutral-950 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-900"
+            >
+              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
+                <span>✨ Omsimos</span>
+                <ArrowUpRightIcon className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+              </AnimatedShinyText>
+            </a>
 
             <h2 className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]">
               Crafting ideas into <br /> digital experiences
