@@ -4,8 +4,8 @@ import { Button } from "../ui/button";
 
 import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
-import { BorderBeam } from "../magicui/border-beam";
-import ShineBorder from "../magicui/shine-border";
+import { BorderBeam } from "@/components/magicui/border-beam";
+import ShineBorder from "@/components/magicui/shine-border";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const { Subtitle, image, description, company, year, role, techs, url } =
@@ -22,7 +22,10 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <ShineBorder color={["#15422c"]} className="backdrop-blur-sm">
+          <ShineBorder
+            color={["#15422c"]}
+            className="overflow-hidden backdrop-blur-sm"
+          >
             <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
               <Image
                 alt={`${company} Showcase`}
