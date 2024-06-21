@@ -4,7 +4,6 @@ import "./globals.css";
 
 import { GridHighlight } from "@/components/grid-highlight";
 import { CommandMenu } from "@/components/command-menu";
-import SmoothScroll from "@/components/smooth-scroll";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/navbar";
 import { Footer } from "@/components/sections";
@@ -26,7 +25,7 @@ export default function RootLayout({
         <Navbar />
         <CommandMenu />
         <GridHighlight />
-        <SmoothScroll>{children}</SmoothScroll>
+        {children}
         <Footer />
         <Toaster />
       </body>
