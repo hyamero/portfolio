@@ -1,11 +1,11 @@
 import Image from "next/image";
-import { Icons } from "../icons";
 import { Button } from "../ui/button";
 
 import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
 import { BorderBeam } from "@/components/magicui/border-beam";
 import ShineBorder from "@/components/magicui/shine-border";
+import { ArrowUpRight } from "lucide-react";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const {
@@ -86,7 +86,7 @@ export default function ProjectShowcase({ ...props }: Project) {
                   className="flex items-center gap-3 px-7"
                 >
                   <span>Visit</span>
-                  <Icons.arrowUpRight />
+                  <ArrowUpRight className="stroke-1" />
                 </a>
               </Button>
             </div>

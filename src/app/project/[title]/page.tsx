@@ -6,10 +6,10 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 
 import { projects } from "@/lib/projects";
-import { Icons } from "@/components/icons";
 import { useParams } from "next/navigation";
 import { ProjectShowcase } from "@/components/sections";
 import { animatePageIn } from "@/components/animations/page-transition";
+import { ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(useGSAP);
 
@@ -71,10 +71,10 @@ export default function Project() {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover-effect pointer-events-auto flex items-center justify-center gap-5 rounded-full px-2 pb-2 text-base text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground md:text-lg"
+          className="hover-effect pointer-events-auto flex items-center justify-center gap-3 rounded-full px-2 pb-2 text-base text-muted-foreground backdrop-blur-sm transition-colors hover:text-foreground md:text-lg"
         >
           <p>Return Home</p>
-          <Icons.arrowUpRight />
+          <ArrowUpRight />
         </Link>
       </div>
     </div>
