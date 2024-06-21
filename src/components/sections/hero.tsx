@@ -1,10 +1,9 @@
 import Image from "next/image";
-import { Icons } from "@/components/icons";
 import heroBg from "/public/img/main-bg.jpg";
 import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
-import { ArrowUpRightIcon } from "lucide-react";
+import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import Particles from "../magicui/particles";
 
 export default function Hero() {
@@ -77,7 +76,7 @@ export default function Hero() {
               className="hover-effect pointer-events-auto relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
             >
               <p>View Resume</p>
-              <Icons.arrowUpRight />
+              <ArrowUpRight className="stroke-1" />
             </a>
 
             <Image
