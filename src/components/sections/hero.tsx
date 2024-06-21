@@ -5,6 +5,7 @@ import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
 import { ArrowUpRightIcon } from "lucide-react";
+import Particles from "../magicui/particles";
 
 export default function Hero() {
   return (
@@ -27,6 +28,14 @@ export default function Hero() {
         <div
           className="absolute inset-0 -z-10 bg-top opacity-15 forced-colors:hidden"
           style={{ backgroundImage: `url(/img/noise.png)` }}
+        />
+
+        <Particles
+          className="absolute inset-0"
+          quantity={75}
+          ease={80}
+          color="#888888"
+          refresh
         />
 
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
