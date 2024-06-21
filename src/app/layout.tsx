@@ -1,12 +1,11 @@
+import "./globals.css";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
-import "./globals.css";
 
-import { GridHighlight } from "@/components/grid-highlight";
-import { CommandMenu } from "@/components/command-menu";
-import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/navbar";
 import { Footer } from "@/components/sections";
+import { Toaster } from "@/components/ui/sonner";
+import { CommandMenu } from "@/components/command-menu";
 
 export const metadata: Metadata = {
   title: "Dale Bañares — Software Engineer and Designer",
@@ -24,7 +23,6 @@ export default function RootLayout({
       <body className={GeistSans.className}>
         <Navbar />
         <CommandMenu />
-        <GridHighlight />
         {children}
         <Footer />
         <Toaster />
