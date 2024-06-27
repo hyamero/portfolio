@@ -45,9 +45,7 @@ const features = [
     href: "/",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
-    background: (
-      <div className="size-full">{/* <IconCloud iconSlugs={slugs} /> */}</div>
-    ),
+    background: <div className="size-full"> </div>,
   },
   {
     Icon: BotMessageSquare,

@@ -25,7 +25,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePathname, useRouter } from "next/navigation";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-import { animatePageOut } from "./animations/page-transition";
+import { animatePageOut as _animatePageOut } from "./animations/page-transition";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
@@ -73,13 +73,15 @@ export function CommandMenu() {
 
   const { contextSafe } = useGSAP();
 
-  const animateOut = contextSafe((href: string, router: AppRouterInstance) => {
-    animatePageOut(href, router);
-  });
+  const animatePageOut = contextSafe(
+    (href: string, router: AppRouterInstance) => {
+      _animatePageOut(href, router);
+    },
+  );
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (pathname !== "/") {
-      animateOut("/", router);
+      animatePageOut("/", router);
     }
 
     gsap.to(window, {
@@ -107,7 +109,7 @@ export function CommandMenu() {
       scrollTo(title, 0);
     } else if (group === "Projects") {
       if (title !== pathname.split("/")[2]) {
-        animateOut(`/project/${title}`, router);
+        animatePageOut(`/project/${title}`, router);
       }
     } else return;
 
