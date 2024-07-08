@@ -25,8 +25,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePathname, useRouter } from "next/navigation";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-import { animatePageOut } from "./animations/page-transition";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import PageTransition from "./animations/page-transition";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
@@ -42,7 +41,7 @@ type Commands = {
 
 const commands: Commands[] = [
   {
-    group: "",
+    group: "home",
     items: [{ Icon: Home, title: "home" }],
   },
   {
@@ -73,13 +72,11 @@ export function CommandMenu() {
 
   const { contextSafe } = useGSAP();
 
-  const animateOut = contextSafe((href: string, router: AppRouterInstance) => {
-    animatePageOut(href, router);
-  });
+  const { animatePageOut } = PageTransition();
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (pathname !== "/") {
-      animateOut("/", router);
+      animatePageOut("/");
     }
 
     gsap.to(window, {
@@ -103,11 +100,11 @@ export function CommandMenu() {
   }, []);
 
   const commandAction = (group: string, title: string) => {
-    if (group === "") {
+    if (group === "home") {
       scrollTo(title, 0);
     } else if (group === "Projects") {
       if (title !== pathname.split("/")[2]) {
-        animateOut(`/project/${title}`, router);
+        animatePageOut(`/project/${title}`);
       }
     } else return;
 
@@ -121,7 +118,7 @@ export function CommandMenu() {
         <CommandEmpty>No results found.</CommandEmpty>
 
         {commands.map(({ group, items }) => (
-          <CommandGroup key={group} heading={group}>
+          <CommandGroup key={group} heading={group === "home" ? "" : group}>
             {items.map(({ Icon, title, action }) => (
               <CommandItem
                 onSelect={() => commandAction(group, title)}

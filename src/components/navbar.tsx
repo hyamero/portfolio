@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { animatePageOut } from "./animations/page-transition";
+import PageTransition from "./animations/page-transition";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
@@ -23,9 +23,7 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { contextSafe } = useGSAP();
 
-  const animateOut = contextSafe((href: string, router: AppRouterInstance) => {
-    animatePageOut(href, router);
-  });
+  const { animatePageOut } = PageTransition();
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     setIsOpen(false);
@@ -107,7 +105,7 @@ export default function Navbar() {
           className="nav-item text-xl font-normal tracking-tighter"
           onClick={() => {
             if (pathname !== "/") {
-              animateOut("/", router);
+              animatePageOut("/");
             } else {
               scrollTo("home", 0);
             }
