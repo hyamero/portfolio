@@ -3,7 +3,6 @@ import { Button } from "../ui/button";
 
 import atomIcon from "/public/img/icons/atom-icon.png";
 import { type Project } from "@/lib/projects";
-import { BorderBeam } from "@/components/magicui/border-beam";
 import ShineBorder from "@/components/magicui/shine-border";
 import { ArrowUpRight } from "lucide-react";
 
@@ -42,13 +41,6 @@ export default function ProjectShowcase({ ...props }: Project) {
                 className="w-full rounded-lg shadow-md"
                 placeholder="blur"
                 priority
-              />
-              <BorderBeam
-                colorFrom={shineColor[0]}
-                colorTo={shineColor[1]}
-                size={250}
-                duration={12}
-                delay={9}
               />
             </div>
           </ShineBorder>
