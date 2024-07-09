@@ -1,11 +1,10 @@
 "use client";
 
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-import { usePathname, useRouter } from "next/navigation";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import PageTransition from "./animations/page-transition";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
@@ -15,14 +14,11 @@ const navItems = ["tools", "design", "contact"];
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const tl = useRef<GSAPTimeline>();
-  const navRef = useRef<HTMLDivElement>(null);
-
-  const [isOpen, setIsOpen] = useState(false);
   const { contextSafe } = useGSAP();
-
+  const navRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
   const { animatePageOut } = PageTransition();
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
@@ -33,6 +29,16 @@ export default function Navbar() {
       scrollTo: { y: `#${scrollElement}`, offsetY },
       ease: "power2.easeOut",
     });
+  });
+
+  const toggleNav = contextSafe(() => {
+    if (!isOpen) {
+      setIsOpen(true);
+    } else {
+      tl.current?.reverse().eventCallback("onReverseComplete", () => {
+        setIsOpen(false);
+      });
+    }
   });
 
   useGSAP(
@@ -62,9 +68,7 @@ export default function Navbar() {
             },
             "-=0.1",
           );
-      } else {
-        tl.current?.reverse();
-      }
+      } else return;
     },
     { dependencies: [isOpen], scope: navRef },
   );
@@ -117,7 +121,7 @@ export default function Navbar() {
         <button
           type="button"
           className="nav-item menu-burger group flex w-8 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:w-full [&>span]:transform [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => toggleNav()}
         >
           <span
             className={`${
@@ -138,7 +142,7 @@ export default function Navbar() {
       {/**
        * MENU COMPONENT
        */}
-      <Menu scrollTo={scrollTo} />
+      {isOpen && <Menu scrollTo={scrollTo} />}
     </div>
   );
 }
