@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/command";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 import PageTransition from "./animations/page-transition";
 
@@ -68,15 +68,12 @@ const commands: Commands[] = [
 
 export function CommandMenu() {
   const pathname = usePathname();
-  const router = useRouter();
-
   const { contextSafe } = useGSAP();
-
   const { animatePageOut } = PageTransition();
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (pathname !== "/") {
-      animatePageOut("/");
+      return animatePageOut("/");
     }
 
     gsap.to(window, {
