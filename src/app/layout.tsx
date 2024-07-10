@@ -7,7 +7,7 @@ import { Footer } from "@/components/sections";
 import { Toaster } from "@/components/ui/sonner";
 import { CommandMenu } from "@/components/command-menu";
 import GridPattern from "@/components/magicui/grid-pattern";
-import Loader from "@/components/loader";
+import TransitionLoader from "@/components/transition-loader";
 
 export const metadata: Metadata = {
   title: "Dale Bañares — Software Engineer and Designer",
@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={GeistSans.className}>
-        <Loader />
+        <TransitionLoader />
         <Navbar />
 
         <GridPattern className="[mask-image:radial-gradient(ellipse_at_center,white,transparent_80%)]" />
