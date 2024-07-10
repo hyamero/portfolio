@@ -8,7 +8,6 @@ import { useGSAP } from "@gsap/react";
 import { projects } from "@/lib/projects";
 import { useParams } from "next/navigation";
 import { ProjectShowcase } from "@/components/sections";
-import { animatePageIn } from "@/components/animations/page-transition";
 import { ArrowUpRight } from "lucide-react";
 
 gsap.registerPlugin(useGSAP);
@@ -20,8 +19,6 @@ export default function Project() {
   const tl = useRef<GSAPTimeline>();
 
   useGSAP(() => {
-    animatePageIn();
-
     tl.current = gsap
       .timeline()
       .fromTo(

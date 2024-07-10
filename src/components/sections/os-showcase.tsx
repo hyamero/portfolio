@@ -34,9 +34,7 @@ const features = [
     className: "col-span-3 lg:col-span-1",
     href: "/",
     cta: "Learn more",
-    background: (
-      <div className="size-full">{/* <IconCloud iconSlugs={slugs} /> */}</div>
-    ),
+    background: <div className="size-full"></div>,
   },
   {
     Icon: Github,
@@ -45,7 +43,7 @@ const features = [
     href: "/",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
-    background: <div className="size-full"> </div>,
+    background: <div className="size-full"></div>,
   },
   {
     Icon: BotMessageSquare,
@@ -54,9 +52,7 @@ const features = [
     href: "/",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-2",
-    background: (
-      <div className="size-full">{/* <IconCloud iconSlugs={slugs} /> */}</div>
-    ),
+    background: <div className="size-full"></div>,
   },
   {
     className: "col-span-3 lg:col-span-1",

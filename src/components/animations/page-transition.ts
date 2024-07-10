@@ -1,39 +1,21 @@
 "use client";
 
 import gsap from "gsap";
-import { type AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { useGSAP } from "@gsap/react";
+import { useUnmountStore } from "@/lib/unmount-store";
 
-export const animatePageIn = () => {
-  const tl = gsap.timeline();
+gsap.registerPlugin(useGSAP);
 
-  tl.set("body", {
-    overflowY: "hidden",
-  })
-    .set(".banner div", {
-      yPercent: 0,
-    })
-    .to(".banner div", {
-      yPercent: 100,
-      stagger: 0.2,
-      ease: "power2.inOut",
-      delay: 0.5,
-    })
-    .to("body", {
-      overflowY: "auto",
-    });
-};
+export default function PageTransition() {
+  // const setUnmount = useUnmountStore((state) => state.setUnmount);
+  const setPageOut = useUnmountStore((state) => state.setPageOut);
+  const setHref = useUnmountStore((state) => state.setHref);
 
-export const animatePageOut = (href: string, router: AppRouterInstance) => {
-  const tl = gsap.timeline();
+  const animatePageOut = (href: string) => {
+    setHref(href);
+    // setUnmount(false);
+    setPageOut(true);
+  };
 
-  tl.set(".banner div", {
-    yPercent: -100,
-  }).to(".banner div", {
-    yPercent: 0,
-    stagger: 0.2,
-    ease: "power2.inOut",
-    onComplete: () => {
-      router.push(href);
-    },
-  });
-};
+  return { animatePageOut };
+}
