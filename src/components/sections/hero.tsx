@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import heroBg from "/public/img/main-bg.jpg";
 import starIcon from "/public/img/icons/star-icon.png";
@@ -5,8 +7,38 @@ import globeIcon from "/public/img/icons/globe-icon.png";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import Particles from "../magicui/particles";
+// import Loader from "../loader";
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { useUnmountStore } from "@/lib/unmount-store";
+
+const topText = "Crafting ideas into";
+const bottomText = "digital experiences";
+
+const heroText = [topText.split(" "), bottomText.split(" ")];
 
 export default function Hero() {
+  const tl = useRef<GSAPTimeline>();
+  const setPageOut = useUnmountStore((state) => state.setPageOut);
+
+  useGSAP(() => {
+    tl.current = gsap
+      .timeline()
+      .set("body", { overflow: "hidden" })
+      .to(".banner div", {
+        yPercent: 100,
+        stagger: 0.2,
+        ease: "power2.inOut",
+        onComplete: () => {
+          setPageOut(false);
+        },
+      })
+      .to("body", {
+        overflow: "auto",
+      });
+  });
+
   return (
     <section id="home" className="pointer-events-none relative border-b">
       {/* BG Filter */}
@@ -51,8 +83,20 @@ export default function Hero() {
               </AnimatedShinyText>
             </a>
 
-            <h2 className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]">
-              Crafting ideas into <br /> digital experiences
+            <h2
+              id="hero-text"
+              className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]"
+            >
+              <div className="flex gap-2 sm:gap-4">
+                {heroText[0].map((text) => (
+                  <span key={text}>{text}</span>
+                ))}
+              </div>
+              <div className="flex gap-2 sm:gap-4">
+                {heroText[1].map((text) => (
+                  <span key={text}>{text}</span>
+                ))}
+              </div>
             </h2>
           </div>
           <div className="pointer-events-auto flex gap-3 md:gap-5">

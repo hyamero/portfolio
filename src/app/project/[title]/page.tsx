@@ -9,6 +9,7 @@ import { projects } from "@/lib/projects";
 import { useParams } from "next/navigation";
 import { ProjectShowcase } from "@/components/sections";
 import { ArrowUpRight } from "lucide-react";
+import { useUnmountStore } from "@/lib/unmount-store";
 
 gsap.registerPlugin(useGSAP);
 
@@ -17,10 +18,20 @@ export default function Project() {
   const project = projects.find((project) => project.company === params.title);
 
   const tl = useRef<GSAPTimeline>();
+  const setPageOut = useUnmountStore((state) => state.setPageOut);
 
   useGSAP(() => {
     tl.current = gsap
       .timeline()
+      .set("body", { overflow: "hidden" })
+      .to(".banner div", {
+        yPercent: 100,
+        stagger: 0.2,
+        ease: "power2.inOut",
+        onComplete: () => {
+          setPageOut(false);
+        },
+      })
       .fromTo(
         ".project-title",
         {
