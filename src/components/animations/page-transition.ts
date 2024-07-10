@@ -7,13 +7,11 @@ import { useUnmountStore } from "@/lib/unmount-store";
 gsap.registerPlugin(useGSAP);
 
 export default function PageTransition() {
-  // const setUnmount = useUnmountStore((state) => state.setUnmount);
-  const setPageOut = useUnmountStore((state) => state.setPageOut);
   const setHref = useUnmountStore((state) => state.setHref);
+  const setPageOut = useUnmountStore((state) => state.setPageOut);
 
   const animatePageOut = (href: string) => {
     setHref(href);
-    // setUnmount(false);
     setPageOut(true);
   };
 
