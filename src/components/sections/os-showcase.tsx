@@ -57,8 +57,10 @@ const features = [
   {
     className: "col-span-3 lg:col-span-1",
     background: (
-      <div className="absolute -top-5 grid size-full place-items-center px-10">
-        <IconCloud iconSlugs={slugs} />
+      <div className="absolute grid size-full place-items-center bg-slate-600/10 px-10">
+        <div className="relative bottom-5">
+          <IconCloud iconSlugs={slugs} />
+        </div>
       </div>
     ),
   },

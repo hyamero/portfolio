@@ -34,6 +34,35 @@ export default function Hero() {
           setPageOut(false);
         },
       })
+      .fromTo(
+        "#hero-text div span",
+        {
+          opacity: 0,
+          filter: "blur(8px)",
+        },
+        {
+          opacity: 100,
+          duration: 2,
+          ease: "power4.inOut",
+          stagger: 0.1,
+          filter: "blur(0px)",
+        },
+        "<20%",
+      )
+      .fromTo(
+        ".blur-item",
+        {
+          opacity: 0,
+          filter: "blur(8px)",
+        },
+        {
+          opacity: 100,
+          ease: "power4.inOut",
+          stagger: 0.3,
+          filter: "blur(0px)",
+        },
+        "<20%",
+      )
       .to("body", {
         overflow: "auto",
       });
@@ -75,7 +104,7 @@ export default function Hero() {
               href="https://github.com/omsimos"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-block rounded-full border border-white/5 bg-neutral-950 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-900"
+              className="blur-item group inline-block rounded-full border border-white/5 bg-neutral-950 text-white opacity-0 transition-all ease-in hover:cursor-pointer hover:bg-neutral-900"
             >
               <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
                 <span>✨ Omsimos</span>
@@ -99,7 +128,7 @@ export default function Hero() {
               </div>
             </h2>
           </div>
-          <div className="pointer-events-auto flex gap-3 md:gap-5">
+          <div className="blur-item pointer-events-auto flex gap-3 md:gap-5">
             <h1 className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl [&>span]:font-medium [&>span]:text-foreground">
               Joseph Dale Bañares is a <span>Software Engineer</span> and{" "}
               <span> Designer</span> based in the Philippines.
@@ -112,7 +141,7 @@ export default function Hero() {
             />
           </div>
 
-          <div className="flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-sm md:w-1/3 md:pb-10">
+          <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-sm md:w-1/3 md:pb-10">
             <a
               href="#"
               target="_blank"
