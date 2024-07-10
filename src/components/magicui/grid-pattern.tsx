@@ -2,7 +2,7 @@
 
 import gsap from "gsap";
 import { cn } from "@/lib/utils";
-import { useId } from "react";
+import { useId, useRef } from "react";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(useGSAP);
@@ -56,21 +56,6 @@ export function GridPattern({
         </pattern>
       </defs>
       <rect width="100%" height="100%" strokeWidth={0} fill={`url(#${id})`} />
-      {squares && (
-        <svg x={x} y={y} className="overflow-visible">
-          {squares.map(([x, y]) => (
-            <rect
-              className="rect-item opacity-0"
-              strokeWidth="0"
-              key={`${x}-${y}`}
-              width={width - 1}
-              height={height - 1}
-              x={x * width + 1}
-              y={y * height + 1}
-            />
-          ))}
-        </svg>
-      )}
     </svg>
   );
 }
