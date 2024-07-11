@@ -1,22 +1,28 @@
 "use client";
 
+import gsap from "gsap";
 import Image from "next/image";
+import React, { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+
 import heroBg from "/public/img/main-bg.jpg";
+import Particles from "../magicui/particles";
+import { useUnmountStore } from "@/lib/unmount-store";
 import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
-import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
-import Particles from "../magicui/particles";
-// import Loader from "../loader";
-import { useRef } from "react";
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { useUnmountStore } from "@/lib/unmount-store";
+import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
 
-const topText = "Crafting ideas into";
-const bottomText = "digital experiences";
+const _heroText = {
+  top: "Crafting ideas into",
+  bottom: "digital experiences",
+};
 
-const heroText = [topText.split(" "), bottomText.split(" ")];
+const _descriptionText =
+  "Joseph Dale Bañares is a Software Engineer and Designer based in the Philippines.";
+
+const heroText = [_heroText.top.split(" "), _heroText.bottom.split(" ")];
+const descriptionText = _descriptionText.split(" ");
 
 export default function Hero() {
   const tl = useRef<GSAPTimeline>();
@@ -34,6 +40,7 @@ export default function Hero() {
           setPageOut(false);
         },
       })
+
       .fromTo(
         "#hero-text div span",
         {
@@ -50,6 +57,21 @@ export default function Hero() {
         "<20%",
       )
       .fromTo(
+        "#description span",
+        {
+          opacity: 0,
+          filter: "blur(5px)",
+        },
+        {
+          opacity: 100,
+          duration: 2,
+          ease: "power4.inOut",
+          stagger: 0.05,
+          filter: "blur(0px)",
+        },
+        "<",
+      )
+      .fromTo(
         ".blur-item",
         {
           opacity: 0,
@@ -61,11 +83,15 @@ export default function Hero() {
           stagger: 0.3,
           filter: "blur(0px)",
         },
-        "<20%",
+        "<25%",
       )
-      .to("body", {
-        overflow: "auto",
-      });
+      .to(
+        "body",
+        {
+          overflow: "auto",
+        },
+        "<50%",
+      );
   });
 
   return (
@@ -128,16 +154,26 @@ export default function Hero() {
               </div>
             </h2>
           </div>
-          <div className="blur-item pointer-events-auto flex gap-3 md:gap-5">
-            <h1 className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl [&>span]:font-medium [&>span]:text-foreground">
-              Joseph Dale Bañares is a <span>Software Engineer</span> and{" "}
-              <span> Designer</span> based in the Philippines.
+          <div className="pointer-events-auto flex gap-3 md:gap-5">
+            <h1
+              id="description"
+              className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl"
+            >
+              {descriptionText.map((text, i) => (
+                <React.Fragment key={text + i}>
+                  {["Software", "Engineer", "Designer"].includes(text) ? (
+                    <span className="font-medium text-foreground">{text} </span>
+                  ) : (
+                    <span>{text} </span>
+                  )}
+                </React.Fragment>
+              ))}
             </h1>
 
             <Image
               alt="Star Icon"
               src={starIcon}
-              className="relative bottom-3 hidden h-24 w-24 sm:block"
+              className="blur-item relative bottom-3 hidden h-24 w-24 sm:block"
             />
           </div>
 
