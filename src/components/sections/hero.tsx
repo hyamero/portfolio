@@ -1,13 +1,8 @@
-"use client";
-
-import gsap from "gsap";
+import React from "react";
 import Image from "next/image";
-import React, { useRef } from "react";
-import { useGSAP } from "@gsap/react";
 
 import heroBg from "/public/img/main-bg.jpg";
 import Particles from "../magicui/particles";
-import { useUnmountStore } from "@/lib/unmount-store";
 import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
@@ -25,75 +20,6 @@ const heroText = [_heroText.top.split(" "), _heroText.bottom.split(" ")];
 const descriptionText = _descriptionText.split(" ");
 
 export default function Hero() {
-  const tl = useRef<GSAPTimeline>();
-  const setPageOut = useUnmountStore((state) => state.setPageOut);
-
-  useGSAP(() => {
-    tl.current = gsap
-      .timeline()
-      .set("body", { overflow: "hidden" })
-      .to(".banner div", {
-        yPercent: 100,
-        stagger: 0.2,
-        ease: "power2.inOut",
-        onComplete: () => {
-          setPageOut(false);
-        },
-      })
-
-      .fromTo(
-        "#hero-text div span",
-        {
-          opacity: 0,
-          filter: "blur(8px)",
-        },
-        {
-          opacity: 100,
-          duration: 2,
-          ease: "power4.inOut",
-          stagger: 0.1,
-          filter: "blur(0px)",
-        },
-        "<20%",
-      )
-      .fromTo(
-        "#description span",
-        {
-          opacity: 0,
-          filter: "blur(5px)",
-        },
-        {
-          opacity: 100,
-          duration: 2,
-          ease: "power4.inOut",
-          stagger: 0.05,
-          filter: "blur(0px)",
-        },
-        "<",
-      )
-      .fromTo(
-        ".blur-item",
-        {
-          opacity: 0,
-          filter: "blur(8px)",
-        },
-        {
-          opacity: 100,
-          ease: "power4.inOut",
-          stagger: 0.3,
-          filter: "blur(0px)",
-        },
-        "<25%",
-      )
-      .to(
-        "body",
-        {
-          overflow: "auto",
-        },
-        "<50%",
-      );
-  });
-
   return (
     <section id="home" className="relative border-b">
       {/* BG Filter */}
