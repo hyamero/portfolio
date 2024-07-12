@@ -95,7 +95,7 @@ export default function Hero() {
   });
 
   return (
-    <section id="home" className="pointer-events-none relative border-b">
+    <section id="home" className="relative border-b">
       {/* BG Filter */}
       <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-black/25 mix-blend-overlay" />
 
@@ -125,7 +125,7 @@ export default function Hero() {
         />
 
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
-          <div className="pointer-events-auto space-y-4">
+          <div className="space-y-4">
             <a
               href="https://github.com/omsimos"
               target="_blank"
@@ -154,7 +154,7 @@ export default function Hero() {
               </div>
             </h2>
           </div>
-          <div className="pointer-events-auto flex gap-3 md:gap-5">
+          <div className="flex gap-3 md:gap-5">
             <h1
               id="description"
               className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl"
@@ -182,7 +182,7 @@ export default function Hero() {
               href="#"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover-effect pointer-events-auto relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
+              className="hover-effect relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
             >
               <p>View Resume</p>
               <ArrowUpRight className="stroke-1" />

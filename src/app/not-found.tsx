@@ -10,8 +10,6 @@ export default function NotFound() {
 
       <Link
         href="/"
-        target="_blank"
-        rel="noopener noreferrer"
         className="hover-effect relative flex items-center justify-between gap-3 border-b border-border px-2 pb-2 text-base font-medium text-muted-foreground transition-colors hover:text-foreground md:text-lg"
       >
         <p>Return Home</p>
