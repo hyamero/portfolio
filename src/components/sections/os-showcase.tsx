@@ -70,14 +70,14 @@ export default function OSShowcase() {
   return (
     <section
       id="tools"
-      className="container pointer-events-none relative z-10 mx-auto grid min-h-screen place-items-center gap-40 py-72 lg:w-3/4"
+      className="container relative z-10 mx-auto grid min-h-screen place-items-center gap-40 py-72 lg:w-3/4"
     >
       <h2 className="mx-auto text-center text-[clamp(1.7rem,7vw,6rem)] font-medium leading-[1.1] tracking-[-0.07em]">
         Building tools for the <br />
         open-source community
       </h2>
 
-      <BentoGrid className="pointer-events-auto">
+      <BentoGrid>
         {features.map((feature, idx) => (
           <BentoCard key={idx} {...feature} />
         ))}

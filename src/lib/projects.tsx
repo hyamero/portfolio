@@ -1,11 +1,10 @@
-import React from "react";
 import { type StaticImageData } from "next/image";
 import omsThumb from "/public/img/projects/omsimos.jpg";
 import umaminThumb from "/public/img/projects/umamin.jpg";
 import foliageThumb from "/public/img/projects/foliage.jpg";
 
 export type Project = {
-  Subtitle: () => React.JSX.Element;
+  subtitle: string;
   image: StaticImageData;
   description: string;
   company: string;
@@ -16,23 +15,12 @@ export type Project = {
   shineColor: string[];
 };
 
-const SubtitleWrapper = ({ children }: { children: React.ReactNode }) => (
-  <h2 className="pointer-events-auto w-full  2xl:w-4/5 [&>span]:font-medium [&>span]:text-foreground">
-    {children}
-  </h2>
-);
-
 export const projects: Project[] = [
   {
     company: "omsimos",
     description: "is a community driven open source developer collective",
-    Subtitle: () => (
-      <SubtitleWrapper>
-        I specialize in crafting <span>high-quality</span> websites using{" "}
-        <span>cutting-edge</span> technologies, seamlessly blending creative
-        design with <span>top-tier</span> performance.
-      </SubtitleWrapper>
-    ),
+    subtitle:
+      "I specialize in crafting high-quality websites using cutting-edge technologies, seamlessly blending creative design with top-tier performance.",
     image: omsThumb,
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
@@ -43,13 +31,8 @@ export const projects: Project[] = [
   {
     company: "umamin",
     description: "is an open-source platform for anonymous messages.",
-    Subtitle: () => (
-      <SubtitleWrapper>
-        Reached over <span>2.5 million unique users</span> and generated{" "}
-        <span>14 million+ page visits</span>. Attained over 700K users in less
-        than a week during the initial launch.
-      </SubtitleWrapper>
-    ),
+    subtitle:
+      "Reached over 2.5 million unique users and generated 14 million+ page visits. Attained 700K users in less than a week during the initial launch.",
     image: umaminThumb,
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
@@ -61,13 +44,8 @@ export const projects: Project[] = [
     company: "foliage",
     description:
       "is an experimental e-commerce website design for luxurious plants.",
-    Subtitle: () => (
-      <SubtitleWrapper>
-        Excels in crafting <span>clean</span> and{" "}
-        <span>interactive websites</span>, seamlessly blending minimalist design
-        with <span>modern technology</span> for exceptional user experiences.
-      </SubtitleWrapper>
-    ),
+    subtitle:
+      "Excels in crafting clean and interactive websites, seamlessly blending minimalist design with modern technology for exceptional user experiences.",
     image: foliageThumb,
     year: 2023,
     role: "UI/UX Design, Front-End Engineer",
