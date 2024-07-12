@@ -26,7 +26,6 @@ export default function Project({ params }: { params: { title: string } }) {
           <span>{project.company}</span>
         </h2>
 
-        <div className="bg-overlay fixed left-0 top-0 z-20 h-screen w-screen bg-black" />
         <ProjectShowcase {...project} />
         <div className="mt-20 grid place-items-center">
           <Link

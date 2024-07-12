@@ -42,15 +42,20 @@ export default function ProjectAnimation({
         },
         "<20%",
       )
-      .to(
-        ".bg-overlay",
+      .fromTo(
+        "#project-subtitle span",
         {
           opacity: 0,
-          duration: 1,
-          ease: "power4.out",
-          display: "none",
+          filter: "blur(5px)",
         },
-        "<30%",
+        {
+          opacity: 100,
+          duration: 1.5,
+          ease: "power4.inOut",
+          stagger: 0.1,
+          filter: "blur(0px)",
+        },
+        "<",
       )
       .to(
         "body",
