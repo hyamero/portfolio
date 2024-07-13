@@ -7,6 +7,7 @@ import {
   ProjectShowcase,
 } from "@/components/sections";
 import HeroAnimation from "@/components/animations/hero";
+import ScrollTrigAnimation from "@/components/animations/scroll-trigger";
 
 export default function Home() {
   return (
@@ -14,11 +15,13 @@ export default function Home() {
       <HeroAnimation>
         <Hero />
       </HeroAnimation>
-      <ProjectShowcase {...projects[0]} />
-      <OSShowcase />
-      <ProjectShowcase {...projects[1]} />
-      <DesignShowcase />
-      <ProjectShowcase {...projects[2]} />
+      <ScrollTrigAnimation>
+        <ProjectShowcase {...projects[0]} />
+        <OSShowcase />
+        <ProjectShowcase {...projects[1]} />
+        <DesignShowcase />
+        <ProjectShowcase {...projects[2]} />
+      </ScrollTrigAnimation>
     </main>
   );
 }

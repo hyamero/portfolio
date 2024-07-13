@@ -5,6 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { type Project } from "@/lib/projects";
 import atomIcon from "/public/img/icons/atom-icon.png";
 import ShineBorder from "@/components/magicui/shine-border";
+import { cn } from "@/lib/utils";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const {
@@ -31,12 +32,14 @@ export default function ProjectShowcase({ ...props }: Project) {
 
   return (
     <section
-      id={company}
-      className="border-b-none relative z-10 pb-14 lg:border-b lg:pb-0"
+      className={cn(
+        company,
+        "project-wrapper border-b-none relative z-10 pb-14 lg:border-b lg:pb-0",
+      )}
     >
       <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
         <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
-          <h2 id="project-subtitle" className="w-full 2xl:w-4/5">
+          <h2 className={cn(`project-subtitle-${company}`, "w-full 2xl:w-4/5")}>
             {_subtitle.map((text, i) => (
               <React.Fragment key={text + i}>
                 {keywordsHighlight.includes(text) ? (
@@ -58,7 +61,10 @@ export default function ProjectShowcase({ ...props }: Project) {
               <Image
                 alt={`${company} Showcase`}
                 src={image}
-                className="w-full rounded-lg shadow-md"
+                className={cn(
+                  `thumbnail-${company}`,
+                  "w-full rounded-lg shadow-md",
+                )}
                 placeholder="blur"
                 priority
               />
