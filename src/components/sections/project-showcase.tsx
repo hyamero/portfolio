@@ -102,7 +102,7 @@ export default function ProjectShowcase({ ...props }: Project) {
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-block rounded-full border border-white/5 bg-neutral-200 text-white opacity-0 transition-all ease-in hover:cursor-pointer hover:bg-neutral-300"
+                className="group inline-block rounded-full border border-white/5 bg-neutral-200 text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-300"
               >
                 <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 font-medium tracking-tight">
                   <span>Visit</span>

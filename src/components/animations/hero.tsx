@@ -1,7 +1,6 @@
 "use client";
 
 import gsap from "gsap";
-import { toast } from "sonner";
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { useStateStore } from "@/lib/state-store";
@@ -69,9 +68,6 @@ export default function HeroAnimation({
           ease: "power4.inOut",
           stagger: 0.3,
           filter: "blur(0px)",
-          onComplete: () => {
-            toast.info("Tip: press [ / ] for quick search!");
-          },
         },
         "<25%",
       )
