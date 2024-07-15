@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { toast } from "sonner";
 import React, { useRef } from "react";
 import { useGSAP } from "@gsap/react";
-import { useUnmountStore } from "@/lib/unmount-store";
+import { useStateStore } from "@/lib/state-store";
 
 gsap.registerPlugin(useGSAP);
 
@@ -14,7 +14,7 @@ export default function HeroAnimation({
   children: React.ReactNode;
 }) {
   const tl = useRef<GSAPTimeline>();
-  const setPageOut = useUnmountStore((state) => state.setPageOut);
+  const setPageOut = useStateStore((state) => state.setPageOut);
 
   useGSAP(() => {
     tl.current = gsap
