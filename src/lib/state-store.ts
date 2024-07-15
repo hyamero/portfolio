@@ -10,8 +10,7 @@ type Action = {
   setHref: (href: string) => void;
 };
 
-export const useUnmountStore = create<State & Action>((set) => ({
-  unmount: false,
+export const useStateStore = create<State & Action>((set) => ({
   pageOut: false,
   href: "",
   setPageOut: (pageOut) => set(() => ({ pageOut: pageOut })),

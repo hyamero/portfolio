@@ -4,19 +4,19 @@ import gsap from "gsap";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { useRouter } from "next/navigation";
-import { useUnmountStore } from "@/lib/unmount-store";
+import { useStateStore } from "@/lib/state-store";
 
 gsap.registerPlugin(useGSAP);
 
 export default function PageTransition() {
-  const setHref = useUnmountStore((state) => state.setHref);
-  const setPageOut = useUnmountStore((state) => state.setPageOut);
+  const setHref = useStateStore((state) => state.setHref);
+  const setPageOut = useStateStore((state) => state.setPageOut);
 
   const { push } = useRouter();
   const tlIn = useRef<GSAPTimeline>();
 
-  const href = useUnmountStore((state) => state.href);
-  const pageOut = useUnmountStore((state) => state.pageOut);
+  const href = useStateStore((state) => state.href);
+  const pageOut = useStateStore((state) => state.pageOut);
 
   useGSAP(
     () => {
