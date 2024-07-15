@@ -1,14 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { useEffect } from "react";
+import { usePathname } from "next/navigation";
+import PageTransition from "./animations/page-transition";
+import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
 import {
   Home,
   Leaf,
   Github,
   Linkedin,
-  SquareTerminal,
   Newspaper,
+  SquareTerminal,
   HeartHandshake,
 } from "lucide-react";
 
@@ -21,11 +26,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import gsap from "gsap";
-import { useGSAP } from "@gsap/react";
-import { usePathname } from "next/navigation";
-import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-import PageTransition from "./animations/page-transition";
+import { useStateStore } from "@/lib/state-store";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
@@ -71,6 +72,9 @@ export function CommandMenu() {
   const { contextSafe } = useGSAP();
   const { animatePageOut } = PageTransition();
 
+  const setOpen = useStateStore((state) => state.setOpenMenu);
+  const open = useStateStore((state) => state.openMenu);
+
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (pathname !== "/") {
       return animatePageOut("/");
@@ -83,15 +87,23 @@ export function CommandMenu() {
     });
   });
 
-  const [open, setOpen] = useState(false);
-
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
-      if (e.key === "/") {
+      if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
+        if (
+          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
+          e.target instanceof HTMLInputElement ||
+          e.target instanceof HTMLTextAreaElement ||
+          e.target instanceof HTMLSelectElement
+        ) {
+          return;
+        }
+
         e.preventDefault();
-        setOpen((open) => !open);
+        setOpen(!open);
       }
     };
+
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
   }, []);
