@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import Image from "next/image";
 
 import heroBg from "/public/img/main-bg.jpg";
@@ -52,7 +53,7 @@ export default function Hero() {
 
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
           <div className="space-y-4">
-            <a
+            <Link
               href="https://github.com/omsimos"
               target="_blank"
               rel="noopener noreferrer"
@@ -62,7 +63,7 @@ export default function Hero() {
                 <span>✨ Omsimos</span>
                 <ArrowUpRightIcon className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
               </AnimatedShinyText>
-            </a>
+            </Link>
 
             <h2
               id="hero-text"

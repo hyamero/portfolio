@@ -1,23 +1,25 @@
 import React from "react";
+import Link from "next/link";
 import Image from "next/image";
-import { Button } from "../ui/button";
-import { ArrowUpRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 import { type Project } from "@/lib/projects";
+import { ArrowUpRightIcon } from "lucide-react";
 import atomIcon from "/public/img/icons/atom-icon.png";
 import ShineBorder from "@/components/magicui/shine-border";
-import { cn } from "@/lib/utils";
+import AnimatedShinyText from "../magicui/animated-shiny-text";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const {
-    subtitle,
-    image,
-    description,
-    company,
+    url,
     year,
     role,
     techs,
-    url,
+    image,
+    company,
+    subtitle,
     shineColor,
+    description,
   } = props;
 
   const _subtitle = subtitle.split(" ");
@@ -96,17 +98,17 @@ export default function ProjectShowcase({ ...props }: Project) {
                 </span>{" "}
                 {description}
               </p>
-              <Button asChild className=" rounded-full">
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-7"
-                >
+              <Link
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-block rounded-full border border-white/5 bg-neutral-200 text-white opacity-0 transition-all ease-in hover:cursor-pointer hover:bg-neutral-300"
+              >
+                <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 font-medium tracking-tight">
                   <span>Visit</span>
-                  <ArrowUpRight className="stroke-1" />
-                </a>
-              </Button>
+                  <ArrowUpRightIcon className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+                </AnimatedShinyText>
+              </Link>
             </div>
             <div className="hidden h-full border-t lg:block" />
           </div>
