@@ -1,6 +1,10 @@
-import IconCloud from "@/components/magicui/icon-cloud";
 import { BentoCard, BentoGrid } from "../magicui/bento-grid";
-import { BotMessageSquare, FileTextIcon, Github } from "lucide-react";
+import {
+  BlocksIcon,
+  BotMessageSquare,
+  FileTextIcon,
+  Github,
+} from "lucide-react";
 
 const slugs = [
   "typescript",
@@ -55,14 +59,13 @@ const features = [
     background: <div className="size-full"></div>,
   },
   {
+    Icon: BlocksIcon,
+    name: "3D Portfolio",
+    description: "Interactive 3D Portfolio using R3F",
+    href: "/",
+    cta: "Learn more",
     className: "col-span-3 lg:col-span-1",
-    background: (
-      <div className="absolute grid size-full place-items-center bg-slate-600/10 px-10">
-        <div className="relative bottom-5">
-          <IconCloud iconSlugs={slugs} />
-        </div>
-      </div>
-    ),
+    background: <div className="size-full"></div>,
   },
 ];
 
