@@ -50,6 +50,7 @@ export default function Navbar() {
       if (isOpen) {
         tl.current = gsap
           .timeline()
+          .set("body", { overflow: "hidden" })
           .to(".menu", {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
             ease: "power2.easeInOut",
@@ -58,23 +59,26 @@ export default function Navbar() {
           .fromTo(
             ".menu-item, .menu-item-title",
             {
-              y: -150,
+              y: -30,
               opacity: 0,
+              filter: "blur(10px)",
+
               skewX: -10,
             },
             {
               y: 0,
               opacity: 1,
               skewX: 0,
-              duration: 0.4,
+              duration: 0.5,
               stagger: 0.1,
+              filter: "blur(0px)",
               ease: "power4.out",
             },
             "-=0.1",
           );
       } else return;
     },
-    { dependencies: [isOpen], scope: navRef },
+    { dependencies: [isOpen] },
   );
 
   /**
