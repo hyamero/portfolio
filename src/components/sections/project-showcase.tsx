@@ -34,6 +34,7 @@ export default function ProjectShowcase({ ...props }: Project) {
 
   return (
     <section
+      id={company}
       className={cn(
         company,
         "project-wrapper border-b-none relative z-10 pb-14 lg:border-b lg:pb-0",

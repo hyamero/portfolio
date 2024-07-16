@@ -1,15 +1,16 @@
 "use client";
 
 import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { usePathname } from "next/navigation";
+import React, { useRef, useState } from "react";
+import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
+
+import PageTransition from "./animations/page-transition";
+import { useStateStore } from "@/lib/state-store";
+import { CommandMenu } from "./command-menu";
 import { NavMenu } from "./nav-menu";
 import { Button } from "./ui/button";
-import { useGSAP } from "@gsap/react";
-import { CommandMenu } from "./command-menu";
-import { usePathname } from "next/navigation";
-import { useStateStore } from "@/lib/state-store";
-import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-import PageTransition from "./animations/page-transition";
-import React, { useEffect, useRef, useState } from "react";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
@@ -25,7 +26,7 @@ export default function Navbar() {
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
-    setIsOpen(false);
+    toggleNav();
 
     gsap.to(window, {
       duration: 1,
@@ -79,39 +80,39 @@ export default function Navbar() {
   /**
    * Close nav when clicked outside
    */
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        isOpen &&
-        navRef.current &&
-        !navRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (
+  //       isOpen &&
+  //       navRef.current &&
+  //       !navRef.current.contains(event.target as Node)
+  //     ) {
+  //       setIsOpen(false);
+  //     }
+  //   };
 
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
+  //   const handleEscapeKey = (event: KeyboardEvent) => {
+  //     if (event.key === "Escape") {
+  //       setIsOpen(false);
+  //     }
+  //   };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    document.addEventListener("keydown", handleEscapeKey);
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   document.addEventListener("keydown", handleEscapeKey);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscapeKey);
-    };
-  }, [isOpen]);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //     document.removeEventListener("keydown", handleEscapeKey);
+  //   };
+  // }, [isOpen]);
 
   return (
     <div ref={navRef}>
       <CommandMenu />
 
-      <nav className="container fixed left-0 right-0 top-0 z-50 mx-auto flex justify-between py-10 text-foreground ">
+      <nav className="container fixed left-0 right-0 top-0 z-50 mx-auto mt-10 flex justify-between text-foreground">
         <button
-          className="nav-item rounded-md bg-black/50 px-5 text-xl font-normal tracking-tighter backdrop-blur-sm"
+          className="nav-item rounded-md border border-muted/60 bg-black/50 px-3 text-base font-normal tracking-tighter backdrop-blur-sm sm:text-lg lg:px-5 lg:text-xl"
           onClick={() => {
             if (pathname !== "/") {
               animatePageOut("/");
@@ -139,30 +140,27 @@ export default function Navbar() {
           <div className="h-8 rounded-r-md border border-l-0 border-muted/60 bg-black/50 px-3 backdrop-blur-sm hover:bg-muted/40">
             <button
               type="button"
-              className="nav-item menu-burger group flex w-7 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:w-full [&>span]:transform [&>span]:rounded-full [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
+              className="nav-item menu-burger group flex w-7 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:transform [&>span]:rounded-full [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
               onClick={() => toggleNav()}
             >
               <span
                 className={`${
                   isOpen
-                    ? "translate-y-[3px] rotate-45 opacity-80 group-hover:opacity-100"
-                    : "opacity-80 group-hover:opacity-100"
+                    ? "w-3/4 translate-y-[3px] rotate-45 opacity-80 group-hover:opacity-100"
+                    : "w-full opacity-80 group-hover:opacity-100"
                 }`}
               />
               <span
                 className={`${
                   isOpen
-                    ? "-translate-y-[3px] -rotate-45 opacity-80 group-hover:opacity-100"
-                    : "opacity-80 group-hover:opacity-100"
+                    ? "w-3/4 -translate-y-[3px] -rotate-45 opacity-80  group-hover:opacity-100"
+                    : "w-full opacity-80 group-hover:opacity-100"
                 }`}
               />
             </button>
           </div>
         </div>
       </nav>
-      {/**
-       * MENU COMPONENT
-       */}
       {isOpen && <NavMenu scrollTo={scrollTo} />}
     </div>
   );
