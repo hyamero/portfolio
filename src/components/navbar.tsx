@@ -112,7 +112,7 @@ export default function Navbar() {
 
       <nav className="container fixed left-0 right-0 top-0 z-50 mx-auto mt-10 flex justify-between text-foreground">
         <button
-          className="nav-item rounded-md border border-muted/60 bg-black/50 px-3 text-base font-normal tracking-tighter backdrop-blur-sm sm:text-lg lg:px-5 lg:text-xl"
+          className="nav-item rounded-md border border-muted/60 bg-black/50 px-3 text-base font-normal tracking-tighter backdrop-blur-sm sm:text-lg lg:px-5"
           onClick={() => {
             if (pathname !== "/") {
               animatePageOut("/");

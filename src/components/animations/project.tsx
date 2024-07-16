@@ -43,7 +43,7 @@ export default function ProjectAnimation({
         "<20%",
       )
       .fromTo(
-        "#project-subtitle span",
+        ".project-subtitle span",
         {
           opacity: 0,
           filter: "blur(5px)",
