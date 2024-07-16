@@ -46,7 +46,7 @@ export default function ScrollTrigAnimation({
           },
           {
             opacity: 100,
-            duration: 1.5,
+            duration: 1,
             ease: "power4.inOut",
             stagger: 0.1,
             filter: "blur(0px)",
@@ -56,11 +56,11 @@ export default function ScrollTrigAnimation({
         .fromTo(
           `.thumbnail-${project}`,
           {
-            opacity: 0,
+            filter: "grayscale(100%)",
           },
           {
-            opacity: 100,
-            duration: 2,
+            filter: "grayscale(0%)",
+            duration: 1.5,
             ease: "power4.inOut",
           },
           "<20%",
