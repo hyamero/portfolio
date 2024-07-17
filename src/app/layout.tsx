@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 
 import TransitionLoader from "@/components/transition-loader";
 import GridPattern from "@/components/magicui/grid-pattern";
+import Contact from "@/components/sections/contact";
 import { Toaster } from "@/components/ui/sonner";
 import { Footer } from "@/components/sections";
 import Navbar from "@/components/navbar";
@@ -23,13 +24,13 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={GeistSans.className}>
         <TransitionLoader />
+        <Toaster />
         <Navbar />
 
         <GridPattern className="[mask-image:radial-gradient(ellipse_at_center,white,transparent_80%)]" />
-
         {children}
+        <Contact />
         <Footer />
-        <Toaster />
       </body>
     </html>
   );
