@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 import { type Project } from "@/lib/projects";
 import { ArrowUpRightIcon } from "lucide-react";
 import atomIcon from "/public/img/icons/atom-icon.png";
-import ShineBorder from "@/components/magicui/shine-border";
 import AnimatedShinyText from "../magicui/animated-shiny-text";
 
 export default function ProjectShowcase({ ...props }: Project) {
@@ -18,7 +17,7 @@ export default function ProjectShowcase({ ...props }: Project) {
     image,
     company,
     subtitle,
-    shineColor,
+    // shineColor,
     description,
   } = props;
 
@@ -37,11 +36,11 @@ export default function ProjectShowcase({ ...props }: Project) {
       id={company}
       className={cn(
         company,
-        "project-wrapper border-b-none relative z-10 pb-14 lg:border-b lg:pb-0",
+        "project-wrapper border-b-none container relative z-10 pb-14 lg:border-b lg:pb-0 ",
       )}
     >
-      <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
-        <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
+      <div className="grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
+        <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg bg-neutral-950 text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(
               `project-subtitle-${company} project-subtitle`,
@@ -61,26 +60,21 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <ShineBorder
-            color={["#1e1e1e", shineColor[1]]}
-            className="overflow-hidden"
-          >
-            <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
-              <Image
-                alt={`${company} Showcase`}
-                src={image}
-                className={cn(
-                  `thumbnail-${company}`,
-                  "w-full rounded-lg shadow-md",
-                )}
-                placeholder="blur"
-                priority
-              />
-            </div>
-          </ShineBorder>
+          <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
+            <Image
+              alt={`${company} Showcase`}
+              src={image}
+              className={cn(
+                `thumbnail-${company}`,
+                "w-full rounded-lg shadow-md",
+              )}
+              placeholder="blur"
+              priority
+            />
+          </div>
         </div>
 
-        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b px-10 py-10 sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
+        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b bg-neutral-950 px-10 py-10 sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
           <Image
             alt="Atom Icon"
             src={atomIcon}

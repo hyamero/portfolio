@@ -12,7 +12,7 @@ export type Project = {
   role: string;
   techs: string;
   url: string;
-  shineColor: string[];
+  // shineColor: string[];
 };
 
 export const projects: Project[] = [
@@ -26,7 +26,7 @@ export const projects: Project[] = [
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
     url: "https://omsimos.com",
-    shineColor: ["#28af66", "#15422c"],
+    // shineColor: ["#28af66", "#15422c"],
   },
   {
     company: "umamin",
@@ -38,7 +38,7 @@ export const projects: Project[] = [
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
     url: "https://umamin.link",
-    shineColor: ["#f51aa6", "#4f0835"],
+    // shineColor: ["#f51aa6", "#4f0835"],
   },
   {
     company: "foliage",
@@ -51,6 +51,6 @@ export const projects: Project[] = [
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
     url: "https://foliage.omsimos.com",
-    shineColor: ["#656a74", "#273245"],
+    // shineColor: ["#656a74", "#273245"],
   },
 ];
