@@ -7,21 +7,28 @@ import OrbitingIcons, {
 
 export default function Contact() {
   return (
-    <section id="contact" className="container z-10 w-full py-40">
-      <div className="relative flex h-[550px] w-full overflow-hidden rounded-lg border bg-background md:shadow-xl">
+    <section
+      id="contact"
+      className="borde container z-10 my-40 w-full overflow-hidden border-y sm:overflow-auto sm:border-y-0"
+    >
+      <div className="relative flex h-[550px] w-full rounded-lg bg-background sm:overflow-hidden sm:border md:shadow-xl">
         <div className="absolute left-0 top-0 size-full">
           <Ripple />
         </div>
 
-        <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center overflow-hidden rounded-lg border md:shadow-xl">
-          <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-7xl font-semibold leading-none text-transparent">
+        <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center rounded-lg  md:shadow-xl">
+          <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-6xl font-semibold leading-none text-transparent lg:text-7xl">
             Contact
           </span>
 
-          {socials.map((social, i) => (
+          {socials.map((social) => (
             <OrbitingIcons
+              href={social.href}
               key={social.name}
-              className={cn("border-none bg-transparent", social.className)}
+              className={cn(
+                "cursor-pointer border-none bg-transparent",
+                social.className,
+              )}
               duration={social.duration}
               delay={social.delay}
               radius={social.radius}
@@ -40,34 +47,33 @@ export default function Contact() {
 type Socials = {
   name: string;
   icon: any;
-  link: string;
   className?: string;
 } & OrbitingIconsProps;
 
 const socials: Socials[] = [
   {
-    name: "WhatsApp",
-    icon: Icons.whatsapp,
-    link: "",
+    name: "Gmail",
+    icon: Icons.gmail,
+    href: "mailto:daleban.dev@gmail.com",
     duration: 20,
     delay: 20,
     radius: 80,
     path: true,
-    className: "size-[30px]",
+    className: "size-[35px]",
   },
   {
-    name: "Notion",
-    icon: Icons.notion,
-    link: "",
+    name: "Discord",
+    icon: Icons.discord,
+    href: "",
     duration: 20,
     delay: 10,
     radius: 80,
-    className: "size-[30px]",
+    className: "size-[35px]",
   },
   {
-    name: "Google Drive",
-    icon: Icons.googleDrive,
-    link: "",
+    name: "LinkedIn",
+    icon: Icons.linkedIn,
+    href: "https://linkedin.com/in/hyamero",
     duration: 20,
     radius: 190,
     reverse: true,
@@ -76,7 +82,7 @@ const socials: Socials[] = [
   {
     name: "GitHub",
     icon: Icons.gitHub,
-    link: "",
+    href: "https://github.com/hyamero",
     duration: 20,
     delay: 20,
     radius: 190,
