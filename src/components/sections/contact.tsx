@@ -1,6 +1,9 @@
 import { Icons } from "../icons";
+import { cn } from "@/lib/utils";
 import Ripple from "../magicui/ripple";
-import OrbitingIcons from "../magicui/orbiting-icons";
+import OrbitingIcons, {
+  type OrbitingIconsProps,
+} from "../magicui/orbiting-icons";
 
 export default function Contact() {
   return (
@@ -15,45 +18,69 @@ export default function Contact() {
             Contact
           </span>
 
-          {/* Inner Circles */}
-          <OrbitingIcons
-            className="size-[30px] border-none bg-transparent"
-            duration={20}
-            delay={20}
-            radius={80}
-          >
-            <Icons.whatsapp />
-          </OrbitingIcons>
-          <OrbitingIcons
-            className="size-[30px] border-none bg-transparent"
-            duration={20}
-            delay={10}
-            radius={80}
-            path={true}
-          >
-            <Icons.notion />
-          </OrbitingIcons>
-
-          {/* Outer Circles (reverse) */}
-          <OrbitingIcons
-            className="size-[50px] border-none bg-transparent"
-            radius={190}
-            duration={20}
-            reverse
-          >
-            <Icons.googleDrive />
-          </OrbitingIcons>
-          <OrbitingIcons
-            className="size-[50px] border-none bg-transparent"
-            radius={190}
-            duration={20}
-            delay={20}
-            reverse
-          >
-            <Icons.gitHub />
-          </OrbitingIcons>
+          {socials.map((social, i) => (
+            <OrbitingIcons
+              key={social.name}
+              className={cn("border-none bg-transparent", social.className)}
+              duration={social.duration}
+              delay={social.delay}
+              radius={social.radius}
+              reverse={social.reverse}
+              path={social.path}
+            >
+              <social.icon />
+            </OrbitingIcons>
+          ))}
         </div>
       </div>
     </section>
   );
 }
+
+type Socials = {
+  name: string;
+  icon: any;
+  link: string;
+  className?: string;
+} & OrbitingIconsProps;
+
+const socials: Socials[] = [
+  {
+    name: "WhatsApp",
+    icon: Icons.whatsapp,
+    link: "",
+    duration: 20,
+    delay: 20,
+    radius: 80,
+    path: true,
+    className: "size-[30px]",
+  },
+  {
+    name: "Notion",
+    icon: Icons.notion,
+    link: "",
+    duration: 20,
+    delay: 10,
+    radius: 80,
+    className: "size-[30px]",
+  },
+  {
+    name: "Google Drive",
+    icon: Icons.googleDrive,
+    link: "",
+    duration: 20,
+    radius: 190,
+    reverse: true,
+    className: "size-[50px]",
+  },
+  {
+    name: "GitHub",
+    icon: Icons.gitHub,
+    link: "",
+    duration: 20,
+    delay: 20,
+    radius: 190,
+    reverse: true,
+    className: "size-[50px]",
+  },
+];
