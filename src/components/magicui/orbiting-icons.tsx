@@ -1,6 +1,8 @@
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export interface OrbitingIconsProps {
+  href: string;
   className?: string;
   children?: React.ReactNode;
   reverse?: boolean;
@@ -11,6 +13,7 @@ export interface OrbitingIconsProps {
 }
 
 export default function OrbitingIcons({
+  href,
   className,
   children,
   reverse,
@@ -37,7 +40,10 @@ export default function OrbitingIcons({
         </svg>
       )}
 
-      <div
+      <Link
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
         style={
           {
             "--duration": duration,
@@ -52,7 +58,7 @@ export default function OrbitingIcons({
         )}
       >
         {children}
-      </div>
+      </Link>
     </>
   );
 }
