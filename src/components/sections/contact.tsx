@@ -9,35 +9,37 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="borde container z-10 my-40 w-full overflow-hidden border-y sm:overflow-auto sm:border-y-0"
+      className="container z-10 my-40 w-full overflow-hidden border-y sm:overflow-auto sm:border-y-0"
     >
-      <div className="relative flex h-[550px] w-full rounded-lg bg-background sm:overflow-hidden sm:border md:shadow-xl">
-        <div className="absolute left-0 top-0 size-full">
-          <Ripple />
-        </div>
+      <div className="bg-bg-neutral-950 sm:rounded-lg sm:border sm:p-4">
+        <div className="relative flex h-[550px] w-full rounded-lg bg-background sm:overflow-hidden md:shadow-xl">
+          <div className="absolute left-0 top-0 size-full">
+            <Ripple />
+          </div>
 
-        <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center rounded-lg  md:shadow-xl">
-          <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-6xl font-semibold leading-none text-transparent lg:text-7xl">
-            Contact
-          </span>
+          <div className="absolute left-0 top-0 flex size-full flex-col items-center justify-center rounded-lg  md:shadow-xl">
+            <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-6xl font-semibold leading-none text-transparent lg:text-7xl">
+              Contact
+            </span>
 
-          {socials.map((social) => (
-            <OrbitingIcons
-              href={social.href}
-              key={social.name}
-              className={cn(
-                "cursor-pointer border-none bg-transparent",
-                social.className,
-              )}
-              duration={social.duration}
-              delay={social.delay}
-              radius={social.radius}
-              reverse={social.reverse}
-              path={social.path}
-            >
-              <social.icon />
-            </OrbitingIcons>
-          ))}
+            {socials.map((social) => (
+              <OrbitingIcons
+                href={social.href}
+                key={social.name}
+                className={cn(
+                  "cursor-pointer border-none bg-transparent",
+                  social.className,
+                )}
+                duration={social.duration}
+                delay={social.delay}
+                radius={social.radius}
+                reverse={social.reverse}
+                path={social.path}
+              >
+                <social.icon />
+              </OrbitingIcons>
+            ))}
+          </div>
         </div>
       </div>
     </section>

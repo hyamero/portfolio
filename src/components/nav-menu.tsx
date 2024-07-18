@@ -28,7 +28,7 @@ export const NavMenu = ({
   }, []);
 
   return (
-    <div className="menu fixed left-0 top-0 z-40 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-[#111] bg-opacity-95 text-secondary-foreground [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
+    <div className="menu fixed left-0 top-0 z-40 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-neutral-950 bg-opacity-95 text-secondary-foreground [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
       <div className="flex flex-col gap-14 sm:flex-row sm:gap-28">
         <div className="flex flex-col items-start gap-3 md:gap-5">
           <button
