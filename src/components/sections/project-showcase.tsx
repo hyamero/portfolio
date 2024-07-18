@@ -40,7 +40,7 @@ export default function ProjectShowcase({ ...props }: Project) {
       )}
     >
       <div className="grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
-        <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg bg-neutral-950 text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
+        <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950 lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(
               `project-subtitle-${company} project-subtitle`,

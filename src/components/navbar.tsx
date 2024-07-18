@@ -26,7 +26,11 @@ export default function Navbar() {
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
-    toggleNav();
+    if (isOpen) {
+      tl.current?.reverse().eventCallback("onReverseComplete", () => {
+        setIsOpen(false);
+      });
+    }
 
     gsap.to(window, {
       duration: 1,
