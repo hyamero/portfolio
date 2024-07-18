@@ -36,10 +36,10 @@ export default function ProjectShowcase({ ...props }: Project) {
       id={company}
       className={cn(
         company,
-        "project-wrapper border-b-none container relative z-10 pb-14 lg:border-b lg:pb-0 ",
+        "project-wrapper border-b-none  relative z-10 pb-14 lg:border-b lg:pb-0 ",
       )}
     >
-      <div className="grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
+      <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
         <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950 lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(
@@ -60,7 +60,7 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <div className="rounded-lg border bg-[#111] bg-opacity-20 p-2 md:p-4">
+          <div className="rounded-lg border bg-neutral-950 p-2 md:p-4">
             <Image
               alt={`${company} Showcase`}
               src={image}
