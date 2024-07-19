@@ -83,4 +83,982 @@ export const Icons = {
       ></path>
     </svg>
   ),
+
+  stars: () => (
+    <svg fill="none" height={284} viewBox="0 0 1115 284" width={1115}>
+      <g opacity={0.8}>
+        <g opacity={0.6} fill="#D9D9D9">
+          <circle
+            cx={392.129}
+            cy={128.839}
+            r={1.5}
+            transform="rotate(-37.939 392.129 128.839)"
+          />
+          <circle
+            cx={336.105}
+            cy={110.105}
+            r={1.5}
+            transform="rotate(-37.939 336.105 110.105)"
+          />
+          <circle
+            cx={304.105}
+            cy={149.105}
+            r={1.5}
+            transform="rotate(-37.939 304.105 149.105)"
+          />
+          <circle
+            cx={373.525}
+            cy={123.686}
+            r={1}
+            transform="rotate(-37.939 373.525 123.686)"
+          />
+          <circle
+            cx={247.403}
+            cy={152.403}
+            r={1}
+            transform="rotate(-37.939 247.403 152.403)"
+          />
+          <circle
+            cx={395.785}
+            cy={110.767}
+            r={1.5}
+            transform="rotate(-37.939 395.785 110.767)"
+          />
+          <circle
+            cx={478.105}
+            cy={133.105}
+            r={1.5}
+            transform="rotate(-37.939 478.105 133.105)"
+          />
+          <circle
+            cx={496.105}
+            cy={167.105}
+            r={1.5}
+            transform="rotate(-37.939 496.105 167.105)"
+          />
+          <circle
+            cx={297.105}
+            cy={109.105}
+            r={1.5}
+            transform="rotate(-37.939 297.105 109.105)"
+          />
+          <circle
+            cx={405.364}
+            cy={125.492}
+            r={1}
+            transform="rotate(-37.939 405.364 125.492)"
+          />
+          <circle
+            cx={398.45}
+            cy={141.021}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 398.45 141.021)"
+          />
+          <circle
+            cx={198.403}
+            cy={121.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 198.403 121.403)"
+          />
+          <circle
+            cx={368.403}
+            cy={179.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 368.403 179.403)"
+          />
+          <circle
+            cx={286.403}
+            cy={174.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 286.403 174.403)"
+          />
+          <circle
+            cx={554.404}
+            cy={134.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 554.404 134.403)"
+          />
+          <circle
+            cx={422.653}
+            cy={141.172}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 422.653 141.172)"
+          />
+          <circle
+            cx={435.133}
+            cy={177.438}
+            r={1.5}
+            transform="rotate(168.299 435.133 177.438)"
+          />
+          <circle
+            cx={449.525}
+            cy={190.274}
+            r={1}
+            transform="rotate(168.299 449.525 190.274)"
+          />
+          <circle
+            cx={333.181}
+            cy={176.182}
+            r={1}
+            transform="rotate(168.299 333.181 176.182)"
+          />
+          <circle
+            cx={423.844}
+            cy={192.02}
+            r={1.5}
+            transform="rotate(168.299 423.844 192.02)"
+          />
+          <circle
+            cx={238.774}
+            cy={187.773}
+            r={1.5}
+            transform="rotate(168.299 238.774 187.773)"
+          />
+          <circle
+            cx={256.774}
+            cy={134.773}
+            r={1.5}
+            transform="rotate(168.299 256.774 134.773)"
+          />
+          <circle
+            cx={421.763}
+            cy={174.585}
+            r={1}
+            transform="rotate(168.299 421.763 174.585)"
+          />
+          <circle
+            cx={347.181}
+            cy={152.182}
+            r={1}
+            transform="rotate(168.299 347.181 152.182)"
+          />
+          <circle
+            cx={513.181}
+            cy={162.182}
+            r={1}
+            transform="rotate(168.299 513.181 162.182)"
+          />
+          <circle
+            cx={535.181}
+            cy={119.182}
+            r={1}
+            transform="rotate(168.299 535.181 119.182)"
+          />
+          <circle
+            cx={434.83}
+            cy={163.708}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 434.83 163.708)"
+          />
+          <circle
+            cx={623.181}
+            cy={133.182}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 623.181 133.182)"
+          />
+          <circle
+            cx={413.181}
+            cy={152.861}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 413.181 152.861)"
+          />
+          <circle
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 45.769 -1440.566)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 64.9 -1422.744)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -63.66 -1141.56)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 105.708 -1359.846)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 57.435 -1243.067)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 133.249 -1652.901)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 77.222 -1457.875)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 632.199 4626.467)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 562.368 4690.276)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 689.303 4129.609)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 566.689 4564.09)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 679.947 3663.144)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 929.567 3777.477)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 652.805 4562.653)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 799.414 4209.923)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 667.618 5014.934)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 866.442 5143.785)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 699.352 4631.854)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 754.127 5566.191)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 763.1 4531.638)"
+          />
+          <circle
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 112.003 -1188.464)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 131.133 -1170.643)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 2.575 -889.459)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 171.943 -1107.744)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 123.67 -990.966)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 199.485 -1400.804)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 143.456 -1205.773)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 244.015 3891.442)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 174.184 3955.251)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 301.12 3394.584)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 178.505 3829.065)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 291.764 2928.119)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 541.383 3042.452)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 264.622 3827.628)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 411.23 3474.898)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 279.435 4279.914)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 478.258 4408.765)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 311.169 3896.829)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 365.943 4831.17)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 374.917 3796.613)"
+          />
+          <circle
+            cx={208.364}
+            cy={212.492}
+            r={1}
+            transform="rotate(-37.939 208.364 212.492)"
+          />
+          <circle
+            cx={201.45}
+            cy={228.02}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 201.45 228.02)"
+          />
+          <circle
+            cx={1.403}
+            cy={208.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 1.403 208.403)"
+          />
+          <circle
+            cx={171.403}
+            cy={266.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 171.403 266.403)"
+          />
+          <circle
+            cx={89.403}
+            cy={261.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 89.403 261.403)"
+          />
+          <circle
+            cx={357.403}
+            cy={221.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 357.403 221.403)"
+          />
+          <circle
+            cx={225.653}
+            cy={228.172}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 225.653 228.172)"
+          />
+          <circle
+            cx={238.133}
+            cy={264.438}
+            r={1.5}
+            transform="rotate(168.299 238.133 264.438)"
+          />
+          <circle
+            cx={252.525}
+            cy={277.274}
+            r={1}
+            transform="rotate(168.299 252.525 277.274)"
+          />
+          <circle
+            cx={136.181}
+            cy={263.182}
+            r={1}
+            transform="rotate(168.299 136.181 263.182)"
+          />
+          <circle
+            cx={226.844}
+            cy={279.02}
+            r={1.5}
+            transform="rotate(168.299 226.844 279.02)"
+          />
+          <circle
+            cx={41.774}
+            cy={274.773}
+            r={1.5}
+            transform="rotate(168.299 41.774 274.773)"
+          />
+          <circle
+            cx={59.774}
+            cy={221.773}
+            r={1.5}
+            transform="rotate(168.299 59.774 221.773)"
+          />
+          <circle
+            cx={224.763}
+            cy={261.585}
+            r={1}
+            transform="rotate(168.299 224.763 261.585)"
+          />
+          <circle
+            cx={150.181}
+            cy={239.182}
+            r={1}
+            transform="rotate(168.299 150.181 239.182)"
+          />
+          <circle
+            cx={316.181}
+            cy={249.182}
+            r={1}
+            transform="rotate(168.299 316.181 249.182)"
+          />
+          <circle
+            cx={338.181}
+            cy={206.182}
+            r={1}
+            transform="rotate(168.299 338.181 206.182)"
+          />
+          <circle
+            cx={237.83}
+            cy={250.707}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 237.83 250.707)"
+          />
+          <circle
+            cx={426.181}
+            cy={220.182}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 426.181 220.182)"
+          />
+          <circle
+            cx={216.181}
+            cy={239.861}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 216.181 239.861)"
+          />
+          <circle
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -112.14 -938.585)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -93.01 -920.764)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -221.568 -639.58)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -52.2 -857.866)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -100.473 -741.087)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -24.658 -1150.925)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(1 -1)rotate(-37.939 -80.687 -955.894)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 759.282 2953.14)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 689.451 3016.95)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 816.387 2456.282)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 693.772 2890.763)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 807.03 1989.817)"
+          />
+          <circle
+            r={1.5}
+            transform="scale(-1 1)rotate(-11.701 1056.65 2104.15)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 779.889 2889.326)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 926.498 2536.596)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 794.701 3341.612)"
+          />
+          <circle
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 993.525 3470.463)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 826.436 2958.527)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 881.21 3892.869)"
+          />
+          <circle
+            opacity={0.5}
+            r={1}
+            transform="scale(-1 1)rotate(-11.701 890.184 2858.311)"
+          />
+          <circle
+            cx={333.364}
+            cy={7.492}
+            r={1}
+            transform="rotate(-37.939 333.364 7.492)"
+          />
+          <circle
+            cx={326.45}
+            cy={23.02}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 326.45 23.02)"
+          />
+          <circle
+            cx={126.403}
+            cy={3.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 126.403 3.403)"
+          />
+          <circle
+            cx={296.403}
+            cy={61.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 296.403 61.403)"
+          />
+          <circle
+            cx={214.403}
+            cy={56.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 214.403 56.403)"
+          />
+          <circle
+            cx={482.403}
+            cy={16.403}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 482.403 16.403)"
+          />
+          <circle
+            cx={350.653}
+            cy={23.172}
+            opacity={0.5}
+            r={1}
+            transform="rotate(-37.939 350.653 23.172)"
+          />
+          <circle
+            cx={363.133}
+            cy={59.438}
+            r={1.5}
+            transform="rotate(168.299 363.133 59.438)"
+          />
+          <circle
+            cx={377.525}
+            cy={72.274}
+            r={1}
+            transform="rotate(168.299 377.525 72.274)"
+          />
+          <circle
+            cx={261.181}
+            cy={58.182}
+            r={1}
+            transform="rotate(168.299 261.181 58.182)"
+          />
+          <circle
+            cx={351.844}
+            cy={74.02}
+            r={1.5}
+            transform="rotate(168.299 351.844 74.02)"
+          />
+          <circle
+            cx={166.774}
+            cy={69.773}
+            r={1.5}
+            transform="rotate(168.299 166.774 69.773)"
+          />
+          <circle
+            cx={184.774}
+            cy={16.773}
+            r={1.5}
+            transform="rotate(168.299 184.774 16.773)"
+          />
+          <circle
+            cx={349.763}
+            cy={56.585}
+            r={1}
+            transform="rotate(168.299 349.763 56.585)"
+          />
+          <circle
+            cx={275.181}
+            cy={34.182}
+            r={1}
+            transform="rotate(168.299 275.181 34.182)"
+          />
+          <circle
+            cx={441.181}
+            cy={44.182}
+            r={1}
+            transform="rotate(168.299 441.181 44.182)"
+          />
+          <circle
+            cx={463.181}
+            cy={1.182}
+            r={1}
+            transform="rotate(168.299 463.181 1.182)"
+          />
+          <circle
+            cx={362.83}
+            cy={45.707}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 362.83 45.707)"
+          />
+          <circle
+            cx={551.181}
+            cy={15.182}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 551.181 15.182)"
+          />
+          <circle
+            cx={341.181}
+            cy={34.861}
+            opacity={0.5}
+            r={1}
+            transform="rotate(168.299 341.181 34.86)"
+          />
+        </g>
+        <path
+          fill="url(#a)"
+          opacity={0.9}
+          transform="rotate(-45 561 120.571)"
+          d="M561 120.571h.808v16.162H561z"
+        />
+        <path
+          fill="url(#b)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 121.851 -742.901)"
+          d="M0 0h.808v16.162H0z"
+        />
+        <circle cx={567} cy={126} fill="#fff" r={0.808} />
+        <path
+          fill="url(#c)"
+          opacity={0.9}
+          transform="rotate(-45 680 221.571)"
+          d="M680 221.571h.808v16.162H680z"
+        />
+        <path
+          fill="url(#d)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 59.433 -937.047)"
+          d="M0 0h.808v16.162H0z"
+        />
+        <circle cx={686} cy={227} fill="#fff" r={0.808} />
+        <path
+          fill="url(#e)"
+          opacity={0.9}
+          transform="rotate(-45 391 178.571)"
+          d="M391 178.571h.808v16.162H391z"
+        />
+        <path
+          fill="url(#f)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 -33.161 -566.693)"
+          d="M0 0h.808v16.162H0z"
+        />
+        <circle cx={397} cy={184} fill="#fff" r={0.808} />
+        <path
+          fill="url(#g)"
+          opacity={0.9}
+          transform="rotate(-45 812 174.286)"
+          d="M812 174.286h.404v8.081H812z"
+        />
+        <path
+          fill="url(#h)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 189.066 -1070.027)"
+          d="M0 0h.404v8.081H0z"
+        />
+        <circle cx={815.002} cy={177} fill="#fff" r={0.404} />
+        <path
+          fill="url(#i)"
+          opacity={0.9}
+          transform="rotate(-45 220 196.667)"
+          d="M220 196.667h.943v18.856H220z"
+        />
+        <path
+          fill="url(#j)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 -142.687 -370.23)"
+          d="M0 0h.943v18.856H0z"
+        />
+        <circle cx={226.997} cy={202.999} fill="#fff" r={0.943} />
+        <path
+          fill="url(#k)"
+          opacity={0.9}
+          transform="rotate(-45 824 131.667)"
+          d="M824 131.667h.943v18.856H824z"
+        />
+        <path
+          fill="url(#l)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 237.775 -1066.822)"
+          d="M0 0h.943v18.856H0z"
+        />
+        <circle cx={830.997} cy={137.999} fill="#fff" r={0.943} />
+        <path
+          fill="url(#m)"
+          opacity={0.9}
+          transform="rotate(-45 336 88.666)"
+          d="M336 88.666h.943v18.856H336z"
+        />
+        <path
+          fill="url(#n)"
+          opacity={0.9}
+          transform="scale(1 -1)rotate(-45 45.68 -456.254)"
+          d="M0 0h.943v18.856H0z"
+        />
+        <circle cx={342.997} cy={94.999} fill="#fff" r={0.943} />
+      </g>
+      <defs>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="a"
+          x1={561.404}
+          x2={561.404}
+          y1={120.571}
+          y2={136.734}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="b"
+          x1={0.404}
+          x2={0.404}
+          y1={0}
+          y2={16.162}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="c"
+          x1={680.404}
+          x2={680.404}
+          y1={221.571}
+          y2={237.734}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="d"
+          x1={0.404}
+          x2={0.404}
+          y1={0}
+          y2={16.162}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="e"
+          x1={391.404}
+          x2={391.404}
+          y1={178.571}
+          y2={194.734}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="f"
+          x1={0.404}
+          x2={0.404}
+          y1={0}
+          y2={16.162}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="g"
+          x1={812.202}
+          x2={812.202}
+          y1={174.286}
+          y2={182.367}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="h"
+          x1={0.202}
+          x2={0.202}
+          y1={0}
+          y2={8.081}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="i"
+          x1={220.471}
+          x2={220.471}
+          y1={196.667}
+          y2={215.523}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="j"
+          x1={0.471}
+          x2={0.471}
+          y1={0}
+          y2={18.856}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="k"
+          x1={824.471}
+          x2={824.471}
+          y1={131.667}
+          y2={150.523}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="l"
+          x1={0.471}
+          x2={0.471}
+          y1={0}
+          y2={18.856}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="m"
+          x1={336.471}
+          x2={336.471}
+          y1={88.666}
+          y2={107.523}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          gradientUnits="userSpaceOnUse"
+          id="n"
+          x1={0.471}
+          x2={0.471}
+          y1={0}
+          y2={18.856}
+        >
+          <stop stopColor="#fff" stopOpacity={0} />
+          <stop offset={0.5} stopColor="#fff" />
+          <stop offset={1} stopColor="#fff" stopOpacity={0} />
+        </linearGradient>
+      </defs>
+    </svg>
+  ),
 };
