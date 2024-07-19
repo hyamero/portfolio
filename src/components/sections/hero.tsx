@@ -8,6 +8,7 @@ import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
+import ringStar from "/public/img/rings-bg.svg";
 
 const _heroText = {
   top: "Crafting ideas into",
@@ -55,6 +56,11 @@ export default function Hero() {
             ></feTurbulence>
           </filter>
         </svg>
+
+        {/* Noise Filter */}
+        <div className="absolute -left-1/2 bottom-0 -z-10 size-full opacity-80">
+          <Image alt="Stars" src={ringStar} fill />
+        </div>
 
         <Particles
           className="absolute inset-0"

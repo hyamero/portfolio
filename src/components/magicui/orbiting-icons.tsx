@@ -31,7 +31,7 @@ export default function OrbitingIcons({
           className="pointer-events-none absolute inset-0 size-full"
         >
           <circle
-            className="stroke-black/10 stroke-1 dark:stroke-white/10"
+            className="stroke-white/5 stroke-1"
             cx="50%"
             cy="50%"
             r={radius}
@@ -52,7 +52,7 @@ export default function OrbitingIcons({
           } as React.CSSProperties
         }
         className={cn(
-          "animate-orbit absolute flex size-full transform-gpu items-center justify-center rounded-full border bg-black/10 [animation-delay:calc(var(--delay)*1000ms)] dark:bg-white/10",
+          "absolute flex size-full transform-gpu animate-orbit items-center justify-center rounded-full border bg-black/10 [animation-delay:calc(var(--delay)*1000ms)] dark:bg-white/10",
           { "[animation-direction:reverse]": reverse },
           className,
         )}
