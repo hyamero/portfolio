@@ -22,26 +22,39 @@ const descriptionText = _descriptionText.split(" ");
 
 export default function Hero() {
   return (
-    <section id="home" className="relative border-b">
+    <section id="home" className="relative overflow-hidden border-b">
       {/* BG Filter */}
-      <div className="pointer-events-none absolute left-0 top-0 h-full w-full bg-black/25 mix-blend-overlay" />
+      <div className="pointer-events-none absolute inset-0 h-full w-full bg-black/35 mix-blend-overlay" />
 
       <div className="container flex min-h-screen pt-40 lg:pt-48">
         <div className="absolute left-0 top-0 -z-10 size-full">
           <Image
             src={heroBg}
             alt="Main Background"
-            className="object-cover object-center"
+            className="object-cover object-center opacity-90"
             priority
             fill
           />
         </div>
 
-        {/* BG Noise */}
+        {/* Noise Filter */}
         <div
-          className="absolute inset-0 -z-10 bg-top opacity-15 forced-colors:hidden"
-          style={{ backgroundImage: `url(/img/noise.png)` }}
+          style={{
+            filter: "url(#noiseFilter)",
+          }}
+          className="absolute inset-0 opacity-75 mix-blend-soft-light"
         />
+
+        <svg aria-hidden="true" className="absolute">
+          <filter id="noiseFilter">
+            <feTurbulence
+              baseFrequency="6.29"
+              numOctaves="6"
+              stitchTiles="stitch"
+              type="fractalNoise"
+            ></feTurbulence>
+          </filter>
+        </svg>
 
         <Particles
           className="absolute inset-0"
