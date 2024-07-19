@@ -52,6 +52,19 @@
     @apply bg-background text-foreground;
   }
 
+  .spotlight {
+    background: radial-gradient(
+      50% 50% at 50% 50%,
+      #fff 0,
+      hsla(0, 0%, 100%, 0) 100%
+    );
+    opacity: 0.06;
+    transform: rotate(45deg);
+    width: 100%;
+    top: -80px;
+    max-width: 1800px;
+  }
+
   /*
  Hover Effect
  */
