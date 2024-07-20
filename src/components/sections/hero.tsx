@@ -46,7 +46,7 @@ export default function Hero() {
           className="absolute inset-0 opacity-75 mix-blend-soft-light"
         />
 
-        <svg aria-hidden="true" className="absolute">
+        <svg aria-hidden="true" className="absolute hidden">
           <filter id="noiseFilter">
             <feTurbulence
               baseFrequency="6.29"
@@ -58,8 +58,13 @@ export default function Hero() {
         </svg>
 
         {/* Noise Filter */}
-        <div className="absolute -left-1/2 bottom-0 -z-10 size-full opacity-80">
-          <Image alt="Stars" src={ringStar} fill />
+        <div className="absolute -left-1/2 -top-[20%] -z-10 size-full sm:-top-[10%] 2xl:top-0">
+          <Image
+            alt="Stars"
+            src={ringStar}
+            fill
+            className="scale-[2.5] md:scale-[2] lg:scale-125 2xl:scale-100"
+          />
         </div>
 
         <Particles

@@ -16,22 +16,13 @@ export default function Contact() {
       <div className="bg-neutral-950 sm:rounded-lg sm:border sm:p-4">
         <div className="relative flex h-[550px] w-full rounded-lg bg-black sm:overflow-hidden md:shadow-xl">
           <Ripple />
-          {/* <div className="spotlight absolute h-full"></div> */}
 
-          {/* Noise Filter */}
-          <div
-            style={{
-              filter: "url(#noiseFilter)",
-            }}
-            className="absolute inset-0 opacity-75 mix-blend-soft-light"
-          />
-
-          {/* <Image
+          <Image
             alt="Stars"
             src={starsBg}
             className="absolute inset-0 size-full opacity-70"
             fill
-          /> */}
+          />
 
           <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg  md:shadow-xl">
             <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-6xl font-semibold leading-none text-transparent lg:text-7xl">
