@@ -1,3 +1,5 @@
+type IconProps = React.HTMLAttributes<SVGElement>;
+
 export const Icons = {
   gmail: () => (
     <svg
@@ -84,8 +86,435 @@ export const Icons = {
     </svg>
   ),
 
-  stars: () => (
-    <svg fill="none" height={284} viewBox="0 0 1115 284" width={1115}>
+  ringStars: () => (
+    <svg
+      width={1440}
+      height={810}
+      viewBox="0 0 1440 810"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      // {...props}
+    >
+      <style>
+        {
+          "\n@keyframes fade {\n  to {\n    opacity: 1;\n    filter: blur(0px);\n  }\n}\n\n.ring {\n  opacity: 0;\n  animation: fade 1s ease forwards;\n}\n\n.star {\n  opacity: 0;\n  filter: blur(2px);\n  animation: fade 1s ease forwards;\n}\n"
+        }
+      </style>
+      <g opacity={0.5} clipPath="url(#clip0_1328_22)">
+        <path
+          style={{
+            animationDelay: "0s",
+          }}
+          className="ring"
+          d="M1256.21 404.604C1256.21 700.407 1016.14 940.204 720 940.204C423.859 940.204 183.791 700.407 183.791 404.604C183.791 108.801 423.859 -130.996 720 -130.996C1016.14 -130.996 1256.21 108.801 1256.21 404.604Z"
+          stroke="url(#paint1_linear_1328_22)"
+          strokeOpacity={0.1}
+        />
+        <path
+          style={{
+            animationDelay: "150ms",
+          }}
+          className="ring"
+          d="M1148.87 413.296C1148.87 649.883 956.857 841.676 720 841.676C483.143 841.676 291.133 649.883 291.133 413.296C291.133 176.708 483.143 -15.0845 720 -15.0845C956.857 -15.0845 1148.87 176.708 1148.87 413.296Z"
+          stroke="url(#paint2_linear_1328_22)"
+          strokeOpacity={0.12}
+        />
+        <path
+          style={{
+            animationDelay: "250ms",
+          }}
+          className="ring"
+          d="M1041.52 404.604C1041.52 581.975 897.572 725.764 719.998 725.764C542.424 725.764 398.473 581.975 398.473 404.604C398.473 227.233 542.424 83.4438 719.998 83.4438C897.572 83.4438 1041.52 227.233 1041.52 404.604Z"
+          stroke="url(#paint3_linear_1328_22)"
+          strokeOpacity={0.15}
+        />
+        <path
+          style={{
+            animationDelay: "350ms",
+          }}
+          className="ring"
+          d="M934.184 404.604C934.184 522.759 838.291 618.544 720 618.544C601.709 618.544 505.816 522.759 505.816 404.604C505.816 286.448 601.709 190.664 720 190.664C838.291 190.664 934.184 286.448 934.184 404.604Z"
+          stroke="url(#paint4_linear_1328_22)"
+          strokeOpacity={0.2}
+        />
+        <path
+          style={{
+            animationDelay: "400ms",
+          }}
+          className="ring"
+          d="M934.184 404.604C934.184 522.759 838.291 618.544 720 618.544C601.709 618.544 505.816 522.759 505.816 404.604C505.816 286.448 601.709 190.664 720 190.664C838.291 190.664 934.184 286.448 934.184 404.604Z"
+          stroke="url(#paint5_linear_1328_22)"
+          strokeOpacity={0.5}
+        />
+        <path
+          style={{
+            animationDelay: "450ms",
+          }}
+          className="ring"
+          d="M934.184 404.604C934.184 522.759 838.291 618.544 720 618.544C601.709 618.544 505.816 522.759 505.816 404.604C505.816 286.448 601.709 190.664 720 190.664C838.291 190.664 934.184 286.448 934.184 404.604Z"
+          stroke="url(#paint6_linear_1328_22)"
+          strokeOpacity={0.6}
+        />
+        <g filter="url(#filter0_f_1328_22)">
+          <path
+            d="M934.184 404.604C934.184 522.759 838.291 618.544 720 618.544C601.709 618.544 505.816 522.759 505.816 404.604C505.816 286.448 601.709 190.664 720 190.664C838.291 190.664 934.184 286.448 934.184 404.604Z"
+            stroke="url(#paint7_linear_1328_22)"
+            strokeOpacity={0.2}
+          />
+          <path
+            d="M934.184 404.604C934.184 522.759 838.291 618.544 720 618.544C601.709 618.544 505.816 522.759 505.816 404.604C505.816 286.448 601.709 190.664 720 190.664C838.291 190.664 934.184 286.448 934.184 404.604Z"
+            stroke="url(#paint8_linear_1328_22)"
+            strokeOpacity={0.5}
+          />
+        </g>
+        <g
+          className="star"
+          opacity={0.5}
+          style={{
+            animationDelay: "500ms",
+          }}
+        >
+          <rect
+            opacity={0.9}
+            width={1.09878}
+            height={21.9755}
+            transform="matrix(0.707163 -0.70705 0.707163 0.70705 510.492 323.196)"
+            fill="url(#paint9_linear_1328_22)"
+          />
+          <rect
+            opacity={0.9}
+            width={1.09878}
+            height={21.9755}
+            transform="matrix(0.707163 0.70705 0.707163 -0.70705 510.492 337.957)"
+            fill="url(#paint10_linear_1328_22)"
+          />
+          <ellipse
+            cx={518.65}
+            cy={330.576}
+            rx={1.09886}
+            ry={1.09869}
+            fill="white"
+          />
+        </g>
+      </g>
+      <g
+        className="star"
+        style={{
+          animationDelay: "700ms",
+        }}
+      >
+        <rect
+          opacity={0.9}
+          x={587.539}
+          y={228.853}
+          width={1.0775}
+          height={21.5499}
+          transform="rotate(-90 587.539 228.853)"
+          fill="url(#paint11_linear_1328_22)"
+        />
+        <rect
+          opacity={0.9}
+          width={1.0775}
+          height={21.5499}
+          transform="matrix(1 0 0 -1 597.779 239.09)"
+          fill="url(#paint12_linear_1328_22)"
+        />
+        <circle
+          cx={598.313}
+          cy={228.315}
+          r={1.0775}
+          transform="rotate(-45 598.313 228.315)"
+          fill="white"
+        />
+      </g>
+      <g
+        className="star"
+        opacity={0.7}
+        style={{
+          animationDelay: "600ms",
+        }}
+      >
+        <rect
+          opacity={0.9}
+          x={788.971}
+          y={206.371}
+          width={0.94276}
+          height={18.8552}
+          transform="rotate(-90 788.971 206.371)"
+          fill="url(#paint13_linear_1328_22)"
+        />
+        <rect
+          opacity={0.9}
+          width={0.94276}
+          height={18.8552}
+          transform="matrix(1 0 0 -1 797.928 215.327)"
+          fill="url(#paint14_linear_1328_22)"
+        />
+        <circle
+          cx={798.398}
+          cy={205.9}
+          r={0.94276}
+          transform="rotate(-45 798.398 205.9)"
+          fill="white"
+        />
+      </g>
+      <g
+        className="star"
+        opacity={0.5}
+        style={{
+          animationDelay: "800ms",
+        }}
+      >
+        <rect
+          opacity={0.9}
+          x={928}
+          y={392.571}
+          width={0.808122}
+          height={16.1624}
+          transform="rotate(-45 928 392.571)"
+          fill="url(#paint15_linear_1328_22)"
+        />
+        <rect
+          opacity={0.9}
+          width={0.808122}
+          height={16.1624}
+          transform="matrix(0.707107 0.707107 0.707107 -0.707107 928 403.429)"
+          fill="url(#paint16_linear_1328_22)"
+        />
+        <circle cx={934} cy={398} r={0.808122} fill="white" />
+      </g>
+      <defs>
+        <filter
+          id="filter0_f_1328_22"
+          x={475.316}
+          y={160.164}
+          width={489.367}
+          height={488.88}
+          filterUnits="userSpaceOnUse"
+          colorInterpolationFilters="sRGB"
+        >
+          <feFlood floodOpacity={0} result="BackgroundImageFix" />
+          <feBlend
+            mode="normal"
+            in="SourceGraphic"
+            in2="BackgroundImageFix"
+            result="shape"
+          />
+          <feGaussianBlur
+            stdDeviation={15}
+            result="effect1_foregroundBlur_1328_22"
+          />
+        </filter>
+        <radialGradient
+          id="paint0_radial_1328_22"
+          cx={0}
+          cy={0}
+          r={1}
+          gradientUnits="userSpaceOnUse"
+          gradientTransform="translate(720 364) rotate(80.3639) scale(379.352 675.064)"
+        >
+          <stop stopOpacity={0} />
+          <stop offset={1} />
+        </radialGradient>
+        <linearGradient
+          id="paint1_linear_1328_22"
+          x1={720}
+          y1={-131.496}
+          x2={720}
+          y2={940.704}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint2_linear_1328_22"
+          x1={720}
+          y1={-15.5845}
+          x2={720}
+          y2={842.176}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="#8D8D8D" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint3_linear_1328_22"
+          x1={719.998}
+          y1={82.9438}
+          x2={719.998}
+          y2={726.264}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint4_linear_1328_22"
+          x1={720}
+          y1={190.164}
+          x2={720}
+          y2={525.854}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint5_linear_1328_22"
+          x1={720}
+          y1={190.164}
+          x2={739.981}
+          y2={264.235}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint6_linear_1328_22"
+          x1={720}
+          y1={190.164}
+          x2={724.341}
+          y2={205.127}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint7_linear_1328_22"
+          x1={720}
+          y1={190.164}
+          x2={720}
+          y2={525.854}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint8_linear_1328_22"
+          x1={720}
+          y1={190.164}
+          x2={739.981}
+          y2={264.235}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint9_linear_1328_22"
+          x1={0.549388}
+          y1={0}
+          x2={0.549388}
+          y2={21.9755}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint10_linear_1328_22"
+          x1={0.549388}
+          y1={0}
+          x2={0.549388}
+          y2={21.9755}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint11_linear_1328_22"
+          x1={588.078}
+          y1={228.853}
+          x2={588.078}
+          y2={250.403}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint12_linear_1328_22"
+          x1={0.538748}
+          y1={0}
+          x2={0.538748}
+          y2={21.5499}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint13_linear_1328_22"
+          x1={789.442}
+          y1={206.371}
+          x2={789.442}
+          y2={225.226}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint14_linear_1328_22"
+          x1={0.47138}
+          y1={0}
+          x2={0.47138}
+          y2={18.8552}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint15_linear_1328_22"
+          x1={928.404}
+          y1={392.571}
+          x2={928.404}
+          y2={408.734}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <linearGradient
+          id="paint16_linear_1328_22"
+          x1={0.404061}
+          y1={0}
+          x2={0.404061}
+          y2={16.1624}
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="white" stopOpacity={0} />
+          <stop offset={0.5} stopColor="white" />
+          <stop offset={1} stopColor="white" stopOpacity={0} />
+        </linearGradient>
+        <clipPath id="clip0_1328_22">
+          <rect width={1440} height={809.208} fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  ),
+
+  stars: (props: IconProps) => (
+    <svg
+      fill="none"
+      height={284}
+      viewBox="0 0 1115 284"
+      width={1115}
+      {...props}
+    >
       <g opacity={0.8}>
         <g opacity={0.6} fill="#D9D9D9">
           <circle
