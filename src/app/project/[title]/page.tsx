@@ -6,7 +6,9 @@ import { ProjectShowcase } from "@/components/sections";
 import ProjectAnimation from "@/components/animations/project";
 
 export default function Project({ params }: { params: { title: string } }) {
-  const project = projects.find((project) => project.company === params.title);
+  const project = projects.find(
+    (project) => project.projectTitle === params.title,
+  );
 
   if (!project) {
     return (
@@ -23,7 +25,7 @@ export default function Project({ params }: { params: { title: string } }) {
       <div className="relative z-10 pt-64 lg:pb-0">
         <h2 className="project-title relative z-30 text-center text-[clamp(1.7rem,7vw,6rem)] font-medium capitalize leading-[1.1] tracking-[-0.07em]">
           <span>Project </span>
-          <span>{project.company}</span>
+          <span>{project.projectTitle}</span>
         </h2>
 
         <ProjectShowcase {...project} />

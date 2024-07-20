@@ -27,17 +27,18 @@ export default function Hero() {
       {/* BG Filter */}
       <div className="pointer-events-none absolute inset-0 h-full w-full bg-black/35 mix-blend-overlay" />
 
-      <div className="container flex min-h-screen pt-40 lg:pt-48">
-        <div className="absolute left-0 top-0 -z-10 size-full">
-          <Image
-            src={heroBg}
-            alt="Main Background"
-            className="object-cover object-center opacity-90"
-            priority
-            fill
-          />
-        </div>
+      <div className="absolute top-0 -z-10 size-full lg:left-0">
+        <Image
+          id="hero-bg"
+          src={heroBg}
+          alt="Main Background"
+          className="object-cover object-center opacity-90"
+          priority
+          fill
+        />
+      </div>
 
+      <div className="container flex min-h-screen pt-40 lg:pt-48">
         {/* Noise Filter */}
         <div
           style={{
@@ -57,7 +58,6 @@ export default function Hero() {
           </filter>
         </svg>
 
-        {/* Noise Filter */}
         <div className="absolute -left-1/2 -top-[20%] -z-10 size-full sm:-top-[10%] 2xl:top-0">
           <Image
             alt="Stars"
