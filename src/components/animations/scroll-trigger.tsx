@@ -4,29 +4,42 @@ import gsap from "gsap";
 import React from "react";
 import { useGSAP } from "@gsap/react";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useMediaQuery } from "../use-media-query";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+type scrollTriggerParams = {
+  trigger: string;
+  start: string;
+  end: string;
+  scrub: number | boolean;
+  markers?: boolean;
+  toggleActions?: string;
+};
 
 export default function ScrollTrigAnimation({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  function createScrollTrigger(
-    trigger: string,
-    start: string,
-    scrub: number | boolean,
-    toggleActions?: string,
-    end?: string,
-  ) {
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  function createScrollTrigger({
+    trigger,
+    start,
+    end,
+    scrub,
+    markers,
+    toggleActions,
+  }: scrollTriggerParams) {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger,
         start,
-        scrub,
-        toggleActions: toggleActions || "restart none none reset",
         end,
-        markers: process.env.NODE_ENV === "development",
+        scrub,
+        markers: markers ? process.env.NODE_ENV === "development" : false,
+        toggleActions: toggleActions || "restart none none reset",
       },
     });
 
@@ -35,10 +48,15 @@ export default function ScrollTrigAnimation({
 
   const projects = ["omsimos", "umamin", "foliage"];
 
-  useGSAP(() => {
-    projects.forEach((project) => {
-      createScrollTrigger(`.${project}`, "100px bottom", false)
-        .fromTo(
+  useGSAP(
+    () => {
+      projects.forEach((project) => {
+        createScrollTrigger({
+          trigger: `.${project}`,
+          start: "5% bottom",
+          end: "25% 40%",
+          scrub: 3,
+        }).fromTo(
           `.project-subtitle-${project} span`,
           {
             opacity: 0,
@@ -52,21 +70,56 @@ export default function ScrollTrigAnimation({
             filter: "blur(0px)",
           },
           "<",
-        )
-        .fromTo(
+        );
+
+        createScrollTrigger({
+          trigger: `.${project}`,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1.1,
+        }).to(
+          `.stars-${project}`,
+          {
+            y: 130,
+          },
+          "<",
+        );
+
+        if (isDesktop) {
+          createScrollTrigger({
+            trigger: "#home",
+            start: "5px top",
+            end: "bottom top",
+            scrub: 1.2,
+          }).to(
+            "#hero-bg",
+            {
+              y: 80,
+              x: 30,
+            },
+            "<",
+          );
+        }
+
+        createScrollTrigger({
+          trigger: `.thumbnail-${project}`,
+          start: "-50px bottom",
+          end: "65% 40%",
+          scrub: 2,
+        }).fromTo(
           `.thumbnail-${project}`,
           {
-            filter: "grayscale(100%)",
+            opacity: 0.2,
           },
           {
-            filter: "grayscale(0%)",
-            duration: 2.5,
-            ease: "power4.inOut",
+            opacity: 1,
           },
-          "<10%",
+          "<",
         );
-    });
-  });
+      });
+    },
+    { dependencies: [isDesktop] },
+  );
 
   return <>{children}</>;
 }

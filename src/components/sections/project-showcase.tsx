@@ -3,10 +3,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
+import { Icons } from "../icons";
 import { type Project } from "@/lib/projects";
 import { ArrowUpRightIcon } from "lucide-react";
 import atomIcon from "/public/img/icons/atom-icon.png";
 import AnimatedShinyText from "../magicui/animated-shiny-text";
+import ringStar from "/public/img/rings-bg.svg";
 
 export default function ProjectShowcase({ ...props }: Project) {
   const {
@@ -15,7 +17,7 @@ export default function ProjectShowcase({ ...props }: Project) {
     role,
     techs,
     image,
-    company,
+    projectTitle,
     subtitle,
     // shineColor,
     description,
@@ -33,17 +35,26 @@ export default function ProjectShowcase({ ...props }: Project) {
 
   return (
     <section
-      id={company}
+      id={projectTitle}
       className={cn(
-        company,
-        "project-wrapper border-b-none  relative z-10 pb-14 lg:border-b lg:pb-0 ",
+        projectTitle,
+        "project-wrapper border-b-none relative z-10 overflow-hidden pb-14 lg:border-b lg:pb-0",
       )}
     >
+      <div className="absolute -bottom-[45%] -right-[45%] -z-10 hidden size-full xl:block">
+        <Image
+          alt="Stars"
+          src={ringStar}
+          fill
+          className=" scale-[2.5] opacity-75 md:scale-[2] lg:scale-125 2xl:scale-100"
+        />
+      </div>
+
       <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
-        <div className="col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950 lg:py-24 lg:leading-[1.1] xl:text-balance xl:rounded-br-none">
+        <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-muted-foreground backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(
-              `project-subtitle-${company} project-subtitle`,
+              `project-subtitle-${projectTitle} project-subtitle`,
               "w-full 2xl:w-4/5",
             )}
           >
@@ -59,19 +70,35 @@ export default function ProjectShowcase({ ...props }: Project) {
           </h2>
         </div>
 
-        <div className="col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <div className="rounded-lg border bg-neutral-950 p-2 md:p-4">
-            <Image
-              alt={`${company} Showcase`}
-              src={image}
-              className={cn(
-                `thumbnail-${company}`,
-                "w-full rounded-lg shadow-md",
-              )}
-              placeholder="blur"
-              priority
-            />
+        <div className="relative -z-10 col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
+          <div className="rounded-lg bg-gradient-to-bl from-neutral-800 to-border p-px">
+            <div className="rounded-lg bg-neutral-950 p-2 md:p-4">
+              <Image
+                alt={`${projectTitle} Showcase`}
+                src={image}
+                className={cn(
+                  `thumbnail-${projectTitle}`,
+                  "w-full rounded-lg shadow-md",
+                )}
+                placeholder="blur"
+                priority
+              />
+            </div>
           </div>
+
+          <Icons.stars
+            className={cn(
+              `stars-${projectTitle}`,
+              "absolute -left-52 -top-40 -z-[11] opacity-70 xl:-left-10",
+            )}
+          />
+
+          {/* <Icons.stars
+            className={cn(
+              `stars-${projectTitle}`,
+              "absolute -left-52 bottom-20 -z-[11] opacity-70 xl:-left-10",
+            )}
+          /> */}
         </div>
 
         <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b bg-neutral-950 px-10 py-10 sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
@@ -94,7 +121,7 @@ export default function ProjectShowcase({ ...props }: Project) {
             <div className="flex h-full flex-col items-start gap-7 px-7 py-10 sm:px-10">
               <p className="text-lg font-medium leading-[1.3] tracking-tight text-muted-foreground sm:text-xl md:leading-[1.2] 2xl:text-2xl 2xl:leading-[1.1]">
                 <span className="font-semibold capitalize text-foreground">
-                  {company}
+                  {projectTitle}
                 </span>{" "}
                 {description}
               </p>
@@ -117,7 +144,7 @@ export default function ProjectShowcase({ ...props }: Project) {
             <ul className="flex h-full flex-col justify-between border-l text-sm text-muted-foreground md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
               <li>
                 <span>Company</span>
-                <span className="capitalize">{company}</span>
+                <span className="capitalize">{projectTitle}</span>
               </li>
               <li>
                 <span>Year</span>
@@ -128,7 +155,7 @@ export default function ProjectShowcase({ ...props }: Project) {
                 <span className="text-right">{role}</span>
               </li>
             </ul>
-            <div className="hidden h-full border-l border-t lg:block" />
+            <div className="hidden h-full border-l border-t backdrop-blur-sm lg:block" />
           </div>
         </div>
       </div>

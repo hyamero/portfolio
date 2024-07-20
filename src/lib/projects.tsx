@@ -7,7 +7,7 @@ export type Project = {
   subtitle: string;
   image: StaticImageData;
   description: string;
-  company: string;
+  projectTitle: string;
   year: number;
   role: string;
   techs: string;
@@ -17,7 +17,7 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    company: "omsimos",
+    projectTitle: "omsimos",
     description: "is a community driven open source developer collective",
     subtitle:
       "I specialize in crafting high-quality websites using cutting-edge technologies, seamlessly blending creative design with top-tier performance.",
@@ -29,7 +29,7 @@ export const projects: Project[] = [
     // shineColor: ["#28af66", "#15422c"],
   },
   {
-    company: "umamin",
+    projectTitle: "umamin",
     description: "is an open-source platform for anonymous messages.",
     subtitle:
       "Reached over 2.5 million unique users and generated 14 million+ page visits. Attained 700K users in less than a week during the initial launch.",
@@ -41,7 +41,7 @@ export const projects: Project[] = [
     // shineColor: ["#f51aa6", "#4f0835"],
   },
   {
-    company: "foliage",
+    projectTitle: "foliage",
     description:
       "is an experimental e-commerce website design for luxurious plants.",
     subtitle:
