@@ -47,11 +47,11 @@ export default function Hero() {
           className="absolute inset-0 opacity-75 mix-blend-soft-light"
         />
 
-        <svg aria-hidden="true" className="absolute hidden">
+        <svg aria-hidden="true" className="absolute left-full">
           <filter id="noiseFilter">
             <feTurbulence
               baseFrequency="6.29"
-              numOctaves="6"
+              numOctaves="1"
               stitchTiles="stitch"
               type="fractalNoise"
             ></feTurbulence>

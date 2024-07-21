@@ -55,7 +55,7 @@ export default function ScrollTrigAnimation({
           trigger: `.${project}`,
           start: "5% bottom",
           end: "25% 40%",
-          scrub: 3,
+          scrub: false,
         }).fromTo(
           `.project-subtitle-${project} span`,
           {
