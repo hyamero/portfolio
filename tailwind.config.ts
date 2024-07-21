@@ -73,17 +73,17 @@ const config = {
           },
         },
 
-        "shine-pulse": {
-          "0%": {
-            "background-position": "0% 0%",
-          },
-          "50%": {
-            "background-position": "100% 100%",
-          },
-          to: {
-            "background-position": "0% 0%",
-          },
-        },
+        // "shine-pulse": {
+        //   "0%": {
+        //     "background-position": "0% 0%",
+        //   },
+        //   "50%": {
+        //     "background-position": "100% 100%",
+        //   },
+        //   to: {
+        //     "background-position": "0% 0%",
+        //   },
+        // },
 
         shimmer: {
           "0%, 90%, 100%": {
@@ -113,14 +113,26 @@ const config = {
               "rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)",
           },
         },
+
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(calc(-100% - var(--gap)))" },
+        },
+
+        "marquee-vertical": {
+          from: { transform: "translateY(0)" },
+          to: { transform: "translateY(calc(-100% - var(--gap)))" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
+        // "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
         shimmer: "shimmer 8s infinite",
         ripple: "ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite",
         orbit: "orbit calc(var(--duration)*1s) linear infinite",
+        marquee: "marquee var(--duration) linear infinite",
+        "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
       },
     },
   },
