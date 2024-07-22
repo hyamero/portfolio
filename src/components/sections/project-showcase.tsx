@@ -38,7 +38,7 @@ export default function ProjectShowcase({ ...props }: Project) {
       id={projectTitle}
       className={cn(
         projectTitle,
-        "project-wrapper border-b-none relative z-10 overflow-hidden pb-14 lg:border-b lg:pb-0",
+        "project-wrapper border-b-none relative z-10 my-52 overflow-hidden lg:my-64 lg:border-b",
       )}
     >
       <div className="absolute -bottom-[45%] -right-[45%] -z-10 hidden size-full xl:block">
@@ -50,7 +50,7 @@ export default function ProjectShowcase({ ...props }: Project) {
         />
       </div>
 
-      <div className="container grid min-h-screen grid-cols-4 items-center pt-40 lg:gap-y-0">
+      <div className="container grid min-h-screen grid-cols-4 items-center lg:gap-y-0">
         <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-neutral-500 backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(

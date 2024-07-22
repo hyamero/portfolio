@@ -6,29 +6,6 @@ import {
   Github,
 } from "lucide-react";
 
-const slugs = [
-  "typescript",
-  "javascript",
-  "react",
-  "html5",
-  "css3",
-  "nodedotjs",
-  "nextdotjs",
-  "prisma",
-  "postgresql",
-  "firebase",
-  "vercel",
-  "docker",
-  "git",
-  "github",
-  "visualstudiocode",
-  "figma",
-  "drizzle",
-  "trpc",
-  "supabase",
-  "tailwindcss",
-];
-
 const features = [
   {
     Icon: FileTextIcon,
@@ -71,11 +48,8 @@ const features = [
 
 export default function OSShowcase() {
   return (
-    <section
-      id="tools"
-      className="container relative z-10 mx-auto grid min-h-screen place-items-center gap-40 py-72 xl:w-5/6"
-    >
-      <h2 className="mx-auto text-center text-[clamp(1.7rem,7vw,6rem)] font-medium leading-[1.1] tracking-[-0.07em]">
+    <section id="tools" className="container relative z-10 mx-auto xl:w-5/6">
+      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,7vw,5rem)] font-medium leading-[1.1] tracking-[-0.07em]">
         Building tools for the <br />
         open-source community
       </h2>

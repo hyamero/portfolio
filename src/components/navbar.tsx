@@ -148,6 +148,7 @@ export default function Navbar() {
           <div className="h-8 rounded-r-md border border-l-0 border-muted/60 bg-black/50 px-3 backdrop-blur-sm hover:bg-muted/40">
             <button
               type="button"
+              name="menu"
               className="nav-item menu-burger group flex w-7 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:transform [&>span]:rounded-full [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
               onClick={() => toggleNav()}
             >

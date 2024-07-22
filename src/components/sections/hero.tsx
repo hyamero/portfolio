@@ -63,6 +63,7 @@ export default function Hero() {
             alt="Stars"
             src={ringStar}
             fill
+            priority
             className="scale-[2.5] md:scale-[2] lg:scale-125 2xl:scale-100"
           />
         </div>
