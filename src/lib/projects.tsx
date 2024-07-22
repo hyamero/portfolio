@@ -32,7 +32,7 @@ export const projects: Project[] = [
     projectTitle: "umamin",
     description: "is an open-source platform for anonymous messages.",
     subtitle:
-      "Reached over 2.5 million unique users and generated 14 million+ page visits. Attained 700K users in less than a week during the initial launch.",
+      "Reached over 2.6 million unique users and generated 14.5 million+ page visits. Attained 700K users in less than a week during the initial launch.",
     image: umaminThumb,
     year: 2023,
     role: "Front-End Engineer, UI/UX Design",

@@ -79,7 +79,7 @@ const ReviewCard = ({
         "relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-950 p-2 lg:p-4",
       )}
     >
-      <div className="size-full rounded-lg bg-neutral-800" />
+      <div className="size-full rounded-lg [box-shadow:0_0_40px_-20px_#ffffff1f_inset]" />
     </div>
   );
 };
