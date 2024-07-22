@@ -27,7 +27,9 @@ export default function ProjectShowcase({ ...props }: Project) {
 
   const _keywordsHighlight = {
     omsimos: "high-quality cutting-edge top-tier".split(" "),
-    umamin: "2.5 million unique users 14 million+ page visits 700K".split(" "),
+    umamin: "2.6 million unique users 14.5 million+ page visits 700K".split(
+      " ",
+    ),
     foliage: "clean interactive websites, modern technology".split(" "),
   };
 
@@ -51,7 +53,7 @@ export default function ProjectShowcase({ ...props }: Project) {
       </div>
 
       <div className="container grid min-h-screen grid-cols-4 items-center lg:gap-y-0">
-        <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-neutral-500 backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 xl:text-balance xl:rounded-br-none">
+        <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-neutral-500 backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 lg:[box-shadow:0_10px_40px_-20px_#ffffff1f_inset] xl:text-balance xl:rounded-br-none">
           <h2
             className={cn(
               `project-subtitle-${projectTitle} project-subtitle`,
@@ -71,7 +73,7 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="relative -z-10 col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <div className="rounded-lg bg-gradient-to-bl from-neutral-800 to-border p-px">
+          <div className="rounded-lg bg-gradient-to-bl from-border/50 via-neutral-800/80 to-border/50 p-px">
             <div className="rounded-lg bg-neutral-950 p-2 md:p-4">
               <Image
                 alt={`${projectTitle} Showcase`}
@@ -101,7 +103,7 @@ export default function ProjectShowcase({ ...props }: Project) {
           />
         </div>
 
-        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b bg-neutral-950 px-10 py-10 sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
+        <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b bg-[#080808] px-10 py-10 [box-shadow:0_-10px_40px_-20px_#ffffff1f_inset] sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
           <Image
             alt="Atom Icon"
             src={atomIcon}
@@ -116,8 +118,8 @@ export default function ProjectShowcase({ ...props }: Project) {
           </p>
         </div>
 
-        <div className="col-span-4 row-start-3 grid h-full w-full grid-cols-4 overflow-hidden rounded-t-lg border md:grid-cols-5 lg:grid-cols-3 lg:grid-rows-2 lg:rounded-none lg:rounded-tl-lg lg:border-b-0 xl:col-span-3">
-          <div className="col-span-4 h-full bg-[#111] md:col-span-2 lg:col-span-1">
+        <div className="col-span-4 row-start-3 grid h-full w-full grid-cols-4 overflow-hidden rounded-t-lg border [box-shadow:0_0_40px_-20px_#ffffff1f_inset] md:grid-cols-5 lg:grid-cols-3 lg:grid-rows-2 lg:rounded-none lg:rounded-tl-lg lg:border-b-0 xl:col-span-3">
+          <div className="col-span-4 h-full bg-neutral-900/50 backdrop-blur-sm md:col-span-2 lg:col-span-1">
             <div className="flex h-full flex-col items-start gap-7 px-7 py-10 sm:px-10">
               <p className="text-lg font-medium leading-[1.3] tracking-tight text-neutral-500 sm:text-xl md:leading-[1.2] 2xl:text-2xl 2xl:leading-[1.1]">
                 <span className="font-semibold capitalize text-foreground">
@@ -141,7 +143,7 @@ export default function ProjectShowcase({ ...props }: Project) {
             <div className="hidden h-full border-t lg:block" />
           </div>
 
-          <div className="col-span-4 bg-[#111] md:col-span-3 md:col-start-3 lg:col-span-2">
+          <div className="col-span-4 bg-neutral-900/50 backdrop-blur-sm  md:col-span-3 md:col-start-3 lg:col-span-2">
             <ul className="flex h-full flex-col justify-between border-l text-sm text-neutral-500 md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
               <li>
                 <span>Company</span>

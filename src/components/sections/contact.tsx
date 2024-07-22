@@ -11,7 +11,7 @@ export default function Contact() {
   return (
     <section
       id="contact"
-      className="z-10 my-40 w-full overflow-hidden border-y sm:container sm:overflow-auto sm:border-y-0"
+      className="z-10 w-full overflow-hidden border-y sm:container sm:overflow-auto sm:border-y-0"
     >
       <div className="bg-neutral-950 sm:rounded-lg sm:border sm:p-4">
         <div className="relative flex h-[550px] w-full rounded-lg bg-black sm:overflow-hidden md:shadow-xl">
