@@ -29,7 +29,9 @@ export function CardsChat() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="text-sm font-medium leading-none">GPT</p>
+            <p className="text-sm font-medium leading-none text-neutral-400">
+              GPT
+            </p>
             <p className="text-sm text-muted-foreground">gpt-3.5-turbo</p>
           </div>
         </div>
