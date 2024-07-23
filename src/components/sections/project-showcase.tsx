@@ -40,7 +40,7 @@ export default function ProjectShowcase({ ...props }: Project) {
       id={projectTitle}
       className={cn(
         projectTitle,
-        "project-wrapper border-b-none relative z-10 my-52 overflow-hidden lg:my-64 lg:border-b",
+        "project-wrapper border-b-none relative z-10 my-52 overflow-hidden lg:my-64 lg:border-b xl:my-80",
       )}
     >
       <div className="absolute -bottom-[45%] -right-[45%] -z-10 hidden size-full xl:block">

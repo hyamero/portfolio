@@ -44,7 +44,7 @@ export default function Hero() {
           style={{
             filter: "url(#noiseFilter)",
           }}
-          className="absolute inset-0 opacity-75 mix-blend-soft-light"
+          className="absolute inset-0 opacity-75 mix-blend-soft-light [mask-image:radial-gradient(ellipse_at_bottom,white,transparent_80%)]"
         />
 
         <svg aria-hidden="true" className="absolute left-full">
