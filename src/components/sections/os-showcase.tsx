@@ -5,6 +5,7 @@ import {
   FileTextIcon,
   Github,
 } from "lucide-react";
+import { CardsChat } from "./tools/chat";
 
 const features = [
   {
@@ -30,15 +31,19 @@ const features = [
     Icon: BotMessageSquare,
     name: "Chat Assistant",
     description: "AI Chatbot Application with LLM integration.",
-    href: "/",
-    cta: "Learn more",
+    href: "https://github.com/hyamero/chatbot",
+    cta: "View Repository",
     className: "col-span-3 lg:col-span-2",
-    background: <div className="size-full"></div>,
+    background: (
+      <div className="absolute inset-7 mx-auto [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] lg:inset-10">
+        <CardsChat />
+      </div>
+    ),
   },
   {
     Icon: BlocksIcon,
-    name: "3D Portfolio",
-    description: "Interactive 3D Portfolio using R3F",
+    name: "3D iPhone Config",
+    description: "Interactive 3D iPhone configurator using R3F",
     href: "/",
     cta: "Learn more",
     className: "col-span-3 lg:col-span-1",
@@ -49,9 +54,8 @@ const features = [
 export default function OSShowcase() {
   return (
     <section id="tools" className="container relative z-10 mx-auto xl:w-5/6">
-      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,7vw,5rem)] font-medium leading-[1.1] tracking-[-0.07em]">
-        Building tools for the <br />
-        open-source community
+      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,7vw,5rem)] font-medium leading-[1] tracking-[-0.07em]">
+        Building Tools <br /> for the Community
       </h2>
 
       <BentoGrid>

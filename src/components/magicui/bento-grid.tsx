@@ -1,7 +1,8 @@
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { ArrowRightIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { ArrowRightIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const BentoGrid = ({
   children,
@@ -36,7 +37,7 @@ const BentoCard = ({
   background?: ReactNode;
   Icon?: any;
   description?: string;
-  href?: string;
+  href: string;
   cta?: string;
 }) => (
   <div
@@ -73,10 +74,10 @@ const BentoCard = ({
           size="sm"
           className="pointer-events-auto"
         >
-          <a href={href}>
+          <Link href={href} target="_blank" rel="noopener noreferrer">
             {cta}
             <ArrowRightIcon className="ml-2 h-4 w-4" />
-          </a>
+          </Link>
         </Button>
       )}
     </div>
