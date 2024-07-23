@@ -7,10 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "ui:add": "bunx --bun shadcn-ui@latest add"
+    "ui:add": "bun x --bun shadcn-ui@latest add"
   },
   "dependencies": {
     "@gsap/react": "^2.1.1",
+    "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
