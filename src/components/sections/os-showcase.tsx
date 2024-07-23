@@ -6,6 +6,7 @@ import {
   Github,
 } from "lucide-react";
 import { CardsChat } from "./tools/chat";
+import { GhStatsForm } from "./tools/gh-stats";
 
 const features = [
   {
@@ -22,10 +23,14 @@ const features = [
     Icon: Github,
     name: "GitHub Statistics",
     description: "Generate personal GitHub Stats with ease.",
-    href: "/",
-    cta: "Learn more",
+    href: "https://github-stats.omsimos.com/",
+    cta: "Visit Website",
     className: "col-span-3 lg:col-span-2",
-    background: <div className="size-full"></div>,
+    background: (
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:inset-10">
+        <GhStatsForm />
+      </div>
+    ),
   },
   {
     Icon: BotMessageSquare,
@@ -35,7 +40,7 @@ const features = [
     cta: "View Repository",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] lg:inset-10">
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:inset-10">
         <CardsChat />
       </div>
     ),
