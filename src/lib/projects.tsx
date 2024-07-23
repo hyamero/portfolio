@@ -17,18 +17,6 @@ export type Project = {
 
 export const projects: Project[] = [
   {
-    projectTitle: "omsimos",
-    description: "is a community driven open source developer collective",
-    subtitle:
-      "I specialize in crafting high-quality websites using cutting-edge technologies, seamlessly blending creative design with top-tier performance.",
-    image: omsThumb,
-    year: 2023,
-    role: "Front-End & Design Engineer",
-    techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
-    url: "https://omsimos.com",
-    // shineColor: ["#28af66", "#15422c"],
-  },
-  {
     projectTitle: "umamin",
     description: "is an open-source platform for anonymous messages.",
     subtitle:
@@ -39,6 +27,18 @@ export const projects: Project[] = [
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
     url: "https://umamin.link",
     // shineColor: ["#f51aa6", "#4f0835"],
+  },
+  {
+    projectTitle: "omsimos",
+    description: "is a community driven open source developer collective",
+    subtitle:
+      "I specialize in crafting high-quality websites using cutting-edge technologies, seamlessly blending creative design with top-tier performance.",
+    image: omsThumb,
+    year: 2023,
+    role: "Front-End & Design Engineer",
+    techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
+    url: "https://omsimos.com",
+    // shineColor: ["#28af66", "#15422c"],
   },
   {
     projectTitle: "foliage",

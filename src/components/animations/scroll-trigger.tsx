@@ -22,7 +22,7 @@ export default function ScrollTrigAnimation({
 }: {
   children: React.ReactNode;
 }) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  // const isDesktop = useMediaQuery("(min-width: 768px)");
 
   function createScrollTrigger({
     trigger,
@@ -50,6 +50,22 @@ export default function ScrollTrigAnimation({
 
   useGSAP(
     () => {
+      // if (isDesktop) {
+      //   createScrollTrigger({
+      //     trigger: "#home",
+      //     start: "5px top",
+      //     end: "bottom top",
+      //     scrub: 1.2,
+      //   }).to(
+      //     "#hero-bg",
+      //     {
+      //       y: 80,
+      //       x: 30,
+      //     },
+      //     "<",
+      //   );
+      // }
+
       projects.forEach((project) => {
         createScrollTrigger({
           trigger: `.${project}`,
@@ -85,22 +101,6 @@ export default function ScrollTrigAnimation({
           "<",
         );
 
-        if (isDesktop) {
-          createScrollTrigger({
-            trigger: "#home",
-            start: "5px top",
-            end: "bottom top",
-            scrub: 1.2,
-          }).to(
-            "#hero-bg",
-            {
-              y: 80,
-              x: 30,
-            },
-            "<",
-          );
-        }
-
         createScrollTrigger({
           trigger: `.thumbnail-${project}`,
           start: "-50px bottom",
@@ -118,7 +118,7 @@ export default function ScrollTrigAnimation({
         );
       });
     },
-    { dependencies: [isDesktop] },
+    // { dependencies: [isDesktop] },
   );
 
   return <>{children}</>;
