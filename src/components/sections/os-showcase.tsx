@@ -1,12 +1,13 @@
-import { BentoCard, BentoGrid } from "../magicui/bento-grid";
 import {
-  BlocksIcon,
-  BotMessageSquare,
-  FileTextIcon,
   Github,
+  BlocksIcon,
+  FileTextIcon,
+  BotMessageSquare,
 } from "lucide-react";
 import { CardsChat } from "./tools/chat";
+import { CertGen } from "./tools/certgen";
 import { GhStatsForm } from "./tools/gh-stats";
+import { BentoCard, BentoGrid } from "../magicui/bento-grid";
 
 const features = [
   {
@@ -15,9 +16,13 @@ const features = [
     description:
       "Effortlessly create and distribute e-certificates for events.",
     className: "col-span-3 lg:col-span-1",
-    href: "/",
+    href: "https://github.com/hyamero/certificate-generator",
     cta: "Learn more",
-    background: <div className="size-full"></div>,
+    background: (
+      <div className="absolute inset-7 duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:left-10 lg:top-10 lg:w-[450px]">
+        <CertGen />
+      </div>
+    ),
   },
   {
     Icon: Github,
