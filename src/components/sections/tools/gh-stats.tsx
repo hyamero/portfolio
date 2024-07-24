@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronsUpDown } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-export function GhStatsForm() {
+export function GhStats() {
   return (
     <Card className="mx-auto w-full max-w-lg">
       <CardContent className="space-y-10 px-0 pt-10 lg:px-6">

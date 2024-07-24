@@ -4,11 +4,9 @@ import {
   FileTextIcon,
   BotMessageSquare,
 } from "lucide-react";
-import { CardsChat } from "./tools/chat";
-import { CertGen } from "./tools/certgen";
-import { GhStatsForm } from "./tools/gh-stats";
-import { BentoCard, BentoGrid } from "../magicui/bento-grid";
-import { PhoneConfig } from "./tools/iphone";
+
+import { ChatBot, CertGen, GhStats, PhoneConfig } from "./tools";
+import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
 
 const features = [
   {
@@ -20,7 +18,7 @@ const features = [
     href: "https://github.com/hyamero/certificate-generator",
     cta: "Learn more",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10 md:w-[450px]">
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10 md:w-[450px]">
         <CertGen />
       </div>
     ),
@@ -33,8 +31,8 @@ const features = [
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10">
-        <GhStatsForm />
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10">
+        <GhStats />
       </div>
     ),
   },
@@ -46,8 +44,8 @@ const features = [
     cta: "View Repository",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10">
-        <CardsChat />
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10">
+        <ChatBot />
       </div>
     ),
   },
@@ -59,7 +57,7 @@ const features = [
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-1",
     background: (
-      <div className="absolute inset-7 mx-auto flex justify-center duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 md:inset-10">
+      <div className="absolute inset-7 mx-auto flex justify-center duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 sm:inset-10">
         <PhoneConfig />
       </div>
     ),
