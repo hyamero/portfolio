@@ -8,6 +8,7 @@ import { CardsChat } from "./tools/chat";
 import { CertGen } from "./tools/certgen";
 import { GhStatsForm } from "./tools/gh-stats";
 import { BentoCard, BentoGrid } from "../magicui/bento-grid";
+import { PhoneConfig } from "./tools/iphone";
 
 const features = [
   {
@@ -19,7 +20,7 @@ const features = [
     href: "https://github.com/hyamero/certificate-generator",
     cta: "Learn more",
     background: (
-      <div className="absolute inset-7 duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:left-10 lg:top-10 lg:w-[450px]">
+      <div className="absolute inset-7 duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:left-16 lg:top-16 lg:w-[450px]">
         <CertGen />
       </div>
     ),
@@ -54,10 +55,14 @@ const features = [
     Icon: BlocksIcon,
     name: "3D iPhone Config",
     description: "Interactive 3D iPhone configurator using R3F",
-    href: "/",
-    cta: "Learn more",
+    href: "https://iphone-config.vercel.app/",
+    cta: "Visit Website",
     className: "col-span-3 lg:col-span-1",
-    background: <div className="size-full"></div>,
+    background: (
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 lg:inset-10">
+        <PhoneConfig />
+      </div>
+    ),
   },
 ];
 
