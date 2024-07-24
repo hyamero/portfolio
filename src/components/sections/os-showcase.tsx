@@ -20,7 +20,7 @@ const features = [
     href: "https://github.com/hyamero/certificate-generator",
     cta: "Learn more",
     background: (
-      <div className="absolute inset-7 duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:left-16 lg:top-16 lg:w-[450px]">
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10 md:w-[450px]">
         <CertGen />
       </div>
     ),
@@ -33,7 +33,7 @@ const features = [
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:inset-10">
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10">
         <GhStatsForm />
       </div>
     ),
@@ -46,7 +46,7 @@ const features = [
     cta: "View Repository",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 lg:inset-10">
+      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 md:inset-10">
         <CardsChat />
       </div>
     ),
@@ -59,7 +59,7 @@ const features = [
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-1",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 lg:inset-10">
+      <div className="absolute inset-7 mx-auto flex justify-center duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 md:inset-10">
         <PhoneConfig />
       </div>
     ),

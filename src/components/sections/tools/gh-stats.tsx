@@ -28,16 +28,16 @@ import { Card, CardContent } from "@/components/ui/card";
 export function GhStatsForm() {
   return (
     <Card className="mx-auto w-full max-w-lg">
-      <CardContent className="space-y-10 pt-10 ">
+      <CardContent className="space-y-10 px-0 pt-10 lg:px-6">
         <div className="w-full scale-90 space-y-6">
-          <div className="flex items-end gap-2 text-neutral-400">
+          <div className="flex items-end gap-2 text-neutral-500">
             <div className="w-full">
-              <label>GitHub Username</label>
+              <label className="text-sm font-medium">Username</label>
               <Input placeholder="hyamero" className="text-base" />
             </div>
 
             <div className="flex w-full flex-col">
-              <label>Theme</label>
+              <label className="text-sm font-medium">Theme</label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
