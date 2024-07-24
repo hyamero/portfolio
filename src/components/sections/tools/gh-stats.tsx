@@ -29,10 +29,7 @@ export function GhStatsForm() {
   return (
     <Card className="mx-auto w-full max-w-lg">
       <CardContent className="space-y-10 pt-10 ">
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="w-full scale-90 space-y-6"
-        >
+        <div className="w-full scale-90 space-y-6">
           <div className="flex items-end gap-2 text-neutral-400">
             <div className="w-full">
               <label>GitHub Username</label>
@@ -123,7 +120,7 @@ export function GhStatsForm() {
               <span>Streak</span>
             </li>
           </ul>
-        </form>
+        </div>
       </CardContent>
     </Card>
   );
