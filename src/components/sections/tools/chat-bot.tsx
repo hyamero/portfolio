@@ -6,7 +6,7 @@ import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Moon } from "lucide-react";
 
-export function CardsChat() {
+export function ChatBot() {
   const messages = [
     {
       role: "agent",
