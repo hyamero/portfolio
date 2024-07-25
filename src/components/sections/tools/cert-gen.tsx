@@ -7,16 +7,9 @@ export function CertGen() {
   return (
     <Card className="mx-auto w-full max-w-lg">
       <CardHeader className="flex flex-col items-center justify-center">
-        <Link
-          href="https://github.com/omsimos"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group rounded-full border border-white/5 bg-neutral-950 text-xs font-medium text-white transition-all ease-in"
-        >
-          <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out">
-            <span>✨ Certificate of Recognition</span>
-          </AnimatedShinyText>
-        </Link>
+        <AnimatedShinyText className="group inline-flex items-center justify-center rounded-full border border-white/5 bg-neutral-950 px-4 py-1 text-xs font-medium text-white transition ease-out">
+          <span>✨ Certificate of Recognition</span>
+        </AnimatedShinyText>
 
         <div className="text-center text-neutral-600">
           <p className="text-nowrap text-xl font-semibold sm:text-2xl">

@@ -1,34 +1,49 @@
 import { cn } from "@/lib/utils";
 import Marquee from "../magicui/marquee";
+import Image from "next/image";
+import { type StaticImageData } from "next/image";
+
+import chatti from "/public/img/projects/design/chatti.jpg";
+import gdsc from "/public/img/projects/design/gdsc.jpg";
+import outlaw from "/public/img/projects/design/outlaw.jpg";
+import culture from "/public/img/projects/design/culture.jpg";
+import port3d from "/public/img/projects/design/3d-port.jpg";
+import collectApis from "/public/img/projects/design/collect-apis.jpg";
+import proemial from "/public/img/projects/design/proemial.jpg";
 
 const projects = [
   {
-    img: "",
+    img: chatti,
     url: "",
     square: false,
   },
   {
-    img: "",
+    img: culture,
     url: "",
     square: true,
   },
   {
-    img: "",
+    img: outlaw,
     url: "",
     square: false,
   },
   {
-    img: "",
-    url: "",
-    square: false,
-  },
-  {
-    img: "",
+    img: gdsc,
     url: "",
     square: true,
   },
   {
-    img: "",
+    img: port3d,
+    url: "",
+    square: false,
+  },
+  {
+    img: proemial,
+    url: "",
+    square: true,
+  },
+  {
+    img: collectApis,
     url: "",
     square: false,
   },
@@ -43,13 +58,20 @@ export default function DesignShowcase() {
       <h2 className="mx-auto mb-20 text-balance text-center text-[clamp(1.7rem,6vw,5rem)] font-medium leading-[1.1] tracking-[-0.07em]">
         Crafting digital experiences <br /> that leave a lasting impact.
       </h2>
-      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden  rounded-lg bg-background md:shadow-xl">
-        <Marquee pauseOnHover className="[--duration:20s]">
+      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:shadow-xl">
+        <Marquee
+          pauseOnHover
+          className="[--duration:20s] [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+        >
           {firstRow.map((project) => (
             <ReviewCard key={project.url} {...project} />
           ))}
         </Marquee>
-        <Marquee reverse pauseOnHover className="[--duration:20s]">
+        <Marquee
+          reverse
+          pauseOnHover
+          className="[--duration:20s] [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+        >
           {secondRow.map((project) => (
             <ReviewCard key={project.url} {...project} />
           ))}
@@ -66,7 +88,7 @@ const ReviewCard = ({
   url,
   square,
 }: {
-  img: string;
+  img: StaticImageData;
   url: string;
   square: boolean;
 }) => {
@@ -79,7 +101,12 @@ const ReviewCard = ({
         "relative cursor-pointer overflow-hidden rounded-xl border bg-neutral-950 p-2 lg:p-4",
       )}
     >
-      <div className="size-full rounded-lg [box-shadow:0_0_40px_-20px_#ffffff1f_inset]" />
+      <Image
+        alt="Culture"
+        src={img}
+        className="h-full w-full rounded-lg object-cover"
+      />
+      {/* <div className="size-full rounded-lg [box-shadow:0_0_40px_-20px_#ffffff1f_inset]" /> */}
     </div>
   );
 };
