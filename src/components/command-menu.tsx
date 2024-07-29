@@ -1,8 +1,9 @@
 "use client";
 
 import gsap from "gsap";
+import Link from "next/link";
 import { useGSAP } from "@gsap/react";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import PageTransition from "./animations/page-transition";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
@@ -35,7 +36,6 @@ type Commands = {
   items: {
     Icon: React.FC<React.SVGProps<SVGSVGElement>>;
     title: string;
-    action?: () => void;
     url?: string;
   }[];
 };
@@ -56,7 +56,7 @@ const commands: Commands[] = [
   {
     group: "Contact",
     items: [
-      { Icon: Newspaper, title: "Resume", url: "https://github.com/hyamero" },
+      { Icon: Newspaper, title: "Resume", url: "/resume" },
       { Icon: Github, title: "GitHub", url: "https://github.com/hyamero" },
       {
         Icon: Linkedin,
@@ -128,15 +128,27 @@ export function CommandMenu() {
 
         {commands.map(({ group, items }) => (
           <CommandGroup key={group} heading={group === "home" ? "" : group}>
-            {items.map(({ Icon, title, action }) => (
-              <CommandItem
-                onSelect={() => commandAction(group, title)}
-                key={title}
-                className="cursor-pointer"
-              >
-                <Icon className="mr-2 size-4" />
-                <span className="capitalize">{title}</span>
-              </CommandItem>
+            {items.map(({ Icon, title, url }) => (
+              <React.Fragment key={title}>
+                {group === "Contact" && url ? (
+                  <Link href={url} target="_blank" rel="noopener noreferrer">
+                    <CommandItem className="cursor-pointer">
+                      <Icon className="mr-2 size-4" />
+                      <span className="capitalize">{title}</span>
+                    </CommandItem>
+                  </Link>
+                ) : (
+                  <CommandItem
+                    onSelect={() => commandAction(group, title)}
+                    className="cursor-pointer"
+                  >
+                    <>
+                      <Icon className="mr-2 size-4" />
+                      <span className="capitalize">{title}</span>
+                    </>
+                  </CommandItem>
+                )}
+              </React.Fragment>
             ))}
             <CommandSeparator />
           </CommandGroup>

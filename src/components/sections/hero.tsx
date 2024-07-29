@@ -4,11 +4,11 @@ import Image from "next/image";
 
 import heroBg from "/public/img/main-bg.jpg";
 import Particles from "../magicui/particles";
+import ringStar from "/public/img/rings-bg.svg";
 import starIcon from "/public/img/icons/star-icon.png";
 import globeIcon from "/public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
-import ringStar from "/public/img/rings-bg.svg";
 
 const _heroText = {
   top: "Crafting ideas into",
@@ -130,15 +130,15 @@ export default function Hero() {
           </div>
 
           <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-sm md:w-1/3 md:pb-10">
-            <a
-              href="#"
+            <Link
+              href="/resume"
               target="_blank"
               rel="noopener noreferrer"
               className="hover-effect relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"
             >
               <p>View Resume</p>
               <ArrowUpRight className="stroke-1" />
-            </a>
+            </Link>
 
             <Image
               alt="Globe Icon"
