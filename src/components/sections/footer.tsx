@@ -18,7 +18,7 @@ export default function Footer() {
   return (
     <footer
       id="footer"
-      className="relative mt-52 border-t bg-neutral-950 py-16 pb-12 lg:mt-64 lg:py-28"
+      className="relative mt-52 border-t bg-neutral-950 pb-7 pt-16 lg:mt-64 lg:pt-28"
     >
       <div className="container flex flex-col items-center gap-5 lg:flex-row lg:items-end lg:justify-between">
         <p className="text-[clamp(2rem,16vw,12rem)] font-semibold leading-none tracking-tighter text-neutral-200">

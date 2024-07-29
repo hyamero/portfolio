@@ -73,7 +73,7 @@ const socials: Socials[] = [
   {
     name: "Discord",
     icon: Icons.discord,
-    href: "",
+    href: "https://discord.gg/zbRvmbrZmc",
     duration: 20,
     delay: 10,
     radius: 80,
