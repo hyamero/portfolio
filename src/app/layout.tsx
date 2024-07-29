@@ -10,6 +10,7 @@ import { Footer } from "@/components/sections";
 import Navbar from "@/components/navbar";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dale.omsimos.com"),
   title: {
     default: "Dale Bañares",
     template: "%s | Dale Bañares",
