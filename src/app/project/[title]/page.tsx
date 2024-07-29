@@ -1,24 +1,39 @@
 import Link from "next/link";
 
+import NotFound from "@/app/not-found";
 import { projects } from "@/lib/projects";
 import { ArrowUpRight } from "lucide-react";
 import { ProjectShowcase } from "@/components/sections";
 import ProjectAnimation from "@/components/animations/project";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { title: string };
+}) {
+  const project = projects.find(
+    (project) => project.projectTitle === params.title,
+  );
+
+  if (!project) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    title: project.projectTitle,
+    description: project.subtitle,
+    image: project.image,
+  };
+}
 
 export default function Project({ params }: { params: { title: string } }) {
   const project = projects.find(
     (project) => project.projectTitle === params.title,
   );
 
-  if (!project) {
-    return (
-      <div className="container relative z-50 pt-64 lg:pb-0">
-        <h2 className="mx-auto text-center text-[clamp(1.7rem,7vw,6rem)] font-medium leading-[1.1] tracking-[-0.07em]">
-          Project not found
-        </h2>
-      </div>
-    );
-  }
+  if (!project) return <NotFound />;
 
   return (
     <ProjectAnimation>

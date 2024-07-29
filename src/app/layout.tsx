@@ -10,9 +10,35 @@ import { Footer } from "@/components/sections";
 import Navbar from "@/components/navbar";
 
 export const metadata: Metadata = {
-  title: "Dale Bañares — Software Engineer and Designer",
-  description:
-    "Joseph Dale Bañares is a Software Engineer and Designer based in the Philippines.",
+  title: {
+    default: "Dale Bañares",
+    template: "%s | Dale Bañares",
+  },
+  description: "Software Engineer and Designer based in the Philippines.",
+  openGraph: {
+    title: "Dale Bañares",
+    description: "Software Engineer and Designer based in the Philippines",
+    url: "https://dale.omsimos.com",
+    siteName: "Dale Bañares",
+    locale: "en_US",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  twitter: {
+    title: "Dale Bañares",
+    card: "summary_large_image",
+    description: "Software Engineer and Designer based in the Philippines",
+  },
 };
 
 export default function RootLayout({
