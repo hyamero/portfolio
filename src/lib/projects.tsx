@@ -22,7 +22,7 @@ export const projects: Project[] = [
     subtitle:
       "Reached over 2.6 million unique users and generated 14.5 million+ page visits. Attained 700K users in less than a week during the initial launch.",
     image: umaminThumb,
-    year: 2023,
+    year: 2022,
     role: "Front-End Engineer, UI/UX Design",
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
     url: "https://umamin.link",

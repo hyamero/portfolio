@@ -46,7 +46,7 @@ export const NavMenu = ({
               key={item}
               className="menu-item text-4xl font-light tracking-tighter opacity-0 md:text-5xl"
               onClick={() => {
-                scrollTo(item, 0);
+                scrollTo(item, 150);
               }}
             >
               <div className="col-start-2 row-start-2 flex font-light tracking-tighter">
