@@ -27,7 +27,7 @@ export default function Footer() {
 
         <div className="mb-5 flex items-center gap-2 text-neutral-400 lg:gap-5">
           <p className="text-base font-light tracking-tight sm:text-lg lg:text-xl">
-            Copyright &copy; Dale Bañares 2024
+            Copyright &copy; Dale Bañares 2025
           </p>
           <button onClick={() => scrollToSection("home", 0)}>
             <ArrowUpIcon />

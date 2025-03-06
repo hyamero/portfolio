@@ -16,7 +16,7 @@ const _heroText = {
 };
 
 const _descriptionText =
-  "Joseph Dale Bañares is a Software Engineer and Designer based in the Philippines.";
+  "Joseph Dale Bañares is a Sr. Software Engineer and Designer based in the Philippines and Europe.";
 
 const heroText = [_heroText.top.split(" "), _heroText.bottom.split(" ")];
 const descriptionText = _descriptionText.split(" ");
@@ -113,7 +113,9 @@ export default function Hero() {
             >
               {descriptionText.map((text, i) => (
                 <React.Fragment key={text + i}>
-                  {["Software", "Engineer", "Designer"].includes(text) ? (
+                  {["Sr.", "Software", "Engineer", "Designer"].includes(
+                    text,
+                  ) ? (
                     <span className="font-medium text-foreground">{text} </span>
                   ) : (
                     <span>{text} </span>
