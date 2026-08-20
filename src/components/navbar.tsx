@@ -24,7 +24,7 @@ export default function Navbar() {
 
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 
-  // eslint-disable-next-line react-hooks/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
+  // oxlint-disable-next-line react/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (isOpen) {
       tl.current?.reverse().eventCallback("onReverseComplete", () => {
@@ -39,7 +39,7 @@ export default function Navbar() {
     });
   });
 
-  // eslint-disable-next-line react-hooks/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
+  // oxlint-disable-next-line react/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
   const toggleNav = contextSafe(() => {
     if (!isOpen) {
       setIsOpen(true);
