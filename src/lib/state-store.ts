@@ -8,15 +8,17 @@ type State = {
 
 type Action = {
   setHref: (href: string) => void;
-  setPageOut: (state: boolean) => void;
-  setOpenMenu: (state: boolean) => void;
+  setPageOut: (pageOut: boolean) => void;
+  setOpenMenu: (openMenu: boolean) => void;
+  toggleOpenMenu: () => void;
 };
 
-export const useStateStore = create<State & Action>((set) => ({
+export const useStateStore = create<State & Action>()((set) => ({
+  href: "",
   pageOut: false,
   openMenu: false,
-  href: "",
-  setPageOut: (state) => set(() => ({ pageOut: state })),
-  setOpenMenu: (state) => set(() => ({ openMenu: state })),
-  setHref: (href) => set(() => ({ href: href })),
+  setHref: (href) => set({ href }),
+  setPageOut: (pageOut) => set({ pageOut }),
+  setOpenMenu: (openMenu) => set({ openMenu }),
+  toggleOpenMenu: () => set((state) => ({ openMenu: !state.openMenu })),
 }));

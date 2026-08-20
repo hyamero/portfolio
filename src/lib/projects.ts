@@ -1,7 +1,7 @@
 import { type StaticImageData } from "next/image";
-import omsThumb from "/public/img/projects/omsimos.jpg";
-import umaminThumb from "/public/img/projects/umamin.jpg";
-import foliageThumb from "/public/img/projects/foliage.jpg";
+import omsThumb from "@public/img/projects/omsimos.jpg";
+import umaminThumb from "@public/img/projects/umamin.jpg";
+import foliageThumb from "@public/img/projects/foliage.jpg";
 
 export type Project = {
   subtitle: string;
@@ -12,7 +12,6 @@ export type Project = {
   role: string;
   techs: string;
   url: string;
-  // shineColor: string[];
 };
 
 export const projects: Project[] = [
@@ -26,7 +25,6 @@ export const projects: Project[] = [
     role: "Front-End Engineer, UI/UX Design",
     techs: "React, Typescript, Next.js, Tailwind, Drizzle, and GraphQL.",
     url: "https://umamin.link",
-    // shineColor: ["#f51aa6", "#4f0835"],
   },
   {
     projectTitle: "omsimos",
@@ -38,7 +36,6 @@ export const projects: Project[] = [
     role: "Front-End & Design Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
     url: "https://omsimos.com",
-    // shineColor: ["#28af66", "#15422c"],
   },
   {
     projectTitle: "foliage",
@@ -51,6 +48,5 @@ export const projects: Project[] = [
     role: "UI/UX Design, Front-End Engineer",
     techs: "React, Typescript, Next.js, Tailwind, and GSAP.",
     url: "https://foliage.omsimos.com",
-    // shineColor: ["#656a74", "#273245"],
   },
 ];

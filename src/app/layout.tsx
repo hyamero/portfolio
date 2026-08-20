@@ -54,7 +54,7 @@ export default function RootLayout({
         <Toaster />
         <Navbar />
 
-        <GridPattern className="[mask-image:radial-gradient(ellipse_at_center,white,transparent_80%)]" />
+        <GridPattern className="mask-[radial-gradient(ellipse_at_center,white,transparent_80%)]" />
         {children}
         <Contact />
         <Footer />

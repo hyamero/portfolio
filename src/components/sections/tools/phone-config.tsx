@@ -2,7 +2,7 @@ export function PhoneConfig() {
   return (
     <div className="iphone-x bottom-32 mx-auto scale-[.6] opacity-40 duration-300 ease-in-out hover:opacity-50">
       <div className="side">
-        <div className="screen size-full rounded-[33px] bg-gradient-to-b from-neutral-800"></div>
+        <div className="screen size-full rounded-[33px] bg-linear-to-b from-neutral-800"></div>
       </div>
       <div className="line"></div>
       <div className="header">

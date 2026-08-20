@@ -5,7 +5,7 @@ import Ripple from "../magicui/ripple";
 import OrbitingIcons, {
   type OrbitingIconsProps,
 } from "../magicui/orbiting-icons";
-import starsBg from "/public/img/rings-bg.svg";
+import starsBg from "@public/img/rings-bg.svg";
 
 export default function Contact() {
   return (
@@ -24,8 +24,8 @@ export default function Contact() {
             fill
           />
 
-          <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg  md:shadow-xl">
-            <span className="pointer-events-none whitespace-pre-wrap bg-gradient-to-b from-white from-25% to-black to-[130%] bg-clip-text text-center text-6xl font-semibold leading-none text-transparent lg:text-7xl">
+          <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg md:shadow-xl">
+            <span className="pointer-events-none bg-linear-to-b from-white from-25% to-black to-130% bg-clip-text text-center text-6xl leading-none font-semibold whitespace-pre-wrap text-transparent lg:text-7xl">
               Contact
             </span>
 
@@ -53,13 +53,13 @@ export default function Contact() {
   );
 }
 
-type Socials = {
+type Social = {
   name: string;
-  icon: any;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   className?: string;
 } & OrbitingIconsProps;
 
-const socials: Socials[] = [
+const socials: Social[] = [
   {
     name: "Gmail",
     icon: Icons.gmail,
