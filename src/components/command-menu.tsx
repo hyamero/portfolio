@@ -2,17 +2,13 @@
 
 import gsap from "gsap";
 import Link from "next/link";
+import { useEffect } from "react";
 import { useGSAP } from "@gsap/react";
-import React, { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import PageTransition from "./animations/page-transition";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-
 import {
   Home,
   Leaf,
-  Github,
-  Linkedin,
   Newspaper,
   SquareTerminal,
   HeartHandshake,
@@ -27,20 +23,22 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Icons } from "./icons";
 import { useStateStore } from "@/lib/state-store";
+import usePageTransition from "./animations/use-page-transition";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
-type Commands = {
+type CommandGroupData = {
   group: string;
   items: {
-    Icon: React.FC<React.SVGProps<SVGSVGElement>>;
+    Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
     title: string;
     url?: string;
   }[];
 };
 
-const commands: Commands[] = [
+const commands: CommandGroupData[] = [
   {
     group: "home",
     items: [{ Icon: Home, title: "home" }],
@@ -57,9 +55,13 @@ const commands: Commands[] = [
     group: "Contact",
     items: [
       { Icon: Newspaper, title: "Resume", url: "/resume" },
-      { Icon: Github, title: "GitHub", url: "https://github.com/hyamero" },
       {
-        Icon: Linkedin,
+        Icon: Icons.gitHub,
+        title: "GitHub",
+        url: "https://github.com/hyamero",
+      },
+      {
+        Icon: Icons.linkedIn,
         title: "LinkedIn",
         url: "https://linkedin.com/in/daleban",
       },
@@ -67,13 +69,20 @@ const commands: Commands[] = [
   },
 ];
 
+const isEditableTarget = (target: EventTarget | null) =>
+  (target instanceof HTMLElement && target.isContentEditable) ||
+  target instanceof HTMLInputElement ||
+  target instanceof HTMLTextAreaElement ||
+  target instanceof HTMLSelectElement;
+
 export function CommandMenu() {
   const pathname = usePathname();
   const { contextSafe } = useGSAP();
-  const { animatePageOut } = PageTransition();
+  const { animatePageOut } = usePageTransition();
 
-  const setOpen = useStateStore((state) => state.setOpenMenu);
   const open = useStateStore((state) => state.openMenu);
+  const setOpen = useStateStore((state) => state.setOpenMenu);
+  const toggleOpen = useStateStore((state) => state.toggleOpenMenu);
 
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (pathname !== "/") {
@@ -90,32 +99,23 @@ export function CommandMenu() {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if ((e.key === "k" && (e.metaKey || e.ctrlKey)) || e.key === "/") {
-        if (
-          (e.target instanceof HTMLElement && e.target.isContentEditable) ||
-          e.target instanceof HTMLInputElement ||
-          e.target instanceof HTMLTextAreaElement ||
-          e.target instanceof HTMLSelectElement
-        ) {
-          return;
-        }
+        if (isEditableTarget(e.target)) return;
 
         e.preventDefault();
-        setOpen(!open);
+        toggleOpen();
       }
     };
 
     document.addEventListener("keydown", down);
     return () => document.removeEventListener("keydown", down);
-  }, []);
+  }, [toggleOpen]);
 
   const commandAction = (group: string, title: string) => {
     if (group === "home") {
       scrollTo(title, 0);
-    } else if (group === "Projects") {
-      if (title !== pathname.split("/")[2]) {
-        animatePageOut(`/project/${title}`);
-      }
-    } else return;
+    } else if (group === "Projects" && title !== pathname.split("/")[2]) {
+      animatePageOut(`/project/${title}`);
+    }
 
     setOpen(false);
   };
@@ -128,28 +128,30 @@ export function CommandMenu() {
 
         {commands.map(({ group, items }) => (
           <CommandGroup key={group} heading={group === "home" ? "" : group}>
-            {items.map(({ Icon, title, url }) => (
-              <React.Fragment key={title}>
-                {group === "Contact" && url ? (
-                  <Link href={url} target="_blank" rel="noopener noreferrer">
-                    <CommandItem className="cursor-pointer">
-                      <Icon className="mr-2 size-4" />
-                      <span className="capitalize">{title}</span>
-                    </CommandItem>
-                  </Link>
-                ) : (
-                  <CommandItem
-                    onSelect={() => commandAction(group, title)}
-                    className="cursor-pointer"
-                  >
-                    <>
-                      <Icon className="mr-2 size-4" />
-                      <span className="capitalize">{title}</span>
-                    </>
+            {items.map(({ Icon, title, url }) =>
+              url ? (
+                <Link
+                  key={title}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <CommandItem className="cursor-pointer">
+                    <Icon className="mr-2 size-4" />
+                    <span className="capitalize">{title}</span>
                   </CommandItem>
-                )}
-              </React.Fragment>
-            ))}
+                </Link>
+              ) : (
+                <CommandItem
+                  key={title}
+                  onSelect={() => commandAction(group, title)}
+                  className="cursor-pointer"
+                >
+                  <Icon className="mr-2 size-4" />
+                  <span className="capitalize">{title}</span>
+                </CommandItem>
+              ),
+            )}
             <CommandSeparator />
           </CommandGroup>
         ))}

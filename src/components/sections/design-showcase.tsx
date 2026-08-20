@@ -3,61 +3,19 @@ import Marquee from "../magicui/marquee";
 import Image from "next/image";
 
 const projects = [
-  {
-    img: "chatti",
-    url: "",
-  },
-  {
-    img: "port-1",
-    url: "",
-  },
-  {
-    img: "culture",
-    url: "",
-    square: true,
-  },
-  {
-    img: "devfest",
-    url: "",
-  },
-  {
-    img: "typography",
-    url: "",
-  },
-  {
-    img: "oscar",
-    url: "",
-  },
-  {
-    img: "outlaw",
-    url: "",
-  },
-  {
-    img: "gdsc",
-    url: "",
-    square: true,
-  },
-  {
-    img: "3d-port",
-    url: "",
-  },
-  {
-    img: "marbre",
-    url: "",
-  },
-  {
-    img: "proemial",
-    url: "",
-    square: true,
-  },
-  {
-    img: "masskara",
-    url: "",
-  },
-  {
-    img: "collect-apis",
-    url: "",
-  },
+  { img: "chatti" },
+  { img: "port-1" },
+  { img: "culture", square: true },
+  { img: "devfest" },
+  { img: "typography" },
+  { img: "oscar" },
+  { img: "outlaw" },
+  { img: "gdsc", square: true },
+  { img: "3d-port" },
+  { img: "marbre" },
+  { img: "proemial", square: true },
+  { img: "masskara" },
+  { img: "collect-apis" },
 ];
 
 const firstRow = projects.slice(0, projects.length / 2);
@@ -65,42 +23,40 @@ const secondRow = projects.slice(projects.length / 2);
 
 export default function DesignShowcase() {
   return (
-    <section id="design" className="container relative z-10">
-      <h2 className="mx-auto mb-20 text-balance text-center text-[clamp(1.7rem,6vw,5rem)] font-medium leading-[1.1] tracking-[-0.07em]">
+    <section id="design" className="relative z-10 container">
+      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,6vw,5rem)] leading-[1.1] font-medium tracking-[-0.07em] text-balance">
         Crafting digital experiences <br /> that leave a lasting impact.
       </h2>
       <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background md:shadow-xl">
         <Marquee
           // pauseOnHover
-          className="[--duration:20s] [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+          className="mask-[linear-gradient(to_top,transparent_10%,#000_100%)] [--duration:20s]"
         >
           {firstRow.map((project) => (
-            <ReviewCard key={project.url} {...project} />
+            <DesignCard key={project.img} {...project} />
           ))}
         </Marquee>
         <Marquee
           reverse
           // pauseOnHover
-          className="[--duration:30s] [mask-image:linear-gradient(to_top,transparent_10%,#000_100%)]"
+          className="mask-[linear-gradient(to_top,transparent_10%,#000_100%)] [--duration:30s]"
         >
           {secondRow.map((project) => (
-            <ReviewCard key={project.url} {...project} />
+            <DesignCard key={project.img} {...project} />
           ))}
         </Marquee>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-gradient-to-r from-white dark:from-background"></div>
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-white dark:from-background"></div>
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-white dark:from-background"></div>
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/3 bg-linear-to-l from-white dark:from-background"></div>
       </div>
     </section>
   );
 }
 
-const ReviewCard = ({
+const DesignCard = ({
   img,
-  url,
   square = false,
 }: {
   img: string;
-  url: string;
   square?: boolean;
 }) => {
   return (
@@ -113,7 +69,7 @@ const ReviewCard = ({
       )}
     >
       <Image
-        alt="Culture"
+        alt={`${img} design showcase`}
         src={`/img/projects/design/${img}.jpg`}
         className="h-full w-full rounded-lg object-cover opacity-85"
         width={square ? 200 : 282}

@@ -3,10 +3,10 @@
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePathname } from "next/navigation";
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
-import PageTransition from "./animations/page-transition";
+import usePageTransition from "./animations/use-page-transition";
 import { useStateStore } from "@/lib/state-store";
 import { CommandMenu } from "./command-menu";
 import { NavMenu } from "./nav-menu";
@@ -17,14 +17,14 @@ gsap.registerPlugin(useGSAP, ScrollToPlugin);
 export default function Navbar() {
   const pathname = usePathname();
 
-  const tl = useRef<GSAPTimeline>();
+  const tl = useRef<GSAPTimeline | null>(null);
   const { contextSafe } = useGSAP();
-  const navRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const { animatePageOut } = PageTransition();
+  const { animatePageOut } = usePageTransition();
 
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 
+  // eslint-disable-next-line react-hooks/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
   const scrollTo = contextSafe((scrollElement: string, offsetY: number) => {
     if (isOpen) {
       tl.current?.reverse().eventCallback("onReverseComplete", () => {
@@ -39,6 +39,7 @@ export default function Navbar() {
     });
   });
 
+  // eslint-disable-next-line react-hooks/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
   const toggleNav = contextSafe(() => {
     if (!isOpen) {
       setIsOpen(true);
@@ -85,42 +86,13 @@ export default function Navbar() {
     { dependencies: [isOpen] },
   );
 
-  /**
-   * Close nav when clicked outside
-   */
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (
-  //       isOpen &&
-  //       navRef.current &&
-  //       !navRef.current.contains(event.target as Node)
-  //     ) {
-  //       setIsOpen(false);
-  //     }
-  //   };
-
-  //   const handleEscapeKey = (event: KeyboardEvent) => {
-  //     if (event.key === "Escape") {
-  //       setIsOpen(false);
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   document.addEventListener("keydown", handleEscapeKey);
-
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //     document.removeEventListener("keydown", handleEscapeKey);
-  //   };
-  // }, [isOpen]);
-
   return (
-    <div ref={navRef}>
+    <div>
       <CommandMenu />
 
-      <nav className="container fixed left-0 right-0 top-0 z-50 mx-auto mt-10 flex justify-between text-foreground">
+      <nav className="fixed top-0 right-0 left-0 z-50 container mx-auto mt-10 flex justify-between text-foreground">
         <button
-          className="nav-item rounded-md border border-muted/60 bg-black/50 px-3 text-base font-normal tracking-tighter backdrop-blur-sm sm:text-lg lg:px-5"
+          className="nav-item rounded-md border border-muted/60 bg-black/50 px-3 text-base font-normal tracking-tighter backdrop-blur-xs sm:text-lg lg:px-5"
           onClick={() => {
             if (pathname !== "/") {
               animatePageOut("/");
@@ -135,17 +107,17 @@ export default function Navbar() {
         <div className="flex items-center">
           <Button
             variant="outline"
-            className="relative h-8 w-full justify-start rounded-none rounded-l-md border-muted/60 bg-black/50 text-sm font-normal text-muted-foreground shadow-none backdrop-blur-sm hover:bg-muted/40 sm:pr-12 md:w-40 lg:w-64"
+            className="relative h-8 w-full justify-start rounded-none rounded-l-md border-muted/60 bg-black/50 text-sm font-normal text-muted-foreground shadow-none backdrop-blur-xs hover:bg-muted/40 sm:pr-12 md:w-40 lg:w-64"
             onClick={() => setOpenMenu(true)}
           >
             <span className="hidden lg:inline-flex">Quick search...</span>
             <span className="inline-flex lg:hidden">Search...</span>
-            <kbd className="pointer-events-none absolute right-[0.3rem] top-[0.3rem] hidden h-5 select-none items-center gap-1 rounded border border-muted/80 bg-muted/50 px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
+            <kbd className="pointer-events-none absolute top-[0.3rem] right-[0.3rem] hidden h-5 items-center gap-1 rounded border border-muted/80 bg-muted/50 px-1.5 font-mono text-[10px] font-medium opacity-100 select-none sm:flex">
               <span className="text-xs">⌘</span>K
             </kbd>
           </Button>
 
-          <div className="h-8 rounded-r-md border border-l-0 border-muted/60 bg-black/50 px-3 backdrop-blur-sm hover:bg-muted/40">
+          <div className="h-8 rounded-r-md border border-l-0 border-muted/60 bg-black/50 px-3 backdrop-blur-xs hover:bg-muted/40">
             <button
               type="button"
               name="menu"
@@ -162,7 +134,7 @@ export default function Navbar() {
               <span
                 className={`${
                   isOpen
-                    ? "w-3/4 -translate-y-[3px] -rotate-45 opacity-80  group-hover:opacity-100"
+                    ? "w-3/4 translate-y-[-3px] -rotate-45 opacity-80 group-hover:opacity-100"
                     : "w-full opacity-80 group-hover:opacity-100"
                 }`}
               />

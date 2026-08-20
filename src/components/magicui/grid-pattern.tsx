@@ -1,30 +1,20 @@
-"use client";
-
-import gsap from "gsap";
+import { useId } from "react";
 import { cn } from "@/lib/utils";
-import { useId, useRef } from "react";
-import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(useGSAP);
-
-interface GridPatternProps {
-  width?: any;
-  height?: any;
-  x?: any;
-  y?: any;
-  squares?: Array<[x: number, y: number]>;
-  strokeDasharray?: any;
-  className?: string;
-  [key: string]: any;
+interface GridPatternProps extends React.SVGProps<SVGSVGElement> {
+  width?: number;
+  height?: number;
+  x?: number;
+  y?: number;
+  strokeDasharray?: number;
 }
 
-export function GridPattern({
+export default function GridPattern({
   width = 40,
   height = 40,
   x = -1,
   y = -1,
   strokeDasharray = 0,
-  squares,
   className,
   ...props
 }: GridPatternProps) {
@@ -59,5 +49,3 @@ export function GridPattern({
     </svg>
   );
 }
-
-export default GridPattern;

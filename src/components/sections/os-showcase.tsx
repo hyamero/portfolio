@@ -1,9 +1,6 @@
-import {
-  Github,
-  BlocksIcon,
-  FileTextIcon,
-  BotMessageSquare,
-} from "lucide-react";
+import { BlocksIcon, FileTextIcon, BotMessageSquare } from "lucide-react";
+
+import { Icons } from "@/components/icons";
 
 import { ChatBot, CertGen, GhStats, PhoneConfig } from "./tools";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
@@ -18,20 +15,20 @@ const features = [
     href: "https://github.com/hyamero/certificate-generator",
     cta: "Learn more",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10 md:w-[450px]">
+      <div className="absolute inset-7 mx-auto mask-[linear-gradient(to_top,transparent_20%,#000_100%)] duration-300 ease-in-out hover:scale-105 sm:inset-10 md:w-[450px]">
         <CertGen />
       </div>
     ),
   },
   {
-    Icon: Github,
+    Icon: Icons.gitHub,
     name: "GitHub Statistics",
     description: "Generate personal GitHub Stats with ease.",
     href: "https://github-stats.omsimos.com/",
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10">
+      <div className="absolute inset-7 mx-auto mask-[linear-gradient(to_top,transparent_20%,#000_100%)] duration-300 ease-in-out hover:scale-105 sm:inset-10">
         <GhStats />
       </div>
     ),
@@ -44,7 +41,7 @@ const features = [
     cta: "View Repository",
     className: "col-span-3 lg:col-span-2",
     background: (
-      <div className="absolute inset-7 mx-auto duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-105 sm:inset-10">
+      <div className="absolute inset-7 mx-auto mask-[linear-gradient(to_top,transparent_20%,#000_100%)] duration-300 ease-in-out hover:scale-105 sm:inset-10">
         <ChatBot />
       </div>
     ),
@@ -57,7 +54,7 @@ const features = [
     cta: "Visit Website",
     className: "col-span-3 lg:col-span-1",
     background: (
-      <div className="absolute inset-7 mx-auto flex justify-center duration-300 ease-in-out [mask-image:linear-gradient(to_top,transparent_20%,#000_100%)] hover:scale-110 sm:inset-10">
+      <div className="absolute inset-7 mx-auto flex justify-center mask-[linear-gradient(to_top,transparent_20%,#000_100%)] duration-300 ease-in-out hover:scale-110 sm:inset-10">
         <PhoneConfig />
       </div>
     ),
@@ -66,14 +63,14 @@ const features = [
 
 export default function OSShowcase() {
   return (
-    <section id="tools" className="container relative z-10 mx-auto xl:w-5/6">
-      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,7vw,5rem)] font-medium leading-[1] tracking-[-0.07em]">
+    <section id="tools" className="relative z-10 container mx-auto xl:w-5/6">
+      <h2 className="mx-auto mb-20 text-center text-[clamp(1.7rem,7vw,5rem)] leading-none font-medium tracking-[-0.07em]">
         Building Tools <br /> for the Community
       </h2>
 
       <BentoGrid>
-        {features.map((feature, idx) => (
-          <BentoCard key={idx} {...feature} />
+        {features.map((feature) => (
+          <BentoCard key={feature.name} {...feature} />
         ))}
       </BentoGrid>
     </section>
