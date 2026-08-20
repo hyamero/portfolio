@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "oxlint",
     "typecheck": "next typegen && tsc --noEmit",
     "ui:add": "bun x --bun shadcn@latest add"
   },
@@ -38,8 +38,7 @@
     "@types/node": "^26.2.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "eslint": "^9",
-    "eslint-config-next": "^16.3.1",
+    "oxlint": "^1.79.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
