@@ -2,11 +2,11 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import heroBg from "/public/img/main-bg.jpg";
+import heroBg from "@public/img/main-bg.jpg";
 import Particles from "../magicui/particles";
-import ringStar from "/public/img/rings-bg.svg";
-import starIcon from "/public/img/icons/star-icon.png";
-import globeIcon from "/public/img/icons/globe-icon.png";
+import ringStar from "@public/img/rings-bg.svg";
+import starIcon from "@public/img/icons/star-icon.png";
+import globeIcon from "@public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
 
@@ -44,7 +44,7 @@ export default function Hero() {
           style={{
             filter: "url(#noiseFilter)",
           }}
-          className="absolute inset-0 opacity-75 mix-blend-soft-light [mask-image:radial-gradient(ellipse_at_bottom,white,transparent_80%)]"
+          className="absolute inset-0 mask-[radial-gradient(ellipse_at_bottom,white,transparent_80%)] opacity-75 mix-blend-soft-light"
         />
 
         <svg aria-hidden="true" className="absolute left-full">
@@ -58,7 +58,7 @@ export default function Hero() {
           </filter>
         </svg>
 
-        <div className="absolute -left-1/2 -top-[20%] -z-10 size-full sm:-top-[10%] 2xl:top-0">
+        <div className="absolute top-[-20%] -left-1/2 -z-10 size-full sm:top-[-10%] 2xl:top-0">
           <Image
             alt="Stars"
             src={ringStar}
@@ -84,30 +84,30 @@ export default function Hero() {
               rel="noopener noreferrer"
               className="blur-item group inline-block rounded-full border border-white/5 bg-neutral-950 text-white opacity-0 transition-all ease-in hover:cursor-pointer hover:bg-neutral-900"
             >
-              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
+              <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 dark:hover:text-neutral-400">
                 <span>✨ Omsimos</span>
                 <ArrowUpRightIcon className="ml-1 size-4 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
               </AnimatedShinyText>
             </Link>
 
-            <h2
+            <h1
               id="hero-text"
-              className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]"
+              className="text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]"
             >
-              <div className="flex gap-2 sm:gap-4">
-                {heroText[0].map((text) => (
-                  <span key={text}>{text}</span>
-                ))}
-              </div>
-              <div className="flex gap-2 sm:gap-4">
-                {heroText[1].map((text) => (
-                  <span key={text}>{text}</span>
-                ))}
-              </div>
-            </h2>
+              {heroText.map((line) => (
+                <span
+                  key={line.join(" ")}
+                  className="hero-line flex gap-2 sm:gap-4"
+                >
+                  {line.map((text) => (
+                    <span key={text}>{text}</span>
+                  ))}
+                </span>
+              ))}
+            </h1>
           </div>
           <div className="flex gap-3 md:gap-5">
-            <h1
+            <p
               id="description"
               className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl"
             >
@@ -122,7 +122,7 @@ export default function Hero() {
                   )}
                 </React.Fragment>
               ))}
-            </h1>
+            </p>
 
             <Image
               alt="Star Icon"
@@ -131,7 +131,7 @@ export default function Hero() {
             />
           </div>
 
-          <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-sm md:w-1/3 md:pb-10">
+          <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-xs md:w-1/3 md:pb-10">
             <Link
               href="/resume"
               target="_blank"

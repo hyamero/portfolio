@@ -6,22 +6,13 @@ import { cn } from "@/lib/utils";
 import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { type Project } from "@/lib/projects";
-import ringStar from "/public/img/rings-bg.svg";
+import ringStar from "@public/img/rings-bg.svg";
 import { ArrowUpRightIcon } from "lucide-react";
-import atomIcon from "/public/img/icons/atom-icon.png";
+import atomIcon from "@public/img/icons/atom-icon.png";
 
 export default function ProjectShowcase({ ...props }: Project) {
-  const {
-    url,
-    year,
-    role,
-    techs,
-    image,
-    projectTitle,
-    subtitle,
-    // shineColor,
-    description,
-  } = props;
+  const { url, year, role, techs, image, projectTitle, subtitle, description } =
+    props;
 
   const _subtitle = subtitle.split(" ");
 
@@ -43,17 +34,17 @@ export default function ProjectShowcase({ ...props }: Project) {
         "project-wrapper border-b-none relative z-10 my-52 overflow-hidden lg:my-64 lg:border-b xl:my-80",
       )}
     >
-      <div className="absolute -bottom-[45%] -right-[45%] -z-10 hidden size-full xl:block">
+      <div className="absolute right-[-45%] bottom-[-45%] -z-10 hidden size-full xl:block">
         <Image
           alt="Stars"
           src={ringStar}
           fill
-          className=" scale-[2.5] opacity-75 md:scale-[2] lg:scale-125 2xl:scale-100"
+          className="scale-[2.5] opacity-75 md:scale-[2] lg:scale-125 2xl:scale-100"
         />
       </div>
 
       <div className="container grid min-h-screen grid-cols-4 items-center lg:gap-y-0">
-        <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full text-pretty rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-neutral-500 backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 lg:[box-shadow:0_10px_40px_-20px_#ffffff1f_inset] xl:text-balance xl:rounded-br-none">
+        <div className="lg:leading-right col-span-4 col-start-1 row-start-1 h-full w-full rounded-lg text-[clamp(1.3rem,3.3vw,3rem)] leading-[1.3] tracking-tighter text-pretty text-neutral-500 backdrop-blur-[2px] sm:px-10 sm:py-10 md:leading-[1.2] lg:border lg:bg-neutral-950/20 lg:py-24 lg:[box-shadow:0_10px_40px_-20px_#ffffff1f_inset] xl:rounded-br-none xl:text-balance">
           <h2
             className={cn(
               `project-subtitle-${projectTitle} project-subtitle`,
@@ -73,7 +64,7 @@ export default function ProjectShowcase({ ...props }: Project) {
         </div>
 
         <div className="relative -z-10 col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
-          <div className="rounded-lg bg-gradient-to-bl from-border/50 via-neutral-800/80 to-border/50 p-px">
+          <div className="rounded-lg bg-linear-to-bl from-border/50 via-neutral-800/80 to-border/50 p-px">
             <div className="rounded-lg bg-neutral-950 p-2 md:p-4">
               <Image
                 alt={`${projectTitle} Showcase`}
@@ -91,14 +82,14 @@ export default function ProjectShowcase({ ...props }: Project) {
           <Icons.stars
             className={cn(
               `stars-${projectTitle}`,
-              "absolute -left-52 -top-40 -z-[11] opacity-70 xl:-left-10",
+              "absolute -top-40 -left-52 z-[-11] opacity-70 xl:-left-10",
             )}
           />
 
           <Icons.stars
             className={cn(
               `stars-${projectTitle}`,
-              "absolute -left-52 bottom-20 -z-[11] hidden opacity-70 xl:-left-10 xl:block",
+              "absolute bottom-20 -left-52 z-[-11] hidden opacity-70 xl:-left-10 xl:block",
             )}
           />
         </div>
@@ -112,17 +103,17 @@ export default function ProjectShowcase({ ...props }: Project) {
             width={200}
           />
 
-          <p className="text-balance text-center text-lg leading-[1.3] tracking-tight text-neutral-500 sm:text-xl md:leading-[1.2] lg:text-base lg:leading-[1.15] xl:text-lg xl:leading-[1.15] 2xl:text-xl">
+          <p className="text-center text-lg leading-[1.3] tracking-tight text-balance text-neutral-500 sm:text-xl md:leading-[1.2] lg:text-base lg:leading-[1.15] xl:text-lg xl:leading-[1.15] 2xl:text-xl">
             <span className="font-medium text-foreground">Powered by </span>
             {techs}
           </p>
         </div>
 
         <div className="col-span-4 row-start-3 grid h-full w-full grid-cols-4 overflow-hidden rounded-t-lg border [box-shadow:0_0_40px_-20px_#ffffff1f_inset] md:grid-cols-5 lg:grid-cols-3 lg:grid-rows-2 lg:rounded-none lg:rounded-tl-lg lg:border-b-0 xl:col-span-3">
-          <div className="col-span-4 h-full bg-neutral-900/50 backdrop-blur-sm md:col-span-2 lg:col-span-1">
+          <div className="col-span-4 h-full bg-neutral-900/50 backdrop-blur-xs md:col-span-2 lg:col-span-1">
             <div className="flex h-full flex-col items-start gap-7 px-7 py-10 sm:px-10">
-              <p className="text-lg font-medium leading-[1.3] tracking-tight text-neutral-500 sm:text-xl md:leading-[1.2] 2xl:text-2xl 2xl:leading-[1.1]">
-                <span className="font-semibold capitalize text-foreground">
+              <p className="text-lg leading-[1.3] font-medium tracking-tight text-neutral-500 sm:text-xl md:leading-[1.2] 2xl:text-2xl 2xl:leading-[1.1]">
+                <span className="font-semibold text-foreground capitalize">
                   {projectTitle}
                 </span>{" "}
                 {description}
@@ -143,8 +134,8 @@ export default function ProjectShowcase({ ...props }: Project) {
             <div className="hidden h-full border-t lg:block" />
           </div>
 
-          <div className="col-span-4 bg-neutral-900/50 backdrop-blur-sm  md:col-span-3 md:col-start-3 lg:col-span-2">
-            <ul className="flex h-full flex-col justify-between border-l text-sm text-neutral-500 md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pb-14 [&>li]:pt-4">
+          <div className="col-span-4 bg-neutral-900/50 backdrop-blur-xs md:col-span-3 md:col-start-3 lg:col-span-2">
+            <ul className="flex h-full flex-col justify-between border-l text-sm text-neutral-500 [&>li]:flex [&>li]:h-full [&>li]:justify-between [&>li]:border-b [&>li]:px-5 [&>li]:pt-4 [&>li]:pb-14 md:[&>li:last-child]:border-b-0 [&>li>span]:uppercase">
               <li>
                 <span>Company</span>
                 <span className="capitalize">{projectTitle}</span>
@@ -158,7 +149,7 @@ export default function ProjectShowcase({ ...props }: Project) {
                 <span className="text-right">{role}</span>
               </li>
             </ul>
-            <div className="hidden h-full border-l border-t backdrop-blur-sm lg:block" />
+            <div className="hidden h-full border-t border-l backdrop-blur-xs lg:block" />
           </div>
         </div>
       </div>

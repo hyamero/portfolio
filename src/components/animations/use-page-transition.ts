@@ -8,12 +8,12 @@ import { useStateStore } from "@/lib/state-store";
 
 gsap.registerPlugin(useGSAP);
 
-export default function PageTransition() {
+export default function usePageTransition() {
   const setHref = useStateStore((state) => state.setHref);
   const setPageOut = useStateStore((state) => state.setPageOut);
 
   const { push } = useRouter();
-  const tlIn = useRef<GSAPTimeline>();
+  const tlIn = useRef<GSAPTimeline | null>(null);
 
   const href = useStateStore((state) => state.href);
   const pageOut = useStateStore((state) => state.pageOut);

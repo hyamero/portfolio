@@ -12,7 +12,7 @@ export default function ProjectAnimation({
 }: {
   children: React.ReactNode;
 }) {
-  const tl = useRef<GSAPTimeline>();
+  const tl = useRef<GSAPTimeline | null>(null);
   const setPageOut = useStateStore((state) => state.setPageOut);
 
   useGSAP(() => {

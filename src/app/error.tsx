@@ -11,7 +11,7 @@ export default function Error({ error }: { error: Error; reset: () => void }) {
 
   return (
     <section className="relative z-50 flex h-screen flex-col items-center justify-center gap-5">
-      <h2 className="text-8xl text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]">
+      <h2 className="text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]">
         Oh no, something went wrong...
       </h2>
 

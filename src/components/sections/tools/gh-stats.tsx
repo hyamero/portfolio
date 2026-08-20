@@ -42,7 +42,6 @@ export function GhStats() {
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
-                    role="combobox"
                     className="w-full justify-between text-muted-foreground"
                   >
                     Select theme
