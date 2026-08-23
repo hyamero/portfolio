@@ -92,7 +92,7 @@ export default function Hero() {
 
             <h1
               id="hero-text"
-              className="text-[clamp(2rem,10vw,6rem)] font-medium tracking-[-0.07em]"
+              className="text-[clamp(2rem,10vw,6rem)] leading-none font-medium tracking-[-0.07em]"
             >
               {heroText.map((line) => (
                 <span
