@@ -5,6 +5,7 @@
 
 @utility container {
   margin-inline: auto;
+  @apply px-6 sm:px-10 md:px-12 lg:px-14;
   @media (width >= --theme(--breakpoint-sm)) {
     max-width: none;
   }
@@ -150,10 +151,6 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentcolor);
   }
-}
-
-@utility container {
-  @apply px-6 sm:px-10 md:px-12 lg:px-14;
 }
 
 @layer base {
