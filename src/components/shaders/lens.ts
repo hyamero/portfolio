@@ -1,7 +1,7 @@
 import { effect, frame, sampler, surface, texture } from "vgpu";
 
 import lensSource from "./lens.wgsl";
-import { getGpu } from "@/lib/gpu";
+import { getGpu, prefersReducedMotion } from "@/lib/gpu";
 
 /**
  * Overlays a glass lens on `image`, drawn only while the pointer is over it.
@@ -59,14 +59,16 @@ export function mountLens(image: HTMLImageElement, canvas: HTMLCanvasElement) {
       await lens.compile({ colors: [output.format] });
       if (disposed) return;
 
+      // Reduced motion keeps the magnifier but drops the trailing and fading.
+      const reduced = prefersReducedMotion();
       let raf = 0;
       let last = 0;
       const tick = (now: number) => {
         const dt = last ? Math.min((now - last) / 1000, 0.1) : 1 / 60;
         last = now;
         // Position trails the pointer a little more than strength does, which reads as liquid.
-        const follow = 1 - Math.exp(-dt * 14);
-        const fade = 1 - Math.exp(-dt * 9);
+        const follow = reduced ? 1 : 1 - Math.exp(-dt * 14);
+        const fade = reduced ? 1 : 1 - Math.exp(-dt * 9);
         state.x += (target.x - state.x) * follow;
         state.y += (target.y - state.y) * follow;
         state.strength += (target.strength - state.strength) * fade;
