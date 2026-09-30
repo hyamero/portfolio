@@ -47,6 +47,7 @@ export function mountPlanet(
             scroll: 0,
             intro: reduced ? 1 : 0,
             rings: [0, 0, 0],
+            hover: 0,
           },
         },
       });
@@ -57,11 +58,16 @@ export function mountPlanet(
         const r = rings.getBoundingClientRect();
         if (!box.height) return;
         // The <img> letterboxes the SVG (preserveAspectRatio meet); the rect includes its scale.
-        const unit = Math.min(r.width / RINGS_VIEWBOX[0], r.height / RINGS_VIEWBOX[1]);
+        const unit = Math.min(
+          r.width / RINGS_VIEWBOX[0],
+          r.height / RINGS_VIEWBOX[1],
+        );
         const x = r.left + r.width / 2 - box.left;
         const y = r.top + r.height / 2 - box.top;
         planet.set({
-          params: { rings: [x / box.height, y / box.height, unit / box.height] },
+          params: {
+            rings: [x / box.height, y / box.height, unit / box.height],
+          },
         });
       };
       measureRings();
@@ -74,13 +80,21 @@ export function mountPlanet(
       await planet.compile({ colors: [output.format] });
       if (disposed) return;
 
+      // Whether a real pointer is over the page: touch and the resting light never glint sparkles.
+      const hover = { value: 0, target: 0 };
       const onPointer = (event: PointerEvent) => {
         const rect = canvas.getBoundingClientRect();
         target.x = (event.clientX - rect.left) / rect.width;
         target.y = (event.clientY - rect.top) / rect.height;
+        hover.target = event.pointerType === "touch" ? 0 : 1;
       };
+      const onLeave = () => (hover.target = 0);
       window.addEventListener("pointermove", onPointer, { passive: true });
-      teardown.push(() => window.removeEventListener("pointermove", onPointer));
+      document.documentElement.addEventListener("pointerleave", onLeave);
+      teardown.push(() => {
+        window.removeEventListener("pointermove", onPointer);
+        document.documentElement.removeEventListener("pointerleave", onLeave);
+      });
 
       const scroll = () =>
         Math.min(Math.max(window.scrollY / window.innerHeight, 0), 1);
@@ -132,6 +146,7 @@ export function mountPlanet(
             const ease = 1 - Math.exp(-dt * 3);
             pointer.x += (target.x - pointer.x) * ease;
             pointer.y += (target.y - pointer.y) * ease;
+            hover.value += (hover.target - hover.value) * ease;
             const intro = Math.min(time / INTRO_SECONDS, 1);
 
             planet.set({
@@ -140,6 +155,7 @@ export function mountPlanet(
                 time,
                 scroll: scroll(),
                 intro: 1 - (1 - intro) ** 3,
+                hover: hover.value,
               },
             });
             f.pass(output, planet);

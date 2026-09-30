@@ -8,6 +8,8 @@ struct Params {
   intro: f32,
   // Where the rings SVG lays out on the page: viewBox center in `p` space, then units per viewBox px.
   rings: vec3f,
+  // Eases to 1 once a real pointer is over the page, so the light only makes sparkles glint then.
+  hover: f32,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -199,6 +201,10 @@ fn drawRings(base: vec3f, p: vec2f, pointer: vec2f, time: f32, intro: f32) -> ve
 
   // Sparkles sit a little closer than the rings, and pulse gently once they've faded in.
   let s = v - pointer * 0.008 / unit;
+  // The pointer light in the same space, so a sparkle it passes over catches it.
+  let aspect = params.resolution.x / params.resolution.y;
+  let light = (vec2f(params.pointer.x * aspect, params.pointer.y) - params.rings.xy - pointer * 0.012) / unit
+    + vec2f(720.0, 405.0) - pointer * 0.008 / unit;
   var stars = array<vec4f, 4>(
     vec4f(518.65, 330.576, 21.976, 1.099),
     vec4f(598.313, 228.315, 21.55, 1.078),
@@ -211,9 +217,14 @@ fn drawRings(base: vec3f, p: vec2f, pointer: vec2f, time: f32, intro: f32) -> ve
   var delay = array<f32, 4>(0.5, 0.7, 0.6, 0.8);
   for (var i = 0; i < 4; i++) {
     let star = stars[i];
-    let a = sparkle(s, star.xy, star.z, star.w, i == 0 || i == 3, pix);
+    // Within ~12% of the hero's height the light draws the rays out and blooms the center.
+    let near = length(star.xy - light) * unit;
+    let glint = exp(-near * near / 0.0144) * params.hover;
+    let a = sparkle(s, star.xy, star.z * (1.0 + 0.6 * glint), star.w, i == 0 || i == 3, pix);
+    let halo = exp(-dot(s - star.xy, s - star.xy) / pow(star.z * 0.3, 2.0)) * 0.3 * glint;
     let pulse = 0.9 + 0.1 * sin(time * (0.9 + 0.3 * f32(i)) + f32(i) * 2.1);
-    color = mix(color, vec3f(1.0), a * opacity[i] * pulse * fadeIn(time, delay[i], intro));
+    let lit = min(a * (1.0 + 0.5 * glint) + halo, 1.0);
+    color = mix(color, vec3f(1.0), lit * opacity[i] * pulse * fadeIn(time, delay[i], intro));
   }
   return color;
 }
