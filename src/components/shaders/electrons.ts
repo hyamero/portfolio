@@ -23,9 +23,10 @@ export function mountElectrons(
   panel: HTMLElement,
   onReady: () => void,
 ) {
+  // Under reduced motion the icon simply stays still.
+  if (prefersReducedMotion()) return () => {};
   let disposed = false;
   const teardown: (() => void)[] = [];
-  if (prefersReducedMotion()) return () => {};
 
   void (async () => {
     const gpu = await getGpu();

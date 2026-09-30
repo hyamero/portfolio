@@ -6,7 +6,7 @@ import { getGpu, prefersReducedMotion } from "@/lib/gpu";
 const PACE = { idle: 1, near: 0.3, held: 0 };
 // Seconds of travel a trail covers at full speed.
 const TRAIL_SECONDS = 2.2;
-// A ping outlives this by a little; it's also the shortest gap between two from one icon.
+// How long a ping takes to spread and fade; also the shortest gap between two from one icon.
 const PING_SECONDS = 1.6;
 const MAX_BODIES = 4;
 const TAU = Math.PI * 2;
@@ -233,7 +233,7 @@ export function mountOrbits(
         const pingData = unused().map((): Vec4 => [0, 0, -1, 0]);
         const pingTints = unused();
         pings.forEach((p, i) => {
-          pingData[i] = [p.x, p.y, p.age, p.radius];
+          pingData[i] = [p.x, p.y, p.age / PING_SECONDS, p.radius];
           pingTints[i] = [...p.tint, 0];
         });
         trails.set({
