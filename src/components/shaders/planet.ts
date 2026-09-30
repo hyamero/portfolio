@@ -7,9 +7,16 @@ const INTRO_SECONDS = 2.4;
 // Frame budget above which the loop drops to 30fps instead of janking the page.
 const SLOW_FRAME_MS = 25;
 
-/** Renders the planet into `canvas`; returns a disposer. `onFallback` fires if WebGPU can't run it. */
+// public/img/rings-bg.svg's viewBox.
+const RINGS_VIEWBOX = [1440, 810] as const;
+
+/**
+ * Renders the planet into `canvas`, with the rings SVG drawn where `rings` lays out;
+ * returns a disposer. `onFallback` fires if WebGPU can't run it.
+ */
 export function mountPlanet(
   canvas: HTMLCanvasElement,
+  rings: HTMLElement,
   { onReady, onFallback }: { onReady: () => void; onFallback: () => void },
 ) {
   let disposed = false;
@@ -39,13 +46,30 @@ export function mountPlanet(
             time: 0,
             scroll: 0,
             intro: reduced ? 1 : 0,
+            rings: [0, 0, 0],
           },
         },
       });
+
+      // The rings share the canvas's containing block, so their offset only changes on resize.
+      const measureRings = () => {
+        const box = canvas.getBoundingClientRect();
+        const r = rings.getBoundingClientRect();
+        if (!box.height) return;
+        // The <img> letterboxes the SVG (preserveAspectRatio meet); the rect includes its scale.
+        const unit = Math.min(r.width / RINGS_VIEWBOX[0], r.height / RINGS_VIEWBOX[1]);
+        const x = r.left + r.width / 2 - box.left;
+        const y = r.top + r.height / 2 - box.top;
+        planet.set({
+          params: { rings: [x / box.height, y / box.height, unit / box.height] },
+        });
+      };
+      measureRings();
       teardown.push(
-        output.onResize(({ width, height }) =>
-          planet.set({ params: { resolution: [width, height] } }),
-        ),
+        output.onResize(({ width, height }) => {
+          planet.set({ params: { resolution: [width, height] } });
+          measureRings();
+        }),
       );
       await planet.compile({ colors: [output.format] });
       if (disposed) return;
