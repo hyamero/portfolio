@@ -46,31 +46,8 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --animate-accordion-down: accordion-down 0.2s ease-out;
-  --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-shimmer: shimmer 8s infinite;
 
-  @keyframes accordion-down {
-    from {
-      height: 0;
-    }
-    to {
-      height: var(--radix-accordion-content-height);
-    }
-  }
-  @keyframes accordion-up {
-    from {
-      height: var(--radix-accordion-content-height);
-    }
-    to {
-      height: 0;
-    }
-  }
-  @keyframes border-beam {
-    100% {
-      offset-distance: 100%;
-    }
-  }
   @keyframes shimmer {
     0%,
     90%,
@@ -197,19 +174,6 @@
     @apply bg-background text-foreground;
   }
 
-  .spotlight {
-    background: radial-gradient(
-      50% 50% at 50% 50%,
-      #fff 0,
-      hsla(0, 0%, 100%, 0) 100%
-    );
-    opacity: 0.06;
-    transform: rotate(45deg);
-    width: 100%;
-    top: -80px;
-    max-width: 1800px;
-  }
-
   /*
  Hover Effect
  */
@@ -259,12 +223,6 @@ Menu Item Text
     top: -0.1rem;
     font-size: 10px;
     letter-spacing: 0.03em;
-  }
-
-  .menu-item-text {
-    pointer-events: none;
-    line-height: 1;
-    position: relative;
   }
 
   .menu-item > div:nth-child(1) span {
