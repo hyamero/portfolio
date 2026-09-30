@@ -41,6 +41,8 @@ const BentoCard = ({
   cta,
 }: BentoCardProps) => (
   <div
+    // BentoLight traces this card's outline.
+    data-bento-card=""
     className={cn(
       "group relative col-span-3 flex flex-col justify-between overflow-hidden rounded-xl",
       // light styles
