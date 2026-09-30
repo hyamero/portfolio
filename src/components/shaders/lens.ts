@@ -1,6 +1,7 @@
-import { effect, frame, sampler, surface, texture } from "vgpu";
+import { effect, frame, sampler, surface } from "vgpu";
 
 import lensSource from "./lens.wgsl";
+import { imageTexture } from "./image-texture";
 import { getGpu, prefersReducedMotion } from "@/lib/gpu";
 
 // Lens radius as a fraction of the thumbnail's height.
@@ -24,28 +25,8 @@ export function mountLens(image: HTMLImageElement, canvas: HTMLCanvasElement) {
     if (!gpu || disposed) return;
 
     try {
-      // Thumbnails load lazily, and decode() rejects on an image that hasn't started loading.
-      if (!image.complete || !image.naturalWidth) {
-        await new Promise((resolve, reject) => {
-          image.addEventListener("load", resolve, { once: true });
-          image.addEventListener("error", reject, { once: true });
-        });
-      }
-      const bitmap = await createImageBitmap(image);
-      if (disposed) return bitmap.close();
-
-      const source = texture(gpu, {
-        kind: "2d",
-        size: [bitmap.width, bitmap.height],
-        format: "rgba8unorm",
-        usage: ["texture_binding", "copy_dst", "render_attachment"],
-      });
-      gpu.gpu.queue.copyExternalImageToTexture(
-        { source: bitmap },
-        { texture: source.gpu },
-        [bitmap.width, bitmap.height],
-      );
-      bitmap.close();
+      const source = await imageTexture(gpu, image);
+      if (disposed) return source.destroy();
       teardown.push(() => source.destroy());
 
       const output = surface(gpu, canvas);
