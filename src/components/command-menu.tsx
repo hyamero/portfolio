@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/command";
 import { Icons } from "./icons";
 import { useStateStore } from "@/lib/state-store";
-import usePageTransition from "./animations/use-page-transition";
 
 gsap.registerPlugin(useGSAP, ScrollToPlugin);
 
@@ -63,7 +62,7 @@ const commands: CommandGroupData[] = [
       {
         Icon: Icons.linkedIn,
         title: "LinkedIn",
-        url: "https://linkedin.com/in/daleban",
+        url: "https://linkedin.com/in/hyamero",
       },
     ],
   },
@@ -78,7 +77,7 @@ const isEditableTarget = (target: EventTarget | null) =>
 export function CommandMenu() {
   const pathname = usePathname();
   const { contextSafe } = useGSAP();
-  const { animatePageOut } = usePageTransition();
+  const animatePageOut = useStateStore((state) => state.animatePageOut);
 
   const open = useStateStore((state) => state.openMenu);
   const setOpen = useStateStore((state) => state.setOpenMenu);

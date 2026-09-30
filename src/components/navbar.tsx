@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
 import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
-import usePageTransition from "./animations/use-page-transition";
 import { useStateStore } from "@/lib/state-store";
 import { CommandMenu } from "./command-menu";
 import { NavMenu } from "./nav-menu";
@@ -20,7 +19,7 @@ export default function Navbar() {
   const tl = useRef<GSAPTimeline | null>(null);
   const { contextSafe } = useGSAP();
   const [isOpen, setIsOpen] = useState(false);
-  const { animatePageOut } = usePageTransition();
+  const animatePageOut = useStateStore((state) => state.animatePageOut);
 
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 

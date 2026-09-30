@@ -18,7 +18,6 @@ const Ripple = React.memo(function Ripple({
         const opacity = mainCircleOpacity - i * 0.03;
         const animationDelay = `${i * 0.06}s`;
         const borderStyle = i === numCircles - 1 ? "dashed" : "solid";
-        const borderOpacity = 5 + i * 5;
 
         return (
           <div
@@ -32,7 +31,6 @@ const Ripple = React.memo(function Ripple({
                 animationDelay: animationDelay,
                 borderStyle: borderStyle,
                 borderWidth: "1px",
-                borderColor: `rgba(var(--foreground-rgb), ${borderOpacity / 100})`,
               } as CSSProperties
             }
           />
