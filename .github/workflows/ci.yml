@@ -8,14 +8,21 @@ on:
     branches:
       - main
 
-# A PR branch triggers both `push` and `pull_request`; keep only the newest run.
+permissions:
+  contents: read
+
+# Superseded runs on a branch or PR are cancelled; every commit on main finishes.
 concurrency:
-  group: ci-${{ github.head_ref || github.ref_name }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
+    # Same-repo branches are covered by `push`; `pull_request` only adds fork
+    # PRs, so each commit gets one run instead of a push run plus a cancelled PR run.
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.fork
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v7
