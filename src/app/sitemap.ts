@@ -1,17 +1,16 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/lib/projects";
-
-const BASE_URL = "https://dale.omsimos.com";
+import { siteConfig } from "@/lib/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: BASE_URL,
+      url: siteConfig.url,
       changeFrequency: "monthly",
       priority: 1,
     },
     ...projects.map((project) => ({
-      url: `${BASE_URL}/project/${project.projectTitle}`,
+      url: `${siteConfig.url}/project/${project.projectTitle}`,
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
