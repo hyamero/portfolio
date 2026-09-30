@@ -1,7 +1,9 @@
-"use client";
+import { BackToTop } from "@/components/back-to-top";
+import { siteConfig } from "@/lib/site";
 
-import { ArrowUpIcon } from "lucide-react";
-import { scrollToSection } from "@/lib/scroll";
+// Evaluated on the server at build time, so the prerendered HTML and the
+// hydrated client always agree on the year.
+const year = new Date().getFullYear();
 
 export default function Footer() {
   return (
@@ -16,15 +18,9 @@ export default function Footer() {
 
         <div className="mb-5 flex items-center gap-2 text-neutral-400 lg:gap-5">
           <p className="text-base font-light tracking-tight sm:text-lg lg:text-xl">
-            Copyright &copy; Dale Bañares {new Date().getFullYear()}
+            Copyright &copy; {siteConfig.name} {year}
           </p>
-          <button
-            type="button"
-            aria-label="Back to top"
-            onClick={() => scrollToSection("home")}
-          >
-            <ArrowUpIcon />
-          </button>
+          <BackToTop />
         </div>
       </div>
     </footer>
