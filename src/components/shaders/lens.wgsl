@@ -5,6 +5,9 @@ struct Params {
   pointer: vec2f,
   strength: f32,
   radius: f32,
+  // Axis the lens is drawn out along, and by how much: negative squashes it across instead.
+  axis: vec2f,
+  stretch: f32,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -14,7 +17,11 @@ struct Params {
 @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
   let aspect = params.resolution.x / params.resolution.y;
   let fromCenter = uv - params.pointer;
-  let local = fromCenter * vec2f(aspect, 1.0) / params.radius;
+  // Reshaped like a drop that keeps its volume: longer along the axis by k, thinner across it.
+  let k = 1.0 + clamp(params.stretch, -0.3, 0.4);
+  let circle = fromCenter * vec2f(aspect, 1.0) / params.radius;
+  let along = dot(circle, params.axis);
+  let local = along / k * params.axis + (circle - along * params.axis) * k;
   let r = length(local);
   let s = params.strength * (1.0 - smoothstep(0.97, 1.0, r));
 
@@ -22,7 +29,8 @@ struct Params {
   let magnify = mix(1.0, 0.7 + 0.3 * r * r, s);
   let base = params.pointer + fromCenter * magnify;
 
-  let fringe = fromCenter * 0.04 * smoothstep(0.5, 1.0, r) * s;
+  // In motion the fringe widens a touch, like the glass is still catching up.
+  let fringe = fromCenter * 0.04 * (1.0 + 0.8 * abs(k - 1.0)) * smoothstep(0.5, 1.0, r) * s;
   let red = textureSampleLevel(image, samp, base + fringe, 0.0).r;
   let green = textureSampleLevel(image, samp, base, 0.0).g;
   let blue = textureSampleLevel(image, samp, base - fringe, 0.0).b;
