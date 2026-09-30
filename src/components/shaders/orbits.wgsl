@@ -11,7 +11,7 @@ struct Params {
   bodies: array<vec4f, 4>,
   // Per icon: trail tint, then how lit its orbit is while the icon is hovered (0-1).
   looks: array<vec4f, 4>,
-  // Per ping: center, age in seconds (negative when unused), starting radius.
+  // Per ping: center, progress from 0 to 1 (outside that when unused), starting radius.
   pings: array<vec4f, 4>,
   pingTints: array<vec4f, 4>,
 }
@@ -19,7 +19,6 @@ struct Params {
 @group(0) @binding(0) var<uniform> params: Params;
 
 const TAU = 6.2831853;
-const PING_SECONDS = 1.6;
 const PING_REACH = 110.0;
 
 // Box-filtered coverage of a stroke `width` wide at signed offset `e`, for pixels `pix` wide.
@@ -74,10 +73,10 @@ fn stroke(e: f32, width: f32, pix: f32) -> f32 {
 
   for (var j = 0; j < 4; j++) {
     let ping = params.pings[j];
-    if (ping.z < 0.0 || ping.z > PING_SECONDS) {
+    let q = ping.z;
+    if (q < 0.0 || q > 1.0) {
       continue;
     }
-    let q = ping.z / PING_SECONDS;
     let radius = ping.w + (1.0 - pow(1.0 - q, 3.0)) * PING_REACH;
     let d = length(p - ping.xy) - radius;
     if (abs(d) > 40.0) {
