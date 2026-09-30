@@ -17,7 +17,9 @@ export default function LensImage({
 
   useEffect(() => {
     const [image, canvas] = [imageRef.current, canvasRef.current];
-    if (!image || !canvas || !("gpu" in navigator)) return;
+    // A hover lens has nothing to follow on touch screens.
+    const canHover = window.matchMedia("(hover: hover)").matches;
+    if (!image || !canvas || !canHover || !("gpu" in navigator)) return;
 
     let dispose: (() => void) | undefined;
     let cancelled = false;

@@ -2,7 +2,6 @@ import Link from "next/link";
 import Image from "next/image";
 
 import HeroBackground from "../shaders/hero-background";
-import ringStar from "@public/img/rings-bg.svg";
 import starIcon from "@public/img/icons/star-icon.png";
 import globeIcon from "@public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
@@ -25,17 +24,6 @@ export default function Hero() {
       <HeroBackground />
 
       <div className="container flex min-h-screen pt-40 lg:pt-48">
-        <div className="absolute top-[-20%] -left-1/2 -z-10 size-full sm:top-[-10%] 2xl:top-0">
-          <Image
-            alt="Stars"
-            src={ringStar}
-            fill
-            unoptimized
-            loading="eager"
-            className="scale-[2.5] md:scale-[2] lg:scale-125 2xl:scale-100"
-          />
-        </div>
-
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
           <div className="space-y-4">
             <Link
