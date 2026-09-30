@@ -16,7 +16,13 @@ export function mountLens(image: HTMLImageElement, canvas: HTMLCanvasElement) {
     if (!gpu || disposed) return;
 
     try {
-      if (!image.complete || !image.naturalWidth) await image.decode();
+      // Thumbnails load lazily, and decode() rejects on an image that hasn't started loading.
+      if (!image.complete || !image.naturalWidth) {
+        await new Promise((resolve, reject) => {
+          image.addEventListener("load", resolve, { once: true });
+          image.addEventListener("error", reject, { once: true });
+        });
+      }
       const bitmap = await createImageBitmap(image);
       if (disposed) return bitmap.close();
 
