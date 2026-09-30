@@ -1,8 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import heroBg from "@public/img/main-bg.jpg";
-import Particles from "../magicui/particles";
+import HeroBackground from "../shaders/hero-background";
 import ringStar from "@public/img/rings-bg.svg";
 import starIcon from "@public/img/icons/star-icon.png";
 import globeIcon from "@public/img/icons/globe-icon.png";
@@ -23,40 +22,9 @@ const descriptionHighlights = ["Sr.", "Software", "Engineer", "Designer"];
 export default function Hero() {
   return (
     <section id="home" className="relative overflow-hidden border-b">
-      {/* BG Filter */}
-      <div className="pointer-events-none absolute inset-0 h-full w-full bg-black/35 mix-blend-overlay" />
-
-      <div className="absolute top-0 -z-10 size-full lg:left-0">
-        <Image
-          id="hero-bg"
-          src={heroBg}
-          alt="Main Background"
-          className="object-cover object-center opacity-90"
-          preload
-          fill
-        />
-      </div>
+      <HeroBackground />
 
       <div className="container flex min-h-screen pt-40 lg:pt-48">
-        {/* Noise Filter */}
-        <div
-          style={{
-            filter: "url(#noiseFilter)",
-          }}
-          className="absolute inset-0 mask-[radial-gradient(ellipse_at_bottom,white,transparent_80%)] opacity-75 mix-blend-soft-light"
-        />
-
-        <svg aria-hidden="true" className="absolute left-full">
-          <filter id="noiseFilter">
-            <feTurbulence
-              baseFrequency="6.29"
-              numOctaves="1"
-              stitchTiles="stitch"
-              type="fractalNoise"
-            ></feTurbulence>
-          </filter>
-        </svg>
-
         <div className="absolute top-[-20%] -left-1/2 -z-10 size-full sm:top-[-10%] 2xl:top-0">
           <Image
             alt="Stars"
@@ -67,14 +35,6 @@ export default function Hero() {
             className="scale-[2.5] md:scale-[2] lg:scale-125 2xl:scale-100"
           />
         </div>
-
-        <Particles
-          className="absolute inset-0"
-          quantity={75}
-          ease={80}
-          color="#888888"
-          refresh
-        />
 
         <div className="relative z-30 flex flex-col items-start gap-10 md:gap-14">
           <div className="space-y-4">
@@ -132,7 +92,7 @@ export default function Hero() {
             />
           </div>
 
-          <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-xs md:w-1/3 md:pb-10">
+          <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg md:w-1/3 md:pb-10">
             <Link
               href={siteConfig.links.resume}
               target="_blank"
