@@ -1,20 +1,9 @@
 "use client";
 
-import gsap from "gsap";
 import { ArrowUpIcon } from "lucide-react";
-import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
-
-gsap.registerPlugin(ScrollToPlugin);
+import { scrollToSection } from "@/lib/scroll";
 
 export default function Footer() {
-  const scrollToSection = (scrollElement: string, offsetY: number) => {
-    gsap.to(window, {
-      duration: 1,
-      scrollTo: { y: `#${scrollElement}`, offsetY },
-      ease: "power2.easeOut",
-    });
-  };
-
   return (
     <footer
       id="footer"
@@ -29,7 +18,11 @@ export default function Footer() {
           <p className="text-base font-light tracking-tight sm:text-lg lg:text-xl">
             Copyright &copy; Dale Bañares {new Date().getFullYear()}
           </p>
-          <button onClick={() => scrollToSection("home", 0)}>
+          <button
+            type="button"
+            aria-label="Back to top"
+            onClick={() => scrollToSection("home")}
+          >
             <ArrowUpIcon />
           </button>
         </div>

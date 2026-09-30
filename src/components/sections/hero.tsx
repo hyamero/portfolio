@@ -1,4 +1,3 @@
-import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -9,17 +8,17 @@ import starIcon from "@public/img/icons/star-icon.png";
 import globeIcon from "@public/img/icons/globe-icon.png";
 import { ArrowUpRight, ArrowUpRightIcon } from "lucide-react";
 import AnimatedShinyText from "@/components/magicui/animated-shiny-text";
+import { siteConfig } from "@/lib/site";
 
-const _heroText = {
-  top: "Crafting ideas into",
-  bottom: "digital experiences",
-};
+const heroText = ["Crafting ideas into", "digital experiences"].map((line) =>
+  line.split(" "),
+);
 
-const _descriptionText =
-  "Joseph Dale Bañares is a Sr. Software Engineer and Designer based in the Philippines and Europe.";
-
-const heroText = [_heroText.top.split(" "), _heroText.bottom.split(" ")];
-const descriptionText = _descriptionText.split(" ");
+const descriptionText =
+  "Joseph Dale Bañares is a Sr. Software Engineer and Designer based in the Philippines and Europe.".split(
+    " ",
+  );
+const descriptionHighlights = ["Sr.", "Software", "Engineer", "Designer"];
 
 export default function Hero() {
   return (
@@ -113,15 +112,16 @@ export default function Hero() {
               className="w-5/6 text-xl leading-tight tracking-tight text-[#888888] sm:w-1/2 md:w-2/5 lg:text-2xl"
             >
               {descriptionText.map((text, i) => (
-                <React.Fragment key={text + i}>
-                  {["Sr.", "Software", "Engineer", "Designer"].includes(
-                    text,
-                  ) ? (
-                    <span className="font-medium text-foreground">{text} </span>
-                  ) : (
-                    <span>{text} </span>
-                  )}
-                </React.Fragment>
+                <span
+                  key={text + i}
+                  className={
+                    descriptionHighlights.includes(text)
+                      ? "font-medium text-foreground"
+                      : undefined
+                  }
+                >
+                  {text}{" "}
+                </span>
               ))}
             </p>
 
@@ -134,7 +134,7 @@ export default function Hero() {
 
           <div className="blur-item flex flex-col items-center justify-center gap-20 rounded-lg backdrop-blur-xs md:w-1/3 md:pb-10">
             <Link
-              href="/resume"
+              href={siteConfig.links.resume}
               target="_blank"
               rel="noopener noreferrer"
               className="hover-effect relative flex w-full items-center justify-between gap-2 border-b border-border px-5 pb-3 text-base text-foreground md:text-lg"

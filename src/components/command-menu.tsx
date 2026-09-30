@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useGSAP } from "@gsap/react";
 import { usePathname } from "next/navigation";
-import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 import {
   Home,
   Leaf,
@@ -25,8 +24,10 @@ import {
 } from "@/components/ui/command";
 import { Icons } from "./icons";
 import { useStateStore } from "@/lib/state-store";
+import { siteConfig } from "@/lib/site";
+import { scrollToSection } from "@/lib/scroll";
 
-gsap.registerPlugin(useGSAP, ScrollToPlugin);
+gsap.registerPlugin(useGSAP);
 
 type CommandGroupData = {
   group: string;
@@ -53,16 +54,16 @@ const commands: CommandGroupData[] = [
   {
     group: "Contact",
     items: [
-      { Icon: Newspaper, title: "Resume", url: "/resume" },
+      { Icon: Newspaper, title: "Resume", url: siteConfig.links.resume },
       {
         Icon: Icons.gitHub,
         title: "GitHub",
-        url: "https://github.com/hyamero",
+        url: siteConfig.links.github,
       },
       {
         Icon: Icons.linkedIn,
         title: "LinkedIn",
-        url: "https://linkedin.com/in/hyamero",
+        url: siteConfig.links.linkedin,
       },
     ],
   },
@@ -88,11 +89,7 @@ export function CommandMenu() {
       return animatePageOut("/");
     }
 
-    gsap.to(window, {
-      duration: 1,
-      scrollTo: { y: `#${scrollElement}`, offsetY },
-      ease: "power2.easeOut",
-    });
+    scrollToSection(scrollElement, offsetY);
   });
 
   useEffect(() => {
