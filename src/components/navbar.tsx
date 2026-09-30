@@ -4,15 +4,14 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { usePathname } from "next/navigation";
 import { useRef, useState } from "react";
-import { ScrollToPlugin } from "gsap/dist/ScrollToPlugin";
 
-import usePageTransition from "./animations/use-page-transition";
 import { useStateStore } from "@/lib/state-store";
+import { scrollToSection } from "@/lib/scroll";
 import { CommandMenu } from "./command-menu";
 import { NavMenu } from "./nav-menu";
 import { Button } from "./ui/button";
 
-gsap.registerPlugin(useGSAP, ScrollToPlugin);
+gsap.registerPlugin(useGSAP);
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -20,7 +19,7 @@ export default function Navbar() {
   const tl = useRef<GSAPTimeline | null>(null);
   const { contextSafe } = useGSAP();
   const [isOpen, setIsOpen] = useState(false);
-  const { animatePageOut } = usePageTransition();
+  const animatePageOut = useStateStore((state) => state.animatePageOut);
 
   const setOpenMenu = useStateStore((state) => state.setOpenMenu);
 
@@ -32,11 +31,7 @@ export default function Navbar() {
       });
     }
 
-    gsap.to(window, {
-      duration: 1,
-      scrollTo: { y: `#${scrollElement}`, offsetY },
-      ease: "power2.easeOut",
-    });
+    scrollToSection(scrollElement, offsetY);
   });
 
   // oxlint-disable-next-line react/refs -- contextSafe only wraps the callback; it runs in event handlers, not during render
@@ -121,6 +116,8 @@ export default function Navbar() {
             <button
               type="button"
               name="menu"
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
               className="nav-item menu-burger group flex w-7 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:transform [&>span]:rounded-full [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
               onClick={() => toggleNav()}
             >

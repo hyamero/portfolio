@@ -1,31 +1,25 @@
-import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { type Project } from "@/lib/projects";
 import ringStar from "@public/img/rings-bg.svg";
+import starsImg from "@public/img/stars.svg";
 import { ArrowUpRightIcon } from "lucide-react";
 import atomIcon from "@public/img/icons/atom-icon.png";
 
-export default function ProjectShowcase({ ...props }: Project) {
-  const { url, year, role, techs, image, projectTitle, subtitle, description } =
-    props;
-
-  const _subtitle = subtitle.split(" ");
-
-  const _keywordsHighlight = {
-    omsimos: "high-quality cutting-edge top-tier".split(" "),
-    umamin: "2.6 million unique users 14.5 million+ page visits 700K".split(
-      " ",
-    ),
-    foliage: "clean interactive websites, modern technology".split(" "),
-  };
-
-  const keywordsHighlight = Object.values(_keywordsHighlight).flat();
-
+export default function ProjectShowcase({
+  url,
+  year,
+  role,
+  techs,
+  image,
+  projectTitle,
+  subtitle,
+  highlights,
+  description,
+}: Project) {
   return (
     <section
       id={projectTitle}
@@ -51,14 +45,17 @@ export default function ProjectShowcase({ ...props }: Project) {
               "w-full 2xl:w-4/5",
             )}
           >
-            {_subtitle.map((text, i) => (
-              <React.Fragment key={text + i}>
-                {keywordsHighlight.includes(text) ? (
-                  <span className="font-medium text-foreground">{text} </span>
-                ) : (
-                  <span>{text} </span>
-                )}
-              </React.Fragment>
+            {subtitle.split(" ").map((text, i) => (
+              <span
+                key={text + i}
+                className={
+                  highlights.includes(text)
+                    ? "font-medium text-foreground"
+                    : undefined
+                }
+              >
+                {text}{" "}
+              </span>
             ))}
           </h2>
         </div>
@@ -74,22 +71,28 @@ export default function ProjectShowcase({ ...props }: Project) {
                   "w-full rounded-lg shadow-md",
                 )}
                 placeholder="blur"
-                priority
+                sizes="(min-width: 1540px) 1155px, (min-width: 1024px) 75vw, 100vw"
               />
             </div>
           </div>
 
-          <Icons.stars
+          <Image
+            alt=""
+            src={starsImg}
+            unoptimized
             className={cn(
               `stars-${projectTitle}`,
-              "absolute -top-40 -left-52 z-[-11] opacity-70 xl:-left-10",
+              "absolute -top-40 -left-52 z-[-11] max-w-none opacity-70 xl:-left-10",
             )}
           />
 
-          <Icons.stars
+          <Image
+            alt=""
+            src={starsImg}
+            unoptimized
             className={cn(
               `stars-${projectTitle}`,
-              "absolute bottom-20 -left-52 z-[-11] hidden opacity-70 xl:-left-10 xl:block",
+              "absolute bottom-20 -left-52 z-[-11] hidden max-w-none opacity-70 xl:-left-10 xl:block",
             )}
           />
         </div>

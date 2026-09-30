@@ -39,7 +39,7 @@ export const NavMenu = ({
   scrollTo: (scrollElement: string, offsetY: number) => void;
 }) => {
   return (
-    <div className="menu fixed top-0 left-0 z-40 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-neutral-950/95 text-secondary-foreground [clipPath:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
+    <div className="menu fixed top-0 left-0 z-40 grid h-screen w-screen place-items-center justify-center space-y-1 rounded-lg border-b bg-neutral-950/95 text-secondary-foreground [clip-path:polygon(0%_0%,_100%_0%,_100%_0%,_0%_0%)]">
       <div className="flex flex-col gap-14 sm:flex-row sm:gap-28">
         <div className="flex flex-col items-start gap-3 md:gap-5">
           <button

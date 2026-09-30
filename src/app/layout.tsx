@@ -5,22 +5,22 @@ import { GeistSans } from "geist/font/sans";
 import TransitionLoader from "@/components/transition-loader";
 import GridPattern from "@/components/magicui/grid-pattern";
 import Contact from "@/components/sections/contact";
-import { Toaster } from "@/components/ui/sonner";
 import { Footer } from "@/components/sections";
 import Navbar from "@/components/navbar";
+import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://dale.omsimos.com"),
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "Dale Bañares",
-    template: "%s | Dale Bañares",
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: "Software Engineer and Designer based in the Philippines.",
+  description: siteConfig.description,
   openGraph: {
-    title: "Dale Bañares",
-    description: "Software Engineer and Designer based in the Philippines",
-    url: "https://dale.omsimos.com",
-    siteName: "Dale Bañares",
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    siteName: siteConfig.name,
     locale: "en_US",
     type: "website",
   },
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: "Dale Bañares",
+    title: siteConfig.name,
     card: "summary_large_image",
-    description: "Software Engineer and Designer based in the Philippines",
+    description: siteConfig.description,
   },
 };
 
@@ -51,7 +51,6 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={GeistSans.className}>
         <TransitionLoader />
-        <Toaster />
         <Navbar />
 
         <GridPattern className="mask-[radial-gradient(ellipse_at_center,white,transparent_80%)]" />

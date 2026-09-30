@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Icons } from "../icons";
 import { cn } from "@/lib/utils";
+import { siteConfig } from "@/lib/site";
 import Ripple from "../magicui/ripple";
 import OrbitingIcons, {
   type OrbitingIconsProps,
@@ -22,6 +23,7 @@ export default function Contact() {
             src={starsBg}
             className="absolute inset-0 size-full opacity-70"
             fill
+            unoptimized
           />
 
           <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg md:shadow-xl">
@@ -63,7 +65,7 @@ const socials: Social[] = [
   {
     name: "Gmail",
     icon: Icons.gmail,
-    href: "mailto:daleban.dev@gmail.com",
+    href: siteConfig.links.email,
     duration: 20,
     delay: 20,
     radius: 80,
@@ -73,7 +75,7 @@ const socials: Social[] = [
   {
     name: "Discord",
     icon: Icons.discord,
-    href: "https://discord.gg/zbRvmbrZmc",
+    href: siteConfig.links.discord,
     duration: 20,
     delay: 10,
     radius: 80,
@@ -82,7 +84,7 @@ const socials: Social[] = [
   {
     name: "LinkedIn",
     icon: Icons.linkedIn,
-    href: "https://linkedin.com/in/hyamero",
+    href: siteConfig.links.linkedin,
     duration: 20,
     radius: 190,
     reverse: true,
@@ -91,7 +93,7 @@ const socials: Social[] = [
   {
     name: "GitHub",
     icon: Icons.gitHub,
-    href: "https://github.com/hyamero",
+    href: siteConfig.links.github,
     duration: 20,
     delay: 20,
     radius: 190,

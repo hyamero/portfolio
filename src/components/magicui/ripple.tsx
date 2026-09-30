@@ -18,12 +18,13 @@ const Ripple = React.memo(function Ripple({
         const opacity = mainCircleOpacity - i * 0.03;
         const animationDelay = `${i * 0.06}s`;
         const borderStyle = i === numCircles - 1 ? "dashed" : "solid";
-        const borderOpacity = 5 + i * 5;
 
         return (
           <div
             key={i}
-            className={`absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2 animate-ripple rounded-full border bg-foreground/25 shadow-xl`}
+            // The old inline rgba(var(--foreground-rgb)) referenced an undefined
+            // variable and resolved to currentcolor; keep that rendered color.
+            className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2 animate-ripple rounded-full border border-foreground bg-foreground/25 shadow-xl"
             style={
               {
                 width: `${size}px`,
@@ -32,7 +33,6 @@ const Ripple = React.memo(function Ripple({
                 animationDelay: animationDelay,
                 borderStyle: borderStyle,
                 borderWidth: "1px",
-                borderColor: `rgba(var(--foreground-rgb), ${borderOpacity / 100})`,
               } as CSSProperties
             }
           />

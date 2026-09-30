@@ -166,15 +166,16 @@ export default function Particles({
 
         drawCircle(circle, true);
 
-        // Replace particles that drift out of the canvas.
+        // Replace particles that drift out of the canvas in place; splicing
+        // mid-iteration made forEach skip the next particle.
         if (
           circle.x < -circle.size ||
           circle.x > canvasSize.w + circle.size ||
           circle.y < -circle.size ||
           circle.y > canvasSize.h + circle.size
         ) {
-          circles.splice(i, 1);
-          drawCircle(circleParams());
+          circles[i] = circleParams();
+          drawCircle(circles[i], true);
         }
       });
       rafId = window.requestAnimationFrame(animate);
