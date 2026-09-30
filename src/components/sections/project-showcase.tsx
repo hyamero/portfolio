@@ -3,12 +3,12 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
+import AtomIcon from "../shaders/atom-icon";
 import LensImage from "../shaders/lens-image";
 import { type Project } from "@/lib/projects";
 import ringStar from "@public/img/rings-bg.svg";
 import starsImg from "@public/img/stars.svg";
 import { ArrowUpRightIcon } from "lucide-react";
-import atomIcon from "@public/img/icons/atom-icon.png";
 
 export default function ProjectShowcase({
   url,
@@ -97,13 +97,7 @@ export default function ProjectShowcase({
         </div>
 
         <div className="col-span-4 row-start-4 flex flex-col items-center justify-center gap-14 rounded-b-lg border-x border-b bg-[#080808] px-10 py-10 [box-shadow:0_-10px_40px_-20px_#ffffff1f_inset] sm:flex-row md:rounded-none lg:col-start-4 lg:row-start-2 lg:h-full lg:flex-col lg:border-t-0 lg:px-7 lg:py-0 xl:rounded-br-lg">
-          <Image
-            alt="Atom Icon"
-            src={atomIcon}
-            className="mx-auto lg:w-5/6"
-            height={200}
-            width={200}
-          />
+          <AtomIcon className="mx-auto w-[200px] max-w-full shrink-0 lg:w-5/6" />
 
           <p className="text-center text-lg leading-[1.3] tracking-tight text-balance text-neutral-500 sm:text-xl md:leading-[1.2] lg:text-base lg:leading-[1.15] xl:text-lg xl:leading-[1.15] 2xl:text-xl">
             <span className="font-medium text-foreground">Powered by </span>
