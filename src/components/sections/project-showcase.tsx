@@ -3,6 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 import { Button } from "../ui/button";
+import LensImage from "../shaders/lens-image";
 import { type Project } from "@/lib/projects";
 import ringStar from "@public/img/rings-bg.svg";
 import starsImg from "@public/img/stars.svg";
@@ -63,13 +64,11 @@ export default function ProjectShowcase({
         <div className="relative -z-10 col-span-4 col-start-1 row-start-2 my-16 sm:px-12 lg:col-span-3 lg:my-0 lg:p-12 2xl:p-24">
           <div className="rounded-lg bg-linear-to-bl from-border/50 via-neutral-800/80 to-border/50 p-px">
             <div className="rounded-lg bg-neutral-950 p-2 md:p-4">
-              <Image
+              <LensImage
                 alt={`${projectTitle} Showcase`}
                 src={image}
-                className={cn(
-                  `thumbnail-${projectTitle}`,
-                  "w-full rounded-lg shadow-md",
-                )}
+                wrapperClassName={`thumbnail-${projectTitle}`}
+                className="w-full rounded-lg shadow-md"
                 placeholder="blur"
                 sizes="(min-width: 1540px) 1155px, (min-width: 1024px) 75vw, 100vw"
               />
