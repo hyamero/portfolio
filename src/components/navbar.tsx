@@ -116,6 +116,8 @@ export default function Navbar() {
             <button
               type="button"
               name="menu"
+              aria-label="Toggle menu"
+              aria-expanded={isOpen}
               className="nav-item menu-burger group flex w-7 cursor-pointer flex-col items-center justify-center space-y-1 py-3 [&>span]:block [&>span]:h-[1.5px] [&>span]:transform [&>span]:rounded-full [&>span]:bg-foreground [&>span]:transition [&>span]:duration-300"
               onClick={() => toggleNav()}
             >

@@ -32,15 +32,24 @@ export function GhStats() {
         <div className="w-full scale-90 space-y-6">
           <div className="flex items-end gap-2 text-neutral-500">
             <div className="w-full">
-              <label className="text-sm font-medium">Username</label>
-              <Input placeholder="hyamero" className="text-base" />
+              <label htmlFor="gh-username" className="text-sm font-medium">
+                Username
+              </label>
+              <Input
+                id="gh-username"
+                placeholder="hyamero"
+                className="text-base"
+              />
             </div>
 
             <div className="flex w-full flex-col">
-              <label className="text-sm font-medium">Theme</label>
+              <label htmlFor="gh-theme" className="text-sm font-medium">
+                Theme
+              </label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="gh-theme"
                     variant="outline"
                     className="w-full justify-between text-muted-foreground"
                   >
