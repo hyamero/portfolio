@@ -42,12 +42,14 @@ export default function HeroBackground() {
   return (
     <>
       <div className="absolute top-0 -z-10 size-full lg:left-0">
+        {/* Only seen without WebGPU, so it shouldn't compete with the page's critical requests. */}
         <Image
           id="hero-bg"
           src={heroBg}
-          alt="Main Background"
+          alt=""
           className="object-cover object-center opacity-90"
-          preload
+          loading="eager"
+          fetchPriority="low"
           fill
         />
         <canvas
