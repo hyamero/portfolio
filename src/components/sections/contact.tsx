@@ -6,6 +6,7 @@ import Ripple from "../magicui/ripple";
 import OrbitingIcons, {
   type OrbitingIconsProps,
 } from "../magicui/orbiting-icons";
+import ContactOrbits from "../shaders/contact-orbits";
 import starsBg from "@public/img/rings-bg.svg";
 
 export default function Contact() {
@@ -26,6 +27,8 @@ export default function Contact() {
             unoptimized
           />
 
+          <ContactOrbits />
+
           <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg md:shadow-xl">
             <span className="pointer-events-none bg-linear-to-b from-white from-25% to-black to-130% bg-clip-text text-center text-6xl leading-none font-semibold whitespace-pre-wrap text-transparent lg:text-7xl">
               Contact
@@ -35,6 +38,8 @@ export default function Contact() {
               <OrbitingIcons
                 href={social.href}
                 key={social.name}
+                label={social.name}
+                tint={social.tint}
                 className={cn(
                   "cursor-pointer border-none bg-transparent opacity-75",
                   social.className,
@@ -59,13 +64,14 @@ type Social = {
   name: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   className?: string;
-} & OrbitingIconsProps;
+} & Omit<OrbitingIconsProps, "label">;
 
 const socials: Social[] = [
   {
     name: "Gmail",
     icon: Icons.gmail,
     href: siteConfig.links.email,
+    tint: "#ea4335",
     duration: 20,
     delay: 20,
     radius: 80,
@@ -76,6 +82,7 @@ const socials: Social[] = [
     name: "Discord",
     icon: Icons.discord,
     href: siteConfig.links.discord,
+    tint: "#5865f2",
     duration: 20,
     delay: 10,
     radius: 80,
@@ -85,6 +92,7 @@ const socials: Social[] = [
     name: "LinkedIn",
     icon: Icons.linkedIn,
     href: siteConfig.links.linkedin,
+    tint: "#0a66c2",
     duration: 20,
     radius: 190,
     reverse: true,
