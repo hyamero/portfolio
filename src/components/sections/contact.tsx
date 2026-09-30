@@ -22,6 +22,7 @@ export default function Contact() {
             src={starsBg}
             className="absolute inset-0 size-full opacity-70"
             fill
+            unoptimized
           />
 
           <div className="absolute inset-0 flex size-full flex-col items-center justify-center rounded-lg md:shadow-xl">

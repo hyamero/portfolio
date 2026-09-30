@@ -33,7 +33,7 @@ export default function Hero() {
           src={heroBg}
           alt="Main Background"
           className="object-cover object-center opacity-90"
-          priority
+          preload
           fill
         />
       </div>
@@ -63,7 +63,8 @@ export default function Hero() {
             alt="Stars"
             src={ringStar}
             fill
-            priority
+            unoptimized
+            loading="eager"
             className="scale-[2.5] md:scale-[2] lg:scale-125 2xl:scale-100"
           />
         </div>

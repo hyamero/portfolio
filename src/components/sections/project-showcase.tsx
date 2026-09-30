@@ -3,10 +3,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-import { Icons } from "../icons";
 import { Button } from "../ui/button";
 import { type Project } from "@/lib/projects";
 import ringStar from "@public/img/rings-bg.svg";
+import starsImg from "@public/img/stars.svg";
 import { ArrowUpRightIcon } from "lucide-react";
 import atomIcon from "@public/img/icons/atom-icon.png";
 
@@ -74,22 +74,28 @@ export default function ProjectShowcase({ ...props }: Project) {
                   "w-full rounded-lg shadow-md",
                 )}
                 placeholder="blur"
-                priority
+                sizes="(min-width: 1540px) 1155px, (min-width: 1024px) 75vw, 100vw"
               />
             </div>
           </div>
 
-          <Icons.stars
+          <Image
+            alt=""
+            src={starsImg}
+            unoptimized
             className={cn(
               `stars-${projectTitle}`,
-              "absolute -top-40 -left-52 z-[-11] opacity-70 xl:-left-10",
+              "absolute -top-40 -left-52 z-[-11] max-w-none opacity-70 xl:-left-10",
             )}
           />
 
-          <Icons.stars
+          <Image
+            alt=""
+            src={starsImg}
+            unoptimized
             className={cn(
               `stars-${projectTitle}`,
-              "absolute bottom-20 -left-52 z-[-11] hidden opacity-70 xl:-left-10 xl:block",
+              "absolute bottom-20 -left-52 z-[-11] hidden max-w-none opacity-70 xl:-left-10 xl:block",
             )}
           />
         </div>

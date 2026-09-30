@@ -22,7 +22,9 @@ const Ripple = React.memo(function Ripple({
         return (
           <div
             key={i}
-            className={`absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2 animate-ripple rounded-full border bg-foreground/25 shadow-xl`}
+            // The old inline rgba(var(--foreground-rgb)) referenced an undefined
+            // variable and resolved to currentcolor; keep that rendered color.
+            className="absolute top-1/2 left-1/2 translate-x-1/2 translate-y-1/2 animate-ripple rounded-full border border-foreground bg-foreground/25 shadow-xl"
             style={
               {
                 width: `${size}px`,
