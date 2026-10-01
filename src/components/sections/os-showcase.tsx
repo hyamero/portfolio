@@ -4,6 +4,7 @@ import { Icons } from "@/components/icons";
 
 import { ChatBot, CertGen, GhStats, PhoneConfig } from "./tools";
 import { BentoCard, BentoGrid } from "@/components/magicui/bento-grid";
+import BentoLight from "@/components/shaders/bento-light";
 
 const features = [
   {
@@ -68,11 +69,14 @@ export default function OSShowcase() {
         Building Tools <br /> for the Community
       </h2>
 
-      <BentoGrid>
-        {features.map((feature) => (
-          <BentoCard key={feature.name} {...feature} />
-        ))}
-      </BentoGrid>
+      <div className="relative">
+        <BentoGrid>
+          {features.map((feature) => (
+            <BentoCard key={feature.name} {...feature} />
+          ))}
+        </BentoGrid>
+        <BentoLight />
+      </div>
     </section>
   );
 }
