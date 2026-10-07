@@ -5,6 +5,8 @@ import { approach, clamp, coastStep, restingLight, type Rect } from "./sky-math"
 
 export const EMPTY_RECT: Rect = { left: 0, top: 0, width: 0, height: 0 };
 const VELOCITY_MAX = 6000;
+// px in one tick; a 1.2 s glide across the page moves ~250 px in its first tick even at 30fps.
+const JUMP = 400;
 const LIGHT_EPSILON = 0.5;
 const HOVER_EPSILON = 0.002;
 
@@ -32,9 +34,11 @@ export const flight = createFlight();
 
 /** Advances `s` by one tick: scroll and velocity, the eased light, and the stars' coast. */
 export function advance(s: Flight, scroll: number, scrollX: number, dt: number) {
-  // The first tick only primes: loading mid-page is not a scroll.
+  // The first tick only primes: loading mid-page is not a scroll. Nor is a jump (End, a late scroll
+  // restore, a hash): Lenis never moves this far in one tick.
+  const delta = scroll - s.scroll;
   s.velocity =
-    s.primed && dt > 0 ? clamp((scroll - s.scroll) / dt, -VELOCITY_MAX, VELOCITY_MAX) : 0;
+    s.primed && dt > 0 && Math.abs(delta) <= JUMP ? clamp(delta / dt, -VELOCITY_MAX, VELOCITY_MAX) : 0;
   s.scroll = scroll;
   s.primed = true;
 
