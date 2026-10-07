@@ -147,6 +147,10 @@ describe("trailFrame", () => {
     expect(trailFrame(0.85, 0, false, true).shed).toBe(1);
     expect(trailFrame(1, 0, false, true).shed).toBe(1);
   });
+  test("most of the shed happens while the setting limb is still in view", () => {
+    // The orb sinks at twice the page speed, so its limb leaves the viewport near dep 0.26.
+    expect(trailFrame(0.26, 0, false, true).shed).toBeGreaterThan(0.5);
+  });
   test("shed grows monotonically with departure", () => {
     let last = -1;
     for (let d = 0; d <= 1; d += 0.05) {

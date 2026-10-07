@@ -8,6 +8,7 @@ export default function Work() {
   return (
     <section
       id="work"
+      data-sky-anchor="work"
       aria-labelledby="work-title"
       className="relative z-1 px-6 pt-24 pb-[72px] md:px-0 md:pt-[120px] md:pb-24"
     >

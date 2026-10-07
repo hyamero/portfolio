@@ -93,7 +93,7 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
 export function trailFrame(dep: number, up: number, reduced: boolean, hasWork: boolean) {
   if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
   return {
-    shed: ease(0.12, 0.85, dep),
+    shed: ease(0.04, 0.4, dep),
     carry: hasWork ? ease(0, 0.35, dep) * (1 - 0.4 * up) : 0,
     gather: up,
   };
