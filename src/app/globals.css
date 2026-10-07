@@ -1,400 +1,146 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-
-@custom-variant dark (&:where(.dark, .dark *));
-
-@utility container {
-  margin-inline: auto;
-  @apply px-6 sm:px-10 md:px-12 lg:px-14;
-  @media (width >= --theme(--breakpoint-sm)) {
-    max-width: none;
-  }
-  @media (width >= 1540px) {
-    max-width: 1540px;
-  }
-}
 
 @theme {
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
-
-  --animate-shimmer: shimmer 8s infinite;
-
-  @keyframes shimmer {
-    0%,
-    90%,
-    100% {
-      background-position: calc(-100% - var(--shimmer-width)) 0;
-    }
-    30%,
-    60% {
-      background-position: calc(100% + var(--shimmer-width)) 0;
-    }
-  }
+  --color-sky: #06070a;
+  --color-ink: #eceef2;
+  --color-glow: #c9dcff;
+  --color-mute: #a1a6af;
+  --color-dim: #7c818b;
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Scale only: circles center with the `translate` property, which a transform keyframe would stack onto. */
-@keyframes ripple {
-  0%,
-  100% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(0.9);
-  }
-}
-@keyframes orbit {
-  0% {
-    transform: rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg) translateY(calc(var(--radius) * 1px))
-      rotate(-360deg);
-  }
-}
-@keyframes marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(calc(-100% - var(--gap)));
-  }
-}
-@keyframes marquee-vertical {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(calc(-100% - var(--gap)));
-  }
-}
-
-@utility animate-ripple {
-  animation: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s) infinite;
-}
-
-@utility animate-orbit {
-  animation: orbit calc(var(--duration) * 1s) linear infinite;
-}
-
-@utility animate-marquee {
-  animation: marquee var(--duration) linear infinite;
-}
-
-@utility animate-marquee-vertical {
-  animation: marquee-vertical var(--duration) linear infinite;
-}
-
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
-
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
-@layer base {
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+@utility px-gutter {
+  padding-inline: clamp(20px, 5.6vw, 80px);
 }
 
 @layer base {
-  :root {
-    --background: 0 0% 2.75%;
-    --foreground: 0 0% 81.57%;
-
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 0 0% 98%;
-    --primary-foreground: 240 5.9% 10%;
-
-    --secondary: 240 3.7% 15.9%;
-    --secondary-foreground: 240 4.8% 95.9%;
-
-    --muted: 240 3.7% 15.9%;
-    --muted-foreground: 0 0% 53.33%;
-
-    --accent: 240 3.7% 15.9%;
-    --accent-foreground: 0 0% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 10%;
-    --input: 240 3.7% 15.9%;
-
-    --ring: 240 4.9% 83.9%;
-
-    --radius: 0.5rem;
+  html {
+    background: var(--color-sky);
+    color-scheme: dark;
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
   body {
-    @apply bg-background text-foreground;
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background: rgb(201 220 255 / 0.24);
+    color: #fff;
+  }
+  :focus-visible {
+    outline: 1px solid var(--color-glow);
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .header-fade {
+    background: linear-gradient(#06070a 0%, rgb(6 7 10 / 0.72) 52%, rgb(6 7 10 / 0) 100%);
+  }
+  .orb-dot {
+    background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
+    box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
+  }
+  .hairline {
+    background: linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
+    transform-origin: left center;
+  }
+  .grid-lines {
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgb(168 184 214 / 0.065) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(168 184 214 / 0.065) 1px, transparent 1px);
+    background-size: 64px 64px;
   }
 
-  /*
- Hover Effect
- */
-
-  .hover-effect {
+  /* Underlined text link: the rule brightens and the arrow nudges toward where it goes. */
+  .line-link {
     position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    transition: color 0.3s ease;
   }
-
-  .hover-effect:after {
+  .line-link::after {
     content: "";
     position: absolute;
-    width: 0;
-    height: 0.5px;
-    display: block;
-    right: 0;
-    bottom: 0;
-    background: rgb(183, 183, 183);
-    -webkit-transition: 0.4s ease;
-    transition: 0.4s ease;
+    inset-inline: 0;
+    bottom: 9px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.22;
+    transition: opacity 0.35s ease;
+  }
+  .line-link svg {
+    flex: none;
+    transition: transform 0.5s var(--ease-out-quint);
   }
 
-  .hover-effect:hover:after {
-    width: 100%;
-    left: 0;
+  /* Round "Visit" button beside each project name. */
+  .visit {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgb(201 220 255 / 0.2);
+    color: var(--color-glow);
+    transition:
+      border-color 0.3s ease,
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+  .visit svg {
+    transition: transform 0.5s var(--ease-out-quint);
   }
 
-  /*
-Menu Item Text
-*/
-
-  .menu {
-    user-select: none;
-    counter-reset: menucounter;
-    z-index: 11;
-  }
-
-  .menu-item {
+  /* "Send a signal.": an underline draws out from the left. */
+  .say {
     position: relative;
-    cursor: pointer;
+    display: inline-block;
+    transition: color 0.3s ease;
   }
-
-  .menu-item::before {
-    counter-increment: menucounter;
-    content: counters(menucounter, ".", decimal-leading-zero);
+  .say::after {
+    content: "";
     position: absolute;
-    left: -15px;
-    top: -0.1rem;
-    font-size: 10px;
-    letter-spacing: 0.03em;
-  }
-
-  .menu-item > div:nth-child(1) span {
-    will-change: transform;
-    transform-style: preserve-3d;
-    transition: 0.5s;
-    transition-delay: calc(0.05s * var(--index));
-    transform-origin: bottom;
-    display: inline-block;
-  }
-
-  .menu-item > div:nth-child(2) span {
-    will-change: transform;
-    transform-style: preserve-3d;
-    transition: 0.5s;
-    transition-delay: calc(0.05s * var(--index));
-    transform-origin: top;
-    display: inline-block;
-    transform: translate3d(0, 100%, 0) rotateX(-90deg);
-  }
-
-  .menu-item:hover > div:nth-child(1) span {
-    transform: translate3d(0, -100%, 0) rotateX(-90deg);
-  }
-
-  .menu-item:hover > div:nth-child(2) span {
-    transform: translate3d(0, 0%, 0) rotateX(0deg);
+    inset-inline: 0;
+    bottom: 0.06em;
+    height: 1px;
+    background: currentColor;
+    opacity: 0;
+    transform: scaleX(0.4);
+    transform-origin: left center;
+    transition:
+      opacity 0.4s ease,
+      transform 0.7s var(--ease-out-quint);
   }
 }
 
-.iphone-x {
-  position: relative;
-  z-index: 1;
-  height: 694px;
-  width: 342px;
+/* Hover only where a real pointer can hover; keyboard focus gets the same states. */
+@media (hover: hover) {
+  .line-link:hover::after { opacity: 0.85; }
+  .line-link:hover svg[data-dir="ne"] { transform: translate(2px, -2px); }
+  .line-link:hover svg[data-dir="s"] { transform: translateY(3px); }
+  .line-link:hover svg[data-dir="n"] { transform: translateY(-3px); }
+  .visit:hover { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
+  .visit:hover svg { transform: translate(2px, -2px); }
+  .say:hover { color: var(--color-glow); }
+  .say:hover::after { opacity: 0.5; transform: scaleX(1); }
 }
-.iphone-x *,
-.iphone-x *::before,
-.iphone-x *::after {
-  box-sizing: border-box;
-  display: block;
-}
-.iphone-x .side {
-  background: #1c1c1c;
-  border-radius: 54px;
-  box-shadow:
-    inset 0 0 2px 2px dimgrey,
-    inset 0 0 0 6px #a4a4a4,
-    0px -1px 13px 9px rgba(112, 112, 112, 0.8) inset;
-  height: 694px;
-  padding: 15px 22px;
-  width: 342px;
-  z-index: 1;
-}
-.iphone-x .line::after,
-.iphone-x .line::before {
-  content: "";
-  position: absolute;
-  border: solid rgba(68, 68, 68, 0.25);
-  border-width: 0 6px;
-  height: 5px;
-  left: 0;
-  width: 100%;
-  z-index: 9;
-}
-.iphone-x .line::after {
-  top: 68px;
-}
-.iphone-x .line::before {
-  bottom: 68px;
-}
-.iphone-x .header {
-  background: #1c1c1c;
-  border-bottom-left-radius: 13px;
-  border-bottom-right-radius: 13px;
-  height: 24px;
-  left: 50%;
-  margin-left: -82px;
-  position: absolute;
-  top: 15px;
-  width: 164px;
-  z-index: 199;
-}
-.iphone-x .sensor-1::after,
-.iphone-x .sensor-1::before {
-  content: "";
-  position: absolute;
-}
-.iphone-x .sensor-1::after {
-  background: #222;
-  border-radius: 50%;
-  height: 11px;
-  width: 11px;
-  left: 1%;
-  margin-left: 10px;
-  top: 3px;
-}
-.iphone-x .sensor-1::before {
-  background: #222;
-  border-radius: 50%;
-  height: 11px;
-  width: 11px;
-  left: 10%;
-  margin-left: 20px;
-  top: 3px;
-}
-.iphone-x .sensor-2::after,
-.iphone-x .sensor-2::before {
-  content: "";
-  position: absolute;
-}
-.iphone-x .sensor-2::before {
-  background: #333;
-  border-radius: 2.5px;
-  height: 5px;
-  width: 40px;
-  left: 50%;
-  margin-left: -20px;
-  top: 7px;
-}
-.iphone-x .sensor-3::after,
-.iphone-x .sensor-3::before {
-  content: "";
-  position: absolute;
-}
-.iphone-x .sensor-3::before {
-  background: #444;
-  border-radius: 50%;
-  height: 11px;
-  width: 11px;
-  left: 50%;
-  margin-left: 35px;
-  top: 3px;
-  box-shadow: 0px 0px 5px 2px navy inset;
-}
-.iphone-x .sensor-3::after {
-  background: #222;
-  border-radius: 50%;
-  height: 15px;
-  width: 15px;
-  left: 65%;
-  margin-left: 33px;
-}
-.iphone-x .volume-button {
-  background: #c8cacb;
-  height: 26px;
-  left: -2px;
-  position: absolute;
-  top: 92px;
-  width: 3px;
-}
-.iphone-x .volume-button::after,
-.iphone-x .volume-button::before {
-  content: "";
-  position: absolute;
-  background: #c8cacb;
-  height: 50px;
-  left: 0;
-  width: 3px;
-}
-.iphone-x .volume-button::after {
-  top: 48px;
-}
-.iphone-x .volume-button::before {
-  top: 112px;
-}
-.iphone-x .power-button {
-  background: #c8cacb;
-  height: 80px;
-  right: -2px;
-  position: absolute;
-  top: 160px;
-  width: 3px;
+.line-link:focus-visible::after { opacity: 0.85; }
+.line-link:focus-visible svg[data-dir="ne"] { transform: translate(2px, -2px); }
+.line-link:focus-visible svg[data-dir="s"] { transform: translateY(3px); }
+.line-link:focus-visible svg[data-dir="n"] { transform: translateY(-3px); }
+.visit:focus-visible { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
+.visit:focus-visible svg { transform: translate(2px, -2px); }
+.say:focus-visible { color: var(--color-glow); }
+.say:focus-visible::after { opacity: 0.5; transform: scaleX(1); }
+
+/* The page-in fades these up (motion.tsx); hidden first so they never flash in. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-rise] { opacity: 0; }
 }

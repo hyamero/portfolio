@@ -2,11 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 
-import TransitionLoader from "@/components/transition-loader";
-import GridPattern from "@/components/magicui/grid-pattern";
-import Contact from "@/components/sections/contact";
-import { Footer } from "@/components/sections";
-import Navbar from "@/components/navbar";
+import SiteHeader from "@/components/site-header";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -48,15 +44,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={GeistSans.className}>
-        <TransitionLoader />
-        <Navbar />
-
-        <GridPattern className="mask-[radial-gradient(ellipse_at_center,white,transparent_80%)]" />
+    <html lang="en" data-sky="css" className={GeistSans.variable}>
+      <body className="flex min-h-svh flex-col overflow-x-clip font-sans">
+        {/* Without scripts nothing would fade the page-in up. */}
+        <noscript>
+          <style>{"[data-rise]{opacity:1!important}"}</style>
+        </noscript>
+        <SiteHeader />
         {children}
-        <Contact />
-        <Footer />
       </body>
     </html>
   );

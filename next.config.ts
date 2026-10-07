@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
         destination: "/resume.pdf",
         permanent: true,
       },
+      {
+        source: "/project/:title",
+        destination: "/#:title",
+        permanent: true,
+      },
     ];
   },
   images: {
