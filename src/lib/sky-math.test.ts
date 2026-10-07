@@ -4,6 +4,8 @@ import {
   approach,
   armIntro,
   clamp,
+  COAST,
+  coastStep,
   departure,
   ease,
   horizonFrame,
@@ -12,6 +14,7 @@ import {
   restingLight,
   rise,
   skyDpr,
+  trailFrame,
   type Rect,
 } from "./sky-math";
 
@@ -135,5 +138,69 @@ describe("armIntro", () => {
   });
   test("keeps a running intro", () => {
     expect(armIntro(500, 1000, true, true)).toBe(500);
+  });
+});
+
+describe("trailFrame", () => {
+  test("nothing sheds at the top, and the whole trail has shed as the orb finishes fading", () => {
+    expect(trailFrame(0, 0, false, true).shed).toBe(0);
+    expect(trailFrame(0.85, 0, false, true).shed).toBe(1);
+    expect(trailFrame(1, 0, false, true).shed).toBe(1);
+  });
+  test("shed grows monotonically with departure", () => {
+    let last = -1;
+    for (let d = 0; d <= 1; d += 0.05) {
+      const { shed } = trailFrame(d, 0, false, true);
+      expect(shed).toBeGreaterThanOrEqual(last);
+      last = shed;
+    }
+  });
+  test("the ribbon appears as the orb leaves and dims as the horizon takes over", () => {
+    expect(trailFrame(0, 0, false, true).carry).toBe(0);
+    expect(trailFrame(0.35, 0, false, true).carry).toBe(1);
+    expect(trailFrame(1, 1, false, true).carry).toBeCloseTo(0.6);
+  });
+  test("there is no ribbon without a Work section", () => {
+    expect(trailFrame(1, 0, false, false).carry).toBe(0);
+  });
+  test("gather follows the horizon's rise", () => {
+    expect(trailFrame(1, 0.4, false, true).gather).toBe(0.4);
+  });
+  test("reduced motion sheds nothing and holds the ribbon as still nebula", () => {
+    expect(trailFrame(0.6, 1, true, true)).toEqual({ shed: 0, carry: 1, gather: 1 });
+  });
+});
+
+describe("coastStep", () => {
+  const DT = 1 / 60;
+  const run = (v: number, velocity: number, seconds: number) => {
+    for (let i = 0; i < Math.round(seconds / DT); i++) v = coastStep(v, velocity, DT);
+    return v;
+  };
+  test("follows the scroll in its direction, at half its speed", () => {
+    expect(run(0, 1000, 0.5)).toBeGreaterThan(450);
+    expect(run(0, -1000, 0.5)).toBeLessThan(-450);
+  });
+  test("is capped", () => {
+    const v = run(0, 6000, 2);
+    expect(v).toBeLessThanOrEqual(COAST.max);
+    expect(v).toBeGreaterThan(COAST.max - 10);
+  });
+  test("glides on after a stop and comes to rest within 3 s from the cap", () => {
+    expect(run(COAST.max, 0, 1)).toBeGreaterThan(COAST.rest);
+    let v: number = COAST.max;
+    let t = 0;
+    while (v !== 0 && t < 5) {
+      v = coastStep(v, 0, DT);
+      t += DT;
+    }
+    expect(v).toBe(0);
+    expect(t).toBeLessThanOrEqual(3);
+  });
+  test("reverses quickly when the scroll does", () => {
+    expect(run(400, -1000, 0.3)).toBeLessThan(0);
+  });
+  test("stays at rest without a scroll", () => {
+    expect(coastStep(0, 0, DT)).toBe(0);
   });
 });

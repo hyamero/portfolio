@@ -85,3 +85,30 @@ export function restingLight(hero: Rect) {
 export function approach(current: number, target: number, dt: number, rate = 3) {
   return current + (target - current) * (1 - Math.exp(-dt * rate));
 }
+
+/**
+ * The orb's trail (spec §4.1): its atmosphere sheds off the limb as it sets, carries on as a
+ * ribbon of nebula through Work, and gathers back into the horizon as Contact rises.
+ */
+export function trailFrame(dep: number, up: number, reduced: boolean, hasWork: boolean) {
+  if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
+  return {
+    shed: ease(0.12, 0.85, dep),
+    carry: hasWork ? ease(0, 0.35, dep) * (1 - 0.4 * up) : 0,
+    gather: up,
+  };
+}
+
+/** The stars' coast, in px/s of virtual scroll (spec §4.2). */
+export const COAST = { gain: 0.5, max: 800, rise: 6, decay: 2, rest: 4 } as const;
+
+/**
+ * One step of the coast velocity. It picks up the scroll quickly and lets go slowly: Lenis already
+ * eases the scroll to a stop, so a single fast rate would let go with it and leave no glide.
+ */
+export function coastStep(v: number, velocity: number, dt: number) {
+  const target = clamp(velocity * COAST.gain, -COAST.max, COAST.max);
+  const lettingGo = Math.abs(target) < Math.abs(v) && target * v >= 0;
+  const next = approach(v, target, dt, lettingGo ? COAST.decay : COAST.rise);
+  return Math.abs(velocity) < COAST.rest && Math.abs(next) < COAST.rest ? 0 : next;
+}
