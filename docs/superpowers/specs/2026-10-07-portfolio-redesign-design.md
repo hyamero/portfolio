@@ -56,6 +56,7 @@ Decisions confirmed with the owner on 2026-10-07:
 - **Route:** a single route, `/`.
 - **Redirects:** `/project/:title` permanently redirects to `/#:title`. `/resume` keeps redirecting to `/resume.pdf`, and every "Résumé" link uses `siteConfig.links.resume` (`/resume`).
 - **Fonts:** Geist (from the `geist` package) only.
+- **Type:** weights and tracking match the original site, dale.omsimos.com. Headlines are weight 500 with tight negative tracking. Running text is weight 400 at `tracking-tight` (−0.025em). No text uses positive tracking.
 - **Root text color:** `#eceef2`, antialiased.
 - **Selection:** `rgba(201,220,255,0.24)`.
 
@@ -78,9 +79,9 @@ Decisions confirmed with the owner on 2026-10-07:
 - **Placement:** fixed and full-width at `z-50`, with `pointer-events: none` except on its links.
 - **Background:** a gradient from `#06070a` through `rgba(6,7,10,.72)` at 52% to transparent.
 - **Padding:** 18 px top and 30 px bottom.
-- **Left side:** a 13 px orb dot, `radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%)` with a soft top glow, then "hyamero" (16 px, weight 500, 0.04em), linking to `#home`.
+- **Left side:** a 13 px orb dot, `radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%)` with a soft top glow, then "hyamero" (16 px, 18 px from `md`; weight 400; −0.05em), linking to `#home`.
 - **Right side:** "Work", "Contact" and "Résumé ↗".
-  - They are 14 px with 0.06em tracking, in `mute`.
+  - They are 14 px (15 px from `md`) with −0.025em tracking, in `mute`.
   - The gap is `clamp(18px, 3vw, 40px)`.
   - Each target is at least 44 px tall.
 
@@ -89,21 +90,21 @@ Decisions confirmed with the owner on 2026-10-07:
 - **Box:** at least 960 px tall (880 px below 760 px wide), `overflow: hidden`.
 - **Copy:** centred, with a 200 px top pad (132 px on mobile).
   - **h1:** "Software engineer" plus a block line "and designer." in `glow`.
-    - Size `clamp(2.75rem, 6.1vw, 5.5rem)`, line-height 1.04, weight 400, 0.01em.
+    - Size `clamp(2.75rem, 6.1vw, 5.5rem)`, line-height 1.04, weight 500, −0.07em.
   - **Lede:** "I'm Dale Bañares, based in the Philippines and working mostly with teams across the EU."
-    - 30 px below the h1, at most 34em wide, `clamp(1rem, 1.3vw, 1.1875rem)`, line-height 1.6, in `mute`, balanced.
+    - 30 px below the h1, at most 34em wide, `clamp(1rem, 1.3vw, 1.1875rem)` (16 px on mobile), line-height 1.6, −0.025em, in `mute`, balanced.
   - **Links:** "Selected work ↓" scrolls to `#work`, and "Résumé ↗" opens the résumé.
-    - 34 px below the lede, 15 px, weight 500, with a 40 px gap (8 px rows when they wrap).
+    - 34 px below the lede, 16 px, weight 400, −0.025em, with a 40 px gap (8 px rows when they wrap).
 - **Grid:** the CSS grid, masked by `radial-gradient(ellipse 58% 60% at 50% 72%, …)`.
 
 ### 3.4 Selected work (`#work`)
 
 - **Box:** padding 120 px top and 96 px bottom.
-- **Label:** "Selected work" (15 px, 0.08em, `mute`), with 26 px below it.
-- **List:** an `<ol>` with a bottom border of `rgba(255,255,255,.07)`. Each `<li id=…>` has 56 px top and 72 px bottom padding (44 px and 52 px on mobile).
+- **Label:** "Selected work" (14 px, 15 px from `md`, normal tracking, `mute`), with 26 px below it.
+- **List:** an `<ol>`, closed by a 1 px `rgba(255,255,255,.07)` rule after it (a `.rule` element, so the cursor light can catch it). Each `<li id=…>` has 56 px top and 72 px bottom padding (44 px and 52 px on mobile).
 - **Row layout:** a wrapping flex row with a 36 × 48 px gap.
-  - The left column (flex `1 1 340px`) holds the year (13 px, tabular, `dim`), then the name as an `h3` (`clamp(2.5rem, 4.4vw, 4rem)`, weight 400) beside a 44 px round Visit link (`aria-label="Visit <Name>"`, opens in a new tab).
-  - The right column (flex `1.7 1 520px`) holds the statement: `clamp(1.375rem, 2.2vw, 2rem)`, line-height 1.4, `dim`, pretty-wrapped.
+  - The left column (flex `1 1 340px`) holds the year (13 px, tabular, `dim`), then the name as an `h3` (`clamp(2.5rem, 4.4vw, 4rem)`, weight 500, −0.06em) beside a 44 px round Visit link (`aria-label="Visit <Name>"`, opens in a new tab).
+  - The right column (flex `1.7 1 520px`) holds the statement: `clamp(1.375rem, 2.2vw, 2rem)`, line-height 1.35, −0.05em, `dim`, pretty-wrapped.
   - Emphasised words are `ink` at weight 500.
 - **Hairline:** a 1 px rule at the top of each row, in the hairline gradient.
 
@@ -112,11 +113,11 @@ Decisions confirmed with the owner on 2026-10-07:
 - **Box:** at least 820 px tall, filling the rest of the page, `overflow: hidden`.
 - **Copy:** centred, with padding 196 px top and 160 px bottom (150 px top on mobile).
   - **Label:** "Contact".
-  - **CTA:** "Send a signal." as a `mailto:` link, 26 px below the label: `clamp(2.5rem, 6.4vw, 5.75rem)`, line-height 1.1.
-  - **Links:** 44 px below the CTA, a list of Email, GitHub, LinkedIn and Résumé (15 px, `mute`, 36 px gap), each with a ↗.
+  - **CTA:** "Send a signal." as a `mailto:` link, 26 px below the label: `clamp(2.75rem, 6.4vw, 5.75rem)`, line-height 1.1, weight 500, −0.07em.
+  - **Links:** 44 px below the CTA, a list of Email, GitHub, LinkedIn and Résumé (14 px, 15 px from `md`; −0.025em; `mute`; 36 px gap), each with a ↗.
 - **Grid:** the CSS grid, masked `radial-gradient(ellipse 56% 78% at 50% 100%, …)` and anchored to the bottom.
 - **Footer:** inside Contact, on the planet's dark side.
-  - "© {year} Dale Bañares" on the left and "Back to top ↑" on the right, 14 px, in `mute`, with 14 px bottom padding.
+  - "© {year} Dale Bañares" on the left and "Back to top ↑" on the right, 14 px (13 px on mobile), weight 300, −0.025em, in `mute`, with 14 px bottom padding.
   - The year is computed at build time.
 
 ### 3.6 Content
