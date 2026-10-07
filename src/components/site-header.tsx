@@ -1,5 +1,6 @@
 import { Arrow } from "@/components/icons";
 import ScrollLink from "@/components/scroll-link";
+import SectionMarker from "@/components/section-marker";
 import { siteConfig } from "@/lib/site";
 
 const NAV_LINK = "inline-flex min-h-11 items-center transition-colors duration-300 hover:text-white";
@@ -17,12 +18,12 @@ export default function SiteHeader() {
         </ScrollLink>
         <nav
           aria-label="Primary"
-          className="pointer-events-auto flex items-center gap-[18px] text-sm tracking-tight text-mute md:gap-[clamp(18px,3vw,40px)] md:text-[15px]"
+          className="pointer-events-auto relative flex items-center gap-[18px] text-sm tracking-tight text-mute md:gap-[clamp(18px,3vw,40px)] md:text-[15px]"
         >
-          <ScrollLink to="work" className={NAV_LINK}>
+          <ScrollLink to="work" data-section-link="work" className={NAV_LINK}>
             Work
           </ScrollLink>
-          <ScrollLink to="contact" className={NAV_LINK}>
+          <ScrollLink to="contact" data-section-link="contact" className={NAV_LINK}>
             Contact
           </ScrollLink>
           <a
@@ -33,6 +34,7 @@ export default function SiteHeader() {
           >
             Résumé <Arrow dir="ne" size={13} strokeWidth={1.5} />
           </a>
+          <SectionMarker />
         </nav>
       </div>
     </header>
