@@ -71,4 +71,22 @@ describe("flight", () => {
     expect(s.light.hover).toBe(1);
     expect(settling(s)).toBe(false);
   });
+  test("the light lands exactly on its target, so a settled light changes nothing", () => {
+    const s = fresh();
+    advance(s, 0, 0, DT);
+    s.pointer = { x: 100, y: 200, nx: 0, ny: 0, active: true };
+    for (let i = 0; i < 600; i++) advance(s, 50, 0, DT);
+    expect(s.light.x).toBe(s.light.tx);
+    expect(s.light.y).toBe(s.light.ty);
+    expect(s.light.hover).toBe(1);
+  });
+  test("the light waits for the hero to be measured before taking its resting place", () => {
+    const s = createFlight();
+    advance(s, 0, 0, DT);
+    s.hero = hero;
+    advance(s, 0, 0, DT);
+    const rest = restingLight(hero);
+    expect(s.light.x).toBe(rest.x);
+    expect(s.light.y).toBe(rest.y);
+  });
 });
