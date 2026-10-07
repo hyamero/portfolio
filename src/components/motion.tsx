@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
 
-import { wordOpacity } from "@/lib/statement";
+import { readProgress, wordOpacity } from "@/lib/statement";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -54,12 +54,14 @@ export default function Motion({ children }: { children: React.ReactNode }) {
             own.forEach((word, i) => {
               word.style.opacity = String(wordOpacity(progress, i, own.length));
             });
+          const update = (self: ScrollTrigger) =>
+            paint(readProgress(self.scroll(), self.start, self.end, ScrollTrigger.maxScroll(window)));
           ScrollTrigger.create({
             trigger: statement,
             start: "top 90%",
             end: "top 40%",
-            onUpdate: (self) => paint(self.progress),
-            onRefresh: (self) => paint(self.progress),
+            onUpdate: update,
+            onRefresh: update,
           });
         });
 
