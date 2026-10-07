@@ -1,5 +1,6 @@
 import { Arrow } from "@/components/icons";
 import ScrollLink from "@/components/scroll-link";
+import { HeroSky } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
 export default function Hero() {
@@ -9,6 +10,7 @@ export default function Hero() {
       data-sky-anchor="hero"
       className="relative min-h-[880px] overflow-hidden md:min-h-[960px]"
     >
+      <HeroSky />
       <div
         aria-hidden="true"
         className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_0] mask-[radial-gradient(ellipse_58%_60%_at_50%_72%,#000_0%,rgb(0_0_0/0.5)_46%,transparent_78%)]"

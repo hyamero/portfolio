@@ -1,5 +1,6 @@
 import { Arrow } from "@/components/icons";
 import ScrollLink from "@/components/scroll-link";
+import { ContactSky } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
 const YEAR = new Date().getFullYear();
@@ -19,6 +20,7 @@ export default function Contact() {
       aria-labelledby="contact-title"
       className="relative flex min-h-[640px] flex-[1_0_auto] flex-col overflow-hidden md:min-h-[820px]"
     >
+      <ContactSky />
       <div
         aria-hidden="true"
         className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_100%] mask-[radial-gradient(ellipse_56%_78%_at_50%_100%,#000_0%,rgb(0_0_0/0.45)_45%,transparent_76%)]"
