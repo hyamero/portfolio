@@ -144,3 +144,30 @@
 @media (prefers-reduced-motion: no-preference) {
   [data-rise] { opacity: 0; }
 }
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.95; }
+}
+@keyframes flare {
+  0%, 100% { opacity: 0.55; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@utility animate-twinkle {
+  animation: twinkle 3.6s ease-in-out infinite;
+}
+@utility animate-flare {
+  animation: flare 4.8s ease-in-out infinite;
+}
+
+/* The vgpu sky paints over all of this once it's live (see sky.tsx). */
+[data-sky="live"] .sky-fallback {
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-twinkle,
+  .animate-flare {
+    animation: none;
+  }
+}
