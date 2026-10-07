@@ -24,3 +24,13 @@ export function plainStatement(source: string) {
 export function wordOpacity(progress: number, index: number, count: number) {
   return clamp((progress * (count + 6) - index) / 4, 0.16, 1);
 }
+
+/**
+ * A statement's read-along progress. Near the page bottom its trigger's end can sit past the last
+ * scroll position, so the light finishes at the bottom instead of leaving the last words dim.
+ */
+export function readProgress(scroll: number, start: number, end: number, maxScroll: number) {
+  const stop = Math.min(end, maxScroll);
+  if (stop <= start) return scroll >= stop ? 1 : 0;
+  return clamp((scroll - start) / (stop - start));
+}
