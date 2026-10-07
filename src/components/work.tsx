@@ -24,7 +24,7 @@ export default function Work() {
               key={project.id}
               id={project.id}
               data-project
-              className="relative flex flex-wrap gap-x-12 gap-y-7 pt-10 pb-12 md:gap-y-9 md:pt-14 md:pb-[72px]"
+              className="relative flex scroll-mt-18 flex-wrap gap-x-12 gap-y-7 pt-10 pb-12 md:scroll-mt-24 md:gap-y-9 md:pt-14 md:pb-[72px]"
             >
               <div aria-hidden="true" data-hairline className="hairline absolute inset-x-0 top-0 h-px" />
               <div className="flex flex-[1_1_340px] flex-col items-start gap-5">
