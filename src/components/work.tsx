@@ -14,7 +14,7 @@ export default function Work() {
       <div className="mx-auto max-w-[1440px] md:px-gutter">
         <h2
           id="work-title"
-          className="pb-[26px] text-sm font-normal tracking-[0.08em] text-mute md:text-[15px]"
+          className="pb-[26px] text-sm font-normal text-mute md:text-[15px]"
         >
           Selected work
         </h2>
@@ -28,11 +28,11 @@ export default function Work() {
             >
               <div aria-hidden="true" data-hairline className="hairline absolute inset-x-0 top-0 h-px" />
               <div className="flex flex-[1_1_340px] flex-col items-start gap-5">
-                <span className="text-[13px] tracking-[0.06em] text-dim tabular-nums">
+                <span className="text-[13px] text-dim tabular-nums">
                   {project.year}
                 </span>
                 <div className="mt-2 flex items-center gap-[18px]">
-                  <h3 className="text-[clamp(2.5rem,4.4vw,4rem)] leading-none font-normal tracking-[0.01em]">
+                  <h3 className="text-[clamp(2.5rem,4.4vw,4rem)] leading-none font-medium tracking-[-0.06em]">
                     {project.name}
                   </h3>
                   <a
@@ -48,7 +48,7 @@ export default function Work() {
               </div>
               <p
                 data-statement
-                className="min-w-0 flex-[1.7_1_520px] text-[clamp(1.375rem,2.2vw,2rem)] leading-[1.4] tracking-[0.008em] text-pretty text-dim"
+                className="min-w-0 flex-[1.7_1_520px] text-[clamp(1.375rem,2.2vw,2rem)] leading-[1.35] tracking-tighter text-pretty text-dim"
               >
                 {parseStatement(project.statement).map((word, i) => (
                   <Fragment key={i}>
