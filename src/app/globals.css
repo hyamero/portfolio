@@ -217,3 +217,15 @@
     mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   }
 }
+
+
+/* Project row: hovering or focusing it brightens its statement; the name slides a touch. */
+@media (hover: hover) and (pointer: fine) {
+  [data-project] [data-statement] { transition: color 0.5s ease; }
+  [data-project]:hover [data-statement] { color: var(--color-mute); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  [data-project] h3 { transition: translate 0.6s var(--ease-out-quint); }
+  [data-project]:hover h3 { translate: 4px 0; }
+}
+[data-project]:focus-within [data-statement] { color: var(--color-mute); }
