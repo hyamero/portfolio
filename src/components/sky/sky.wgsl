@@ -134,6 +134,32 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
     col += neb * (cloud * 0.17 + wisp * 0.12) * min(env, 1.4);
   }
 
+  // Carry: the shed atmosphere becomes a ribbon of nebula winding down through Work. It sits deep
+  // (its path moves at 45% of the scroll) and is dimmed behind the text column for legibility.
+  let carry = params.trail.y;
+  let gather = params.trail.z;
+  let workTop = params.span.x;
+  let contactTop = params.span.y;
+  if (carry > 0.003 && page.y > workTop - 400.0 && page.y < contactTop + 200.0) {
+    let deep = page.y - params.scroll * 0.55;
+    let bend = gather * smoothstep(contactTop - 900.0, contactTop, page.y);
+    let path = W * (0.5 + 0.3 * sin(deep / 900.0 + 1.1) + 0.08 * sin(deep / 310.0));
+    let cx = mix(path, params.foot.x, bend);
+    let off = abs(page.x - cx);
+    if (off < W * 0.5) {
+      let width = W * mix(0.22, 0.08, bend);
+      let q = vec2f(page.x, deep) / 420.0;
+      let w = vec2f(fbm3(q + vec2f(2.1, t * 0.02)), fbm3(q + vec2f(7.3, 3.9)));
+      let n = fbm3(q * 1.6 + (w - 0.45) * 2.0);
+      let body = exp(-(off * off) / (width * width));
+      let ends = smoothstep(workTop - 400.0, workTop + 300.0, page.y)
+               * (1.0 - smoothstep(contactTop, contactTop + 200.0, page.y));
+      let readability = mix(0.55, 1.0, smoothstep(0.32, 0.4, abs(css.x - W * 0.5) / W));
+      // At most ~0.10 added luminance.
+      col += vec3f(0.2, 0.34, 0.7) * smoothstep(0.3, 0.75, n) * body * ends * readability * carry * 0.3;
+    }
+  }
+
   // The orb: a lit limb, a flowing atmosphere band and a dark body that occludes the sky.
   if (vis > 0.001 && dOrb < R * 1.2) {
     let v = vis * (1.0 - smoothstep(-0.02 * H, 0.34 * H, rel.y));
@@ -174,6 +200,25 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
     col += vec3f(0.86, 0.92, 1.0) * (flare(page - f1, t, 0.0) + flare(page - f2, t, 2.2) * 0.75) * vis;
   }
 
+  // Shed: as the orb sets, its atmosphere peels off the limb and streams up the page. It brightens
+  // as the orb fades, then hands over to the ribbon once the orb is gone.
+  let shed = params.trail.x;
+  let shedK = shed * (1.0 - 0.5 * vis) * smoothstep(0.0, 0.15, vis);
+  let shedLen = R * mix(0.15, 0.9, shed);
+  if (shedK > 0.001 && rel.y < 0.0 && dOrb > 0.0 && dOrb < shedLen) {
+    let dir = rel / max(dist, 0.0001);
+    // 0 straight up the page, growing toward the shoulders.
+    let ang = atan2(dir.x, -dir.y);
+    let along = dOrb / shedLen;
+    let q = vec2f(ang * 14.0, along * 1.6 - shed * 2.5 - t * 0.03);
+    let n = fbm(q + vec2f(fbm3(q * 0.8) * 1.2, 0.0));
+    let streak = smoothstep(0.42, 0.8, n) * exp(-along * 1.6) * (1.0 - smoothstep(0.7, 1.0, along));
+    let crown = 1.0 - smoothstep(0.6, 1.1, abs(ang));
+    let tint = mix(vec3f(0.47, 0.7, 0.96), vec3f(0.16, 0.24, 0.52), smoothstep(0.0, 0.8, along));
+    // At most ~0.3 added luminance, at the limb; it thins out well below the copy.
+    col += tint * streak * crown * shedK * 0.45;
+  }
+
   // The closing horizon: the orb again, low and wide, its lit arc leaning toward the pointer.
   if (rise > 0.001 && dFoot < 560.0 && dFoot > -400.0) {
     let hw = max(params.footWidth, 1.0);
@@ -187,8 +232,15 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
     let inner = exp(min(dFoot, 0.0) / 41.0) * (1.0 - above);
     let ground = (1.0 - above) * (1.0 - smoothstep(-24.0, 0.0, dFoot)) * rise;
     col = mix(col, bg * 0.8, ground);
-    let h = vec3f(0.78, 0.87, 1.0) * rim * 0.95 + vec3f(0.3, 0.42, 0.62) * (atmo * 0.55 + inner * 0.32);
+    // Gather: the ribbon's wisps run along the arc into its centre, and the rim lights as they arrive.
+    let arrive = 1.0 + 0.25 * gather * smoothstep(0.6, 1.0, gather);
+    let inward = abs(page.x - params.foot.x) / hw;
+    let wq = vec2f(inward * 2.5 + t * 0.04 + gather * 1.5, max(dFoot, 0.0) / 90.0);
+    let wisp = smoothstep(0.55, 0.85, fbm3(wq)) * exp(-max(dFoot, 0.0) / 180.0) * above;
+    let h = vec3f(0.78, 0.87, 1.0) * rim * 0.95 * arrive + vec3f(0.3, 0.42, 0.62) * (atmo * 0.55 + inner * 0.32);
     col += h * facing * rise * GLOW;
+    // At most ~0.08 added luminance.
+    col += vec3f(0.3, 0.45, 0.85) * wisp * gather * 0.12;
     occ *= mix(1.0, smoothstep(0.0, 14.0, dFoot), rise);
   }
 
