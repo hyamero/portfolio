@@ -62,8 +62,7 @@ It is mounted once in `layout.tsx`, beside `<Sky />`, so every route has it.
 - **When:** only under `(prefers-reduced-motion: no-preference)`. If the preference changes, it is created or destroyed.
 - **Instance:** `new Lenis({ autoRaf: false, smoothWheel: true, syncTouch: false, lerp: 0.1, anchors: false })`.
   - `syncTouch: false` keeps the phone's native momentum.
-- **Ticker:**
-  - `gsap.ticker.add(time => lenis.raf(time * 1000))`.
+- **Ticker:** `flight`'s single `gsap.ticker` callback calls `flight.lenis?.raf(time * 1000)` first, then updates the shared state, then runs subscribers. One callback guarantees the order.
   - `gsap.ticker.lagSmoothing(0)`.
   - `lenis.on("scroll", ScrollTrigger.update)`.
 - **Styles:** imports `lenis/dist/lenis.css`.
@@ -88,11 +87,11 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 
 ### 3.3 Scrolling to a section
 
-- `scrollToSection(id)` calls `flight.lenis.scrollTo("#" + id, { duration: 1.2, easing: easeOutQuint })` when Lenis is running.
+- `scrollToSection(id)` calls `flight.lenis.scrollTo(top, { duration: 1.2, easing: easeOutQuint })` when Lenis is running.
+  - `top` is the element's page top minus its computed `scroll-margin-top`, read once per call. A number target avoids depending on whether Lenis honours `scroll-margin`.
   - `easeOutQuint` matches `--ease-out-quint`.
 - Otherwise it calls `element.scrollIntoView()`, which honours `scroll-margin`.
 - `ScrollToPlugin` is no longer registered or imported.
-- Lenis's `scrollTo` with an element target honours `scroll-margin-top`. If it doesn't, the call passes `offset: -scrollMarginTop`, read from computed style once per call.
 
 ### 3.4 Renderer on the ticker
 
@@ -165,16 +164,20 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 |---|---|
 | `COAST_GAIN` | 0.5 |
 | `COAST_MAX` | 800 px/s |
-| `COAST_RATE` | 3.5 /s |
+| `COAST_RISE` | 6 /s, while the coast is gaining speed or reversing |
+| `COAST_DECAY` | 2 /s, while it is letting go |
 | `COAST_REST` | 4 px/s |
 
 - `target = clamp(velocity * COAST_GAIN, ±COAST_MAX)`.
-- `coast.v = approach(coast.v, target, dt, COAST_RATE)`, then `coast.offset += coast.v * dt`.
-- The coast is at rest when `|coast.v| < COAST_REST` and `velocity == 0`. Then `coast.v` snaps to 0 and the sky stops drawing.
+- `coast.v = approach(coast.v, target, dt, rate)`, then `coast.offset += coast.v * dt`.
+  - `rate` is `COAST_DECAY` when `target` has the same sign as `coast.v` (or is 0) and a smaller magnitude. Otherwise it is `COAST_RISE`.
+  - Two rates are needed because Lenis already eases the scroll to a stop over about a second. A single fast rate would let go in step with Lenis and leave no visible coast.
+- The coast is at rest when `|coast.v| < COAST_REST` and `|velocity| < COAST_REST`. Then `coast.v` snaps to 0 and the sky stops drawing.
+- The first tick after load primes `scroll` with zero velocity, so loading mid-page or at a hash gives no kick.
 - **Reduced motion:** `coast.v = 0` always.
-- **Size:** after a stop from the cap, the remaining glide is at most `800 / 3.5 ≈ 229` px of virtual scroll.
-  - The near layer moves about 39 px on screen in that time, and the far layer about 9 px.
-  - It rests in about 1.7 s.
+- **Size:** after a stop from the cap, the remaining glide is at most `800 / 2 = 400` px of virtual scroll.
+  - The near layer moves about 68 px on screen in that time, and the far layer about 16 px.
+  - It rests within about 2.7 s from the cap, and about 1–1.5 s after a typical wheel scroll.
 
 **Layers (`sky.wgsl`):** the current two `stars()` calls become three. Each layer's screen offset is `starScroll * k`.
 
@@ -221,24 +224,32 @@ It is mounted in `layout.tsx`.
 
 **Each tick** (`flight.onTick`, only while `flight.pointer.active` or `flight.light.hover > 0.002`):
 - The light in viewport coordinates is `flight.light − (scrollX, scroll)`.
-- For each target whose rect is within 300 px of it, write `--lx` and `--ly` in element-local px, plus `--lo` (the hover value), via `style.setProperty`.
+- For each target whose rect is within 300 px of it, write via `style.setProperty`:
+  - `--lx` and `--ly`: the light in element-local px from the top-left
+  - `--lb`: the light's height above the element's bottom edge, for underlines anchored to the bottom
+  - `--lo`: the hover value
 - Write only when the value changed by 0.5 px or more.
 - A target that leaves the 300 px band gets `--lo: 0` once.
 - A target whose transform is non-identity at measure time is measured from its untransformed layout box. The scaled hairline is the case here, and the glint correctly scales with it.
+- **Moving ancestors:** a target inside `[data-hero-copy]` or `[data-rise]` adds those ancestors' current GSAP `y` at each tick. That value comes from GSAP's cache, not layout. It keeps the hero's glints and magnets aligned while the copy drifts.
 
 **CSS (`globals.css`, `@media (hover: hover) and (pointer: fine)` only):**
 
 ```css
-[data-catch-light] { --lx: -999px; --ly: -999px; --lo: 0; }
+[data-catch-light] { --lx: -999px; --ly: -999px; --lb: 999px; --lo: 0; }
+/* --line is each element's own base gradient; the glint layers over it. */
 .hairline, .rule {
   background-image:
     radial-gradient(180px circle at var(--lx) var(--ly), rgb(201 220 255 / calc(0.7 * var(--lo))), transparent 70%),
-    linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
+    var(--line);
 }
-.rule { height: 1px; background-color: rgb(255 255 255 / 0.07); }
-.line-link::after, .say::after {
-  background: radial-gradient(160px circle at var(--lx) 0, rgb(201 220 255 / calc(0.9 * var(--lo))), currentColor 70%);
+/* Underlines glint on a ::before twin of the ::after rule, so the rule's 0.22 opacity doesn't dim it. */
+.line-link::before, .say::before {
+  content: ""; position: absolute; inset-inline: 0; height: 1px; pointer-events: none;
+  background: radial-gradient(160px circle at var(--lx) calc(var(--edge) - var(--lb)), rgb(201 220 255 / calc(0.9 * var(--lo))), transparent 70%);
 }
+.line-link::before { --edge: 9px; bottom: 9px; }
+.say::before { --edge: 0.06em; bottom: 0.06em; }
 /* The ring catches the light on its 1 px border only. */
 .visit { position: relative; }
 .visit::before {
@@ -286,12 +297,14 @@ On `li[data-project]:hover`, or `:focus-within`:
 
 ### 6.3 Section marker
 
-- **Element:** a `<span aria-hidden data-marker class="orb-dot size-[5px] rounded-full absolute -bottom-1">` inside the header `nav`, positioned by `x` (GSAP).
+- **Component:** `src/components/section-marker.tsx` (client). The header sits outside `<Motion>`'s scope, so the marker gets its own `useGSAP`.
+- **Element:** a `<span aria-hidden data-marker class="orb-dot size-[5px] rounded-full absolute bottom-1">` inside the header `nav`, positioned by `x` (GSAP).
+  - The links carry `data-section-link="work"` and `data-section-link="contact"`.
 - **Active section:** a pure helper `activeSection(scroll, viewportH, sections)` in `src/lib/sections.ts`, with bun tests. It returns:
   - `"contact"` once Contact's top is at or above 60% of the viewport
   - else `"work"` once Work's top is at or above 40%
   - else `null`
-- **Driver:** two ScrollTriggers (`#work`, `#contact`) whose `onToggle` calls the helper.
+- **Driver:** one ScrollTrigger over the whole page. Its `onUpdate` calls the helper with section tops cached at refresh, and acts only when the result changes.
   - The marker tweens `x` to the active link's centre: 0.7 s, `power4.out`.
   - It fades to 0 opacity when `null`.
 - **Link positions:** read on refresh, never during a scroll tick.
@@ -315,7 +328,7 @@ On `li[data-project]:hover`, or `:focus-within`:
 |---|---|
 | `package.json` | add `lenis@^1.3.26` |
 | `src/lib/flight.ts` | new: shared state, ticker update, `onTick`, `settling` |
-| `src/lib/sky-math.ts` (+ test) | `shed`, `carry`, coast step and rest, layer constants |
+| `src/lib/sky-math.ts` (+ test) | `trailFrame` (shed, carry, gather) and `coastStep`. Star layer constants live in the shader only. |
 | `src/lib/magnet.ts` (+ test) | new |
 | `src/lib/sections.ts` (+ test) | new |
 | `src/lib/scroll.ts` | Lenis `scrollTo`, else `scrollIntoView`; drop ScrollToPlugin |
@@ -323,7 +336,9 @@ On `li[data-project]:hover`, or `:focus-within`:
 | `src/components/edge-light.tsx` | new: glint variables and magnets |
 | `src/components/sky/renderer.ts` | ticker subscription, `flight` inputs, new uniforms |
 | `src/components/sky/sky.wgsl` | shed, carry, gather, three star layers |
-| `src/components/motion.tsx` | headline blur-in, section marker |
+| `src/components/motion.tsx` | headline blur-in |
+| `src/components/section-marker.tsx` | new: section marker |
+| `src/components/words.tsx` | new: server-side word spans for the headlines |
 | `src/components/hero.tsx`, `contact.tsx`, `work.tsx`, `site-header.tsx` | word spans, data attributes, marker, rule element |
 | `src/app/layout.tsx` | mount `SmoothScroll` and `EdgeLight`; noscript selector |
 | `src/app/globals.css` | Lenis CSS import, glint rules, `translate`-based nudges, row hover, word pre-hide |
@@ -333,7 +348,8 @@ On `li[data-project]:hover`, or `:focus-within`:
 - **Checks:** §2.7.
 - **Unit (bun, written first):**
   - `shed` and `carry` endpoints and monotonicity
-  - coast: decays to rest within 2 s from `COAST_MAX`, honours the cap, flips with direction, and zero velocity at rest stays at rest
+  - coast: comes to rest within 3 s from `COAST_MAX` but still moves after 1 s, honours the cap, reverses quickly, and stays at rest at zero velocity
+  - flight: the first tick primes with no velocity, reduced motion holds the coast at 0, the light rests and follows, and `settling` reflects easing
   - `magnet`: 0 at the centre and at the edge, capped at `max`, points toward the cursor
   - `activeSection` thresholds
 - **Playwright** (scratchpad `pw/`, production build, Chromium with WebGPU):
