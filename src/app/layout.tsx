@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 
 import SiteHeader from "@/components/site-header";
+import Sky from "@/components/sky/sky";
 import { SkyGrain } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
@@ -52,6 +53,7 @@ export default function RootLayout({
           <style>{"[data-rise]{opacity:1!important}"}</style>
         </noscript>
         <SkyGrain />
+        <Sky />
         <SiteHeader />
         {children}
       </body>
