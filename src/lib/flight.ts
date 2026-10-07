@@ -5,6 +5,8 @@ import { approach, clamp, coastStep, restingLight, type Rect } from "./sky-math"
 
 export const EMPTY_RECT: Rect = { left: 0, top: 0, width: 0, height: 0 };
 const VELOCITY_MAX = 6000;
+const LIGHT_EPSILON = 0.5;
+const HOVER_EPSILON = 0.002;
 
 export function createFlight() {
   return {
@@ -40,15 +42,22 @@ export function advance(s: Flight, scroll: number, scrollX: number, dt: number) 
   const rest = restingLight(s.hero);
   light.tx = pointer.active ? pointer.x + scrollX : rest.x;
   light.ty = pointer.active ? pointer.y + scroll : rest.y;
+  // Until the hero is measured there is no resting place to ease from.
   if (!light.ready || s.reduced) {
     light.x = light.tx;
     light.y = light.ty;
-    light.ready = true;
+    light.ready = pointer.active || s.hero.height > 0;
   }
   light.x = approach(light.x, light.tx, dt);
   light.y = approach(light.y, light.ty, dt);
   const hoverTarget = pointer.active ? 1 : 0;
   light.hover = s.reduced ? hoverTarget : approach(light.hover, hoverTarget, dt);
+  // The approach is only asymptotic: land once settled, so a still light stops changing the frame.
+  if (Math.hypot(light.tx - light.x, light.ty - light.y) <= LIGHT_EPSILON) {
+    light.x = light.tx;
+    light.y = light.ty;
+  }
+  if (Math.abs(light.hover - hoverTarget) <= HOVER_EPSILON) light.hover = hoverTarget;
 
   s.coast.v = s.reduced ? 0 : coastStep(s.coast.v, s.velocity, dt);
   s.coast.offset += s.coast.v * dt;
@@ -57,8 +66,8 @@ export function advance(s: Flight, scroll: number, scrollX: number, dt: number) 
 /** True while the light, its hover or the coast is still easing. */
 export function settling(s: Flight) {
   return (
-    Math.abs(s.light.hover - (s.pointer.active ? 1 : 0)) > 0.002 ||
-    Math.hypot(s.light.tx - s.light.x, s.light.ty - s.light.y) > 0.5 ||
+    Math.abs(s.light.hover - (s.pointer.active ? 1 : 0)) > HOVER_EPSILON ||
+    Math.hypot(s.light.tx - s.light.x, s.light.ty - s.light.y) > LIGHT_EPSILON ||
     s.coast.v !== 0
   );
 }

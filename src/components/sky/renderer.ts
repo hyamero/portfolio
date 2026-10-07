@@ -1,41 +1,41 @@
 import { effect, frame, surface } from "vgpu";
 
 import skySource from "./sky.wgsl";
+import { anchorRect, EMPTY_RECT, flight, onTick, startFlight } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
 import {
-  approach,
   armIntro,
   departure,
   horizonFrame,
   introProgress,
   orbFrame,
-  restingLight,
   rise,
   skyDpr,
+  trailFrame,
   type Rect,
 } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
 // The ambient drift (nebula, flow, twinkle) needs no more than ~30fps.
 const AMBIENT_MS = 33;
-const EMPTY: Rect = { left: 0, top: 0, width: 0, height: 0 };
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 
 /**
- * Draws the page's sky into the fixed `canvas`. Frames are drawn on demand: on scroll, pointer
- * and layout changes, while the light eases, and at ~30fps while the orb or horizon is in view.
+ * Draws the page's sky into the fixed `canvas` on flight's tick. Frames are drawn on demand: when
+ * anything the sky reads has changed, while the orb's intro eases, and at ~30fps while the orb,
+ * the horizon or the shedding trail is in view.
  */
 export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
   let disposed = false;
   let measure = () => {};
-  const teardown: (() => void)[] = [];
+  const teardown: (() => void)[] = [startFlight()];
 
   void (async () => {
     const maybeGpu = await getGpu();
     if (disposed) return;
     if (!maybeGpu) return onFallback();
-    // Narrowing doesn't reach the hoisted tick() below.
+    // Narrowing doesn't reach the tick closure below.
     const gpu = maybeGpu;
 
     try {
@@ -47,8 +47,6 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       });
       teardown.push(() => output.dispose());
 
-      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-      let reduced = motionQuery.matches;
       const sky = effect(gpu, skySource, {
         set: {
           params: {
@@ -58,11 +56,13 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
             dpr: 1,
             scroll: 0,
             hover: 0,
-            time: reduced ? 8 : 0,
+            time: flight.reduced ? 8 : 0,
             orb: [0, 0, 1, 0],
             foot: [0, 0, 1, 0],
             footWidth: 1,
             heroHeight: 1,
+            span: [0, 0],
+            trail: [0, 0, 0, 0],
           },
         },
       });
@@ -70,36 +70,24 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       if (disposed) return;
 
       let cssWidth = 1;
-      let hero = EMPTY;
-      let contact = EMPTY;
-      const pointer = { x: 0, y: 0, nx: 0.5, ny: 0.5 };
-      const light = { x: 0, y: 0, ready: false };
-      let hover = 0;
-      let hoverTarget = 0;
-      let time = reduced ? 8 : 0;
-      let raf = 0;
-      let lastTick = 0;
+      let hero: Rect = EMPTY_RECT;
+      let work: Rect = EMPTY_RECT;
+      let contact: Rect = EMPTY_RECT;
+      let time = flight.reduced ? 8 : 0;
       let lastDraw = 0;
       let dirty = true;
       let shown = false;
       let introStart: number | null = null;
+      // What the last frame was drawn from; a tick that matches it draws nothing.
+      const last = new Float64Array(8).fill(Number.NaN);
 
-      const request = () => {
-        dirty = true;
-        if (!raf && !disposed) raf = requestAnimationFrame(tick);
-      };
-
-      const anchor = (name: string): Rect => {
-        const el = document.querySelector(`[data-sky-anchor="${name}"]`);
-        if (!el) return EMPTY;
-        const r = el.getBoundingClientRect();
-        return { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height };
-      };
-      // Layout is read only here, never inside a frame.
+      // Layout is read only here, never inside a tick.
       measure = () => {
-        hero = anchor("hero");
-        contact = anchor("contact");
-        request();
+        hero = anchorRect("hero");
+        work = anchorRect("work");
+        contact = anchorRect("contact");
+        flight.hero = hero;
+        dirty = true;
       };
 
       const resize = () => {
@@ -107,119 +95,87 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         const height = Math.max(canvas.clientHeight, 1);
         const dpr = skyDpr(window.devicePixelRatio, cssWidth, height);
         output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(height * dpr))]);
-        request();
+        dirty = true;
       };
 
-      function tick(now: number) {
-        raf = 0;
+      const tick = (now: number) => {
         if (document.hidden) return;
-        const dt = lastTick ? Math.min((now - lastTick) / 1000, 0.1) : 1 / 60;
-        lastTick = now;
-        const scrollY = window.scrollY;
+        const { light, pointer, reduced } = flight;
+        const scrollY = flight.scroll;
 
-        // tick() only runs while the tab is visible.
+        // The tick only runs while the tab is visible.
         introStart = armIntro(introStart, now + INTRO_DELAY_MS, hero.height > 0, true);
         const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
-        const orb = orbFrame(hero, intro, reduced ? 0 : departure(scrollY, hero));
+        const dep = reduced ? 0 : departure(scrollY, hero);
+        const orb = orbFrame(hero, intro, dep);
         const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, window.innerHeight, contact);
         const horizon = horizonFrame(contact, up);
+        const trail = trailFrame(dep, up, reduced, work.height > 0);
+        const starScroll = scrollY + flight.coast.offset;
 
-        const rest = restingLight(hero);
-        const tx = hoverTarget ? pointer.x + window.scrollX : rest.x;
-        const ty = hoverTarget ? pointer.y + scrollY : rest.y;
-        if (!light.ready || reduced) {
-          light.x = tx;
-          light.y = ty;
-          light.ready = true;
-        }
-        light.x = approach(light.x, tx, dt);
-        light.y = approach(light.y, ty, dt);
-        hover = reduced ? hoverTarget : approach(hover, hoverTarget, dt);
-
-        const settling =
-          Math.abs(hoverTarget - hover) > 0.002 ||
-          Math.hypot(tx - light.x, ty - light.y) > 0.5 ||
-          (!reduced && introStart !== null && intro < 1);
-        const ambient = !reduced && (orb.vis > 0.001 || up > 0);
-
-        if (dirty || settling || (ambient && now - lastDraw >= AMBIENT_MS)) {
-          // Time only runs while something ambient is in view; elsewhere frames are static.
-          if (ambient && lastDraw) time += Math.min((now - lastDraw) / 1000, 0.1);
-          lastDraw = now;
-          dirty = false;
-          sky.set({
-            params: {
-              resolution: output.size,
-              dpr: output.size[0] / cssWidth,
-              scroll: scrollY,
-              light: [light.x, light.y],
-              pointer: [pointer.nx, pointer.ny],
-              hover,
-              time,
-              orb: [orb.cx, orb.apex, orb.radius, orb.vis],
-              foot: [horizon.cx, horizon.top, horizon.radius, up],
-              footWidth: horizon.halfWidth,
-              heroHeight: hero.height,
-            },
-          });
-          const drawn = frame(gpu, (f) => f.pass(output, sky));
-          if (!shown) {
-            shown = true;
-            // A device lost before the first submit rejects here; the lost handler falls back.
-            drawn.done.then(() => !disposed && onFirstFrame()).catch(() => {});
+        const inputs = [scrollY, starScroll, light.x, light.y, light.hover, pointer.nx, pointer.ny, reduced ? 1 : 0];
+        let changed = dirty;
+        inputs.forEach((value, i) => {
+          if (value !== last[i]) {
+            last[i] = value;
+            changed = true;
           }
+        });
+        const easing = !reduced && introStart !== null && intro < 1;
+        const ambient = !reduced && (orb.vis > 0.001 || up > 0 || (trail.shed > 0 && trail.shed < 1));
+        if (!changed && !easing && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
+
+        // Time only runs while something ambient is in view; elsewhere frames are static.
+        if (ambient && lastDraw) time += Math.min((now - lastDraw) / 1000, 0.1);
+        lastDraw = now;
+        dirty = false;
+        sky.set({
+          params: {
+            resolution: output.size,
+            dpr: output.size[0] / cssWidth,
+            scroll: scrollY,
+            light: [light.x, light.y],
+            pointer: [pointer.nx, pointer.ny],
+            hover: light.hover,
+            time,
+            orb: [orb.cx, orb.apex, orb.radius, orb.vis],
+            foot: [horizon.cx, horizon.top, horizon.radius, up],
+            footWidth: horizon.halfWidth,
+            heroHeight: hero.height,
+            span: [work.top, contact.height ? contact.top : work.top + work.height],
+            trail: [trail.shed, trail.carry, trail.gather, starScroll],
+          },
+        });
+        const done = frame(gpu, (f) => f.pass(output, sky)).done;
+        if (!shown) {
+          shown = true;
+          // A device lost before the first submit rejects here; the lost handler falls back.
+          done.then(() => !disposed && onFirstFrame()).catch(() => {});
         }
+      };
 
-        if (settling || ambient) raf = requestAnimationFrame(tick);
-      }
-
-      const onPointer = (event: PointerEvent) => {
-        pointer.x = event.clientX;
-        pointer.y = event.clientY;
-        pointer.nx = event.clientX / Math.max(window.innerWidth, 1);
-        pointer.ny = event.clientY / Math.max(window.innerHeight, 1);
-        hoverTarget = event.pointerType === "touch" ? 0 : 1;
-        request();
-      };
-      const onLeave = () => {
-        hoverTarget = 0;
-        request();
-      };
-      const onMotionChange = (event: MediaQueryListEvent) => {
-        reduced = event.matches;
-        light.ready = false;
-        request();
-      };
       const onVisibility = () => {
-        lastTick = 0;
-        request();
+        dirty = true;
       };
-      window.addEventListener("pointermove", onPointer, { passive: true });
-      window.addEventListener("scroll", request, { passive: true });
       window.addEventListener("load", measure);
-      document.documentElement.addEventListener("pointerleave", onLeave);
       document.addEventListener("visibilitychange", onVisibility);
-      motionQuery.addEventListener("change", onMotionChange);
       const canvasObserver = new ResizeObserver(resize);
       canvasObserver.observe(canvas);
       const pageObserver = new ResizeObserver(measure);
       pageObserver.observe(document.body);
       void document.fonts.ready.then(() => !disposed && measure());
+      const offTick = onTick(tick);
       teardown.push(() => {
-        cancelAnimationFrame(raf);
-        window.removeEventListener("pointermove", onPointer);
-        window.removeEventListener("scroll", request);
+        offTick();
         window.removeEventListener("load", measure);
-        document.documentElement.removeEventListener("pointerleave", onLeave);
         document.removeEventListener("visibilitychange", onVisibility);
-        motionQuery.removeEventListener("change", onMotionChange);
         canvasObserver.disconnect();
         pageObserver.disconnect();
       });
 
       void gpu.gpu.lost.then(() => {
         if (disposed) return;
-        cancelAnimationFrame(raf);
+        offTick();
         onFallback();
       });
 

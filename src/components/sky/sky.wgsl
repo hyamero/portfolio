@@ -17,6 +17,10 @@ struct Params {
   foot: vec4f,
   footWidth: f32,
   heroHeight: f32,
+  // Where the trail's ribbon runs, in page y: the top of Work and the top of Contact.
+  span: vec2f,
+  // The orb's trail (shed, carry, gather; 0..1) and, in w, the stars' virtual scroll (scroll + coast).
+  trail: vec4f,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -188,10 +192,13 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
     occ *= mix(1.0, smoothstep(0.0, 14.0, dFoot), rise);
   }
 
-  let sp = vec2f(css.x, css.y + params.scroll * 0.85);
+  // Stars in three depths. Each layer moves at its own share of the stars' virtual scroll, so
+  // scrolling reads as travel and the field glides on for a moment after a stop.
+  let ss = params.trail.w;
   let par = (params.pointer - 0.5) * 8.0 * params.hover;
-  let st = stars((sp + par) / 11.0, t, 0.986, 0.09) * 0.55
-         + stars((sp + par * 1.8) / 37.0 + 17.0, t * 0.7, 0.975, 0.055) * 0.85;
+  let st = stars((css + vec2f(0.0, ss * 0.04) + par * 0.6) / 9.0, t, 0.988, 0.08) * 0.4
+         + stars((css + vec2f(0.0, ss * 0.08) + par * 1.2) / 23.0 + 17.0, t * 0.8, 0.98, 0.07) * 0.65
+         + stars((css + vec2f(0.0, ss * 0.17) + par * 2.0) / 47.0 + 41.0, t * 0.6, 0.975, 0.09) * 0.95;
   col += vec3f(st * occ);
 
   let lum = dot(col, vec3f(0.2126, 0.7152, 0.0722));
