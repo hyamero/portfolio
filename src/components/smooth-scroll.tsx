@@ -9,6 +9,8 @@ import { flight, startFlight } from "@/lib/flight";
 
 gsap.registerPlugin(ScrollTrigger);
 
+const SCROLL_KEYS = new Set(["PageUp", "PageDown", "Home", "End", " ", "ArrowUp", "ArrowDown"]);
+
 /** Lenis on flight's tick for wheel and trackpad; touch keeps native momentum. Off for reduced motion. */
 export default function SmoothScroll() {
   useEffect(() => {
@@ -26,10 +28,22 @@ export default function SmoothScroll() {
       lenis.on("scroll", ScrollTrigger.update);
       flight.lenis = lenis;
     };
+    // Lenis ignores native scrolls mid-glide and then writes its own position back, which would
+    // undo a key or focus scroll. Hand those over by dropping the glide where it is.
+    const handOver = () => {
+      if (lenis?.isScrolling !== "smooth") return;
+      lenis.stop();
+      lenis.start();
+    };
+    const onKey = (event: KeyboardEvent) => SCROLL_KEYS.has(event.key) && handOver();
     sync();
     motion.addEventListener("change", sync);
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("focusin", handOver);
     return () => {
       motion.removeEventListener("change", sync);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("focusin", handOver);
       lenis?.destroy();
       flight.lenis = null;
       stop();
