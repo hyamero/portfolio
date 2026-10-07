@@ -21,20 +21,20 @@ export default function Hero() {
       >
         <h1
           data-rise
-          className="text-[clamp(2.75rem,6.1vw,5.5rem)] leading-[1.04] font-normal tracking-[0.01em] text-balance"
+          className="text-[clamp(2.75rem,6.1vw,5.5rem)] leading-[1.04] font-medium tracking-[-0.07em] text-balance"
         >
           Software engineer <span className="block text-glow">and designer.</span>
         </h1>
         <p
           data-rise
-          className="mt-6 max-w-[34em] text-base leading-[1.6] tracking-[0.015em] text-balance text-mute md:mt-[30px] md:text-[clamp(1rem,1.3vw,1.1875rem)]"
+          className="mt-6 max-w-[34em] text-base leading-[1.6] tracking-tight text-balance text-mute md:mt-[30px] md:text-[clamp(1rem,1.3vw,1.1875rem)]"
         >
           I’m Dale Bañares, based in the Philippines and working mostly with teams across the EU.
         </p>
         <nav
           data-rise
           aria-label="Start here"
-          className="mt-[26px] flex flex-wrap justify-center gap-x-8 gap-y-1 text-[15px] font-medium tracking-[0.04em] md:mt-[34px] md:gap-x-10 md:gap-y-2"
+          className="mt-[26px] flex flex-wrap justify-center gap-x-8 gap-y-1 text-base tracking-tight md:mt-[34px] md:gap-x-10 md:gap-y-2"
         >
           <ScrollLink to="work" className="line-link">
             Selected work <Arrow dir="s" size={16} />

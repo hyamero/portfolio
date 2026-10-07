@@ -28,17 +28,17 @@ export default function Contact() {
       <div className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-[1_0_auto] flex-col items-center pt-[150px] pb-40 text-center md:pt-[196px]">
         <h2
           id="contact-title"
-          className="text-sm font-normal tracking-[0.08em] text-mute md:text-[15px]"
+          className="text-sm font-normal text-mute md:text-[15px]"
         >
           Contact
         </h2>
         <a
-          className="say mt-5 text-[clamp(2.75rem,6.4vw,5.75rem)] leading-[1.1] tracking-[0.01em] md:mt-[26px]"
+          className="say mt-5 text-[clamp(2.75rem,6.4vw,5.75rem)] leading-[1.1] font-medium tracking-[-0.07em] md:mt-[26px]"
           href={siteConfig.links.email}
         >
           Send a signal.
         </a>
-        <ul className="mt-[30px] flex flex-wrap justify-center gap-x-6 text-sm tracking-[0.04em] text-mute md:mt-11 md:gap-x-9 md:gap-y-1 md:text-[15px]">
+        <ul className="mt-[30px] flex flex-wrap justify-center gap-x-6 text-sm tracking-tight text-mute md:mt-11 md:gap-x-9 md:gap-y-1 md:text-[15px]">
           {LINKS.map((link) => (
             <li key={link.label}>
               <a
@@ -52,7 +52,7 @@ export default function Contact() {
           ))}
         </ul>
       </div>
-      <footer className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-2.5 text-[13px] tracking-[0.04em] text-mute md:pb-3.5 md:text-sm">
+      <footer className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-2.5 text-[13px] font-light tracking-tight text-mute md:pb-3.5 md:text-sm">
         <p>© {YEAR} Dale Bañares</p>
         <ScrollLink to="home" className="line-link">
           Back to top <Arrow dir="n" size={14} />
