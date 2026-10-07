@@ -55,7 +55,12 @@ export default function EdgeLight() {
     const measure = () => {
       if (disposed) return;
       flight.hero = anchorRect("hero");
-      lit = [...document.querySelectorAll<HTMLElement>("[data-catch-light]")].map((el) => ({ ...box(el), lx: Number.NaN, ly: Number.NaN, lo: 0 }));
+      // Carry over what each target last wrote, so one that was lit still gets darkened.
+      const was = new Map(lit.map((t) => [t.el, t]));
+      lit = [...document.querySelectorAll<HTMLElement>("[data-catch-light]")].map((el) => {
+        const prev = was.get(el);
+        return { ...box(el), lx: prev?.lx ?? Number.NaN, ly: prev?.ly ?? Number.NaN, lo: prev?.lo ?? 0 };
+      });
       const seen = new Set<HTMLElement>();
       document.querySelectorAll<HTMLElement>("[data-magnet]").forEach((el) => {
         seen.add(el);
