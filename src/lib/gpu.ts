@@ -18,7 +18,3 @@ export function getGpu(): Promise<Gpu | null> {
   })();
   return pending;
 }
-
-export function prefersReducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}

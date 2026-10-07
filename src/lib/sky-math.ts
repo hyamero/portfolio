@@ -35,6 +35,15 @@ export function rise(scrollY: number, viewportHeight: number, contact: Rect) {
   );
 }
 
+/**
+ * When the orb's intro starts. It waits for a visible tab, so it plays alongside the copy's page-in
+ * instead of finishing unseen, and re-arms when the hero goes away (e.g. after the 404 page).
+ */
+export function armIntro(start: number | null, now: number, hasHero: boolean, visible: boolean) {
+  if (!hasHero) return null;
+  return start ?? (visible ? now : null);
+}
+
 /** The orb's page-in, eased out (cubic) over 2.4 s. */
 export function introProgress(elapsedMs: number) {
   return 1 - (1 - clamp(elapsedMs / INTRO_MS)) ** 3;
