@@ -1,13 +1,14 @@
 import Contact from "@/components/contact";
 import Hero from "@/components/hero";
+import Motion from "@/components/motion";
 import Work from "@/components/work";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col">
+    <Motion>
       <Hero />
       <Work />
       <Contact />
-    </main>
+    </Motion>
   );
 }
