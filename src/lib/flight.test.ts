@@ -23,7 +23,7 @@ describe("flight", () => {
     advance(s, 0, 0, DT);
     advance(s, 10, 0, DT);
     expect(s.velocity).toBeCloseTo(600);
-    advance(s, 10_000, 0, DT);
+    advance(s, 310, 0, DT);
     expect(s.velocity).toBe(6000);
   });
   test("scrolling builds a coast that glides on after the scroll stops", () => {
@@ -88,5 +88,14 @@ describe("flight", () => {
     const rest = restingLight(hero);
     expect(s.light.x).toBe(rest.x);
     expect(s.light.y).toBe(rest.y);
+  });
+  test("a jump in one tick is not a scroll, so it builds no coast", () => {
+    const s = fresh();
+    advance(s, 0, 0, DT);
+    advance(s, 1200, 0, DT);
+    expect(s.velocity).toBe(0);
+    expect(s.coast.v).toBe(0);
+    for (let i = 0; i < 30; i++) advance(s, 1200 + (i + 1) * 20, 0, DT);
+    expect(s.coast.v).toBeGreaterThan(0);
   });
 });
