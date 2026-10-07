@@ -53,7 +53,7 @@ export default function RootLayout({
       <body className="flex min-h-svh flex-col overflow-x-clip font-sans">
         {/* Without scripts nothing would fade the page-in up. */}
         <noscript>
-          <style>{"[data-rise]{opacity:1!important}"}</style>
+          <style>{"[data-rise],[data-head-word]{opacity:1!important}"}</style>
         </noscript>
         <SkyGrain />
         <Sky />

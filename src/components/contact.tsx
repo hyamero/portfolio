@@ -1,5 +1,6 @@
 import { Arrow } from "@/components/icons";
 import ScrollLink from "@/components/scroll-link";
+import { Words } from "@/components/words";
 import { ContactSky } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
@@ -37,7 +38,7 @@ export default function Contact() {
           className="say mt-5 text-[clamp(2.75rem,6.4vw,5.75rem)] leading-[1.1] font-medium tracking-[-0.07em] md:mt-[26px]"
           href={siteConfig.links.email}
         >
-          Send a signal.
+          <Words text="Send a signal." />
         </a>
         <ul className="mt-[30px] flex flex-wrap justify-center gap-x-6 text-sm tracking-tight text-mute md:mt-11 md:gap-x-9 md:gap-y-1 md:text-[15px]">
           {LINKS.map((link) => (

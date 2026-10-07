@@ -148,7 +148,7 @@
 
 /* The page-in fades these up (motion.tsx); hidden first so they never flash in. */
 @media (prefers-reduced-motion: no-preference) {
-  [data-rise] { opacity: 0; }
+  [data-rise], [data-head-word] { opacity: 0; }
 }
 
 @keyframes twinkle {
