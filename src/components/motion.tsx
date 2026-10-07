@@ -17,12 +17,31 @@ export default function Motion({ children }: { children: React.ReactNode }) {
     () => {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // 01 Rise: the copy fades up line by line as the orb rises.
-        gsap.fromTo(
-          "[data-rise]",
-          { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: 1.6, ease: "power4.out", delay: 0.5, stagger: 0.14 },
-        );
+        // 01 Rise: the headline resolves word by word from a soft blur, then the copy fades up line
+        // by line, as the orb rises.
+        const blur = { opacity: 0, y: 16, filter: "blur(10px)" };
+        const clear = { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power4.out", clearProps: "filter" };
+        const heroWords = gsap.utils.toArray<HTMLElement>("#home [data-head-word]");
+        gsap
+          .timeline({ delay: 0.5 })
+          .fromTo(heroWords, blur, { ...clear, stagger: 0.08 }, 0)
+          .fromTo(
+            gsap.utils.toArray<HTMLElement>("[data-rise]"),
+            { opacity: 0, y: 16 },
+            { opacity: 1, y: 0, duration: 1.6, ease: "power4.out", stagger: 0.14 },
+            Math.max(heroWords.length - 1, 0) * 0.08 + 0.14,
+          );
+
+        // "Send a signal." resolves once as it comes into view: a blur tied to scroll would read as
+        // a rendering fault, so this one reveal isn't scrubbed.
+        const sayWords = gsap.utils.toArray<HTMLElement>(".say [data-head-word]");
+        if (sayWords.length) {
+          gsap.fromTo(sayWords, blur, {
+            ...clear,
+            stagger: 0.1,
+            scrollTrigger: { trigger: sayWords[0], start: "top 85%", once: true },
+          });
+        }
 
         // 02 Drift: the copy lifts and is gone by 71% of the hero, while the orb sets below it.
         gsap

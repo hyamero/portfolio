@@ -1,5 +1,6 @@
 import { Arrow } from "@/components/icons";
 import ScrollLink from "@/components/scroll-link";
+import { Words } from "@/components/words";
 import { HeroSky } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
@@ -19,11 +20,11 @@ export default function Hero() {
         data-hero-copy
         className="px-gutter relative z-1 mx-auto flex max-w-[1440px] flex-col items-center pt-[132px] text-center md:pt-[200px]"
       >
-        <h1
-          data-rise
-          className="text-[clamp(2.75rem,6.1vw,5.5rem)] leading-[1.04] font-medium tracking-[-0.07em] text-balance"
-        >
-          Software engineer <span className="block text-glow">and designer.</span>
+        <h1 className="text-[clamp(2.75rem,6.1vw,5.5rem)] leading-[1.04] font-medium tracking-[-0.07em] text-balance">
+          <Words text="Software engineer" />{" "}
+          <span className="block text-glow">
+            <Words text="and designer." />
+          </span>
         </h1>
         <p
           data-rise
