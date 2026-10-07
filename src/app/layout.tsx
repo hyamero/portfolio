@@ -1,8 +1,10 @@
+import "lenis/dist/lenis.css";
 import "./globals.css";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 
 import SiteHeader from "@/components/site-header";
+import SmoothScroll from "@/components/smooth-scroll";
 import Sky from "@/components/sky/sky";
 import { SkyGrain } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
@@ -54,6 +56,7 @@ export default function RootLayout({
         </noscript>
         <SkyGrain />
         <Sky />
+        <SmoothScroll />
         <SiteHeader />
         {children}
       </body>
