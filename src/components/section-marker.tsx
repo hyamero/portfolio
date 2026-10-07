@@ -23,7 +23,7 @@ export default function SectionMarker() {
       const marker = ref.current;
       const nav = marker?.parentElement;
       if (!marker || !nav) return;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
       const links = Object.fromEntries(
         SECTIONS.map((id) => [id, nav.querySelector<HTMLElement>(`[data-section-link="${id}"]`)]),
       ) as Record<Section, HTMLElement | null>;
@@ -35,13 +35,15 @@ export default function SectionMarker() {
         if (next === current) return;
         const from = current;
         current = next;
+        // Read per move: the setting can change while the page is open.
+        const reduced = motion.matches;
         SECTIONS.forEach((id) => {
           if (id === next) links[id]?.setAttribute("aria-current", "true");
           else links[id]?.removeAttribute("aria-current");
         });
         if (!next) return gsap.to(marker, { opacity: 0, duration: reduced ? 0 : 0.4, overwrite: "auto" });
         // Appearing, it starts under its link; moving, it glides from the last one.
-        if (!from || reduced) gsap.set(marker, { x: centres[next] });
+        if (!from || reduced) gsap.set(marker, { x: centres[next], overwrite: "auto" });
         else gsap.to(marker, { x: centres[next], duration: 0.7, ease: "power4.out", overwrite: "auto" });
         gsap.to(marker, { opacity: 1, duration: reduced ? 0 : 0.4 });
       };
