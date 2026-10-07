@@ -214,7 +214,7 @@ Pure functions live in `src/lib/sky-math.ts` and are unit-tested with `bun test`
   - `document.fonts.ready`
   - `window` `load`
 - It never reads layout inside a frame.
-- Sections mark themselves with `data-sky="hero"` and `data-sky="contact"`.
+- Sections mark themselves with `data-sky-anchor="hero"` and `data-sky-anchor="contact"` (not `data-sky`, which `<html>` uses for the sky state).
 
 ### 4.5 Frame policy
 
