@@ -1,9 +1,10 @@
 import { effect, frame, surface } from "vgpu";
 
 import skySource from "./sky.wgsl";
-import { getGpu, prefersReducedMotion } from "@/lib/gpu";
+import { getGpu } from "@/lib/gpu";
 import {
   approach,
+  armIntro,
   departure,
   horizonFrame,
   introProgress,
@@ -46,7 +47,8 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       });
       teardown.push(() => output.dispose());
 
-      const reduced = prefersReducedMotion();
+      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+      let reduced = motionQuery.matches;
       const sky = effect(gpu, skySource, {
         set: {
           params: {
@@ -80,7 +82,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       let lastDraw = 0;
       let dirty = true;
       let shown = false;
-      const introStart = performance.now() + INTRO_DELAY_MS;
+      let introStart: number | null = null;
 
       const request = () => {
         dirty = true;
@@ -115,7 +117,9 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         lastTick = now;
         const scrollY = window.scrollY;
 
-        const intro = reduced ? 1 : introProgress(now - introStart);
+        // tick() only runs while the tab is visible.
+        introStart = armIntro(introStart, now + INTRO_DELAY_MS, hero.height > 0, true);
+        const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
         const orb = orbFrame(hero, intro, reduced ? 0 : departure(scrollY, hero));
         const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, window.innerHeight, contact);
         const horizon = horizonFrame(contact, up);
@@ -135,7 +139,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         const settling =
           Math.abs(hoverTarget - hover) > 0.002 ||
           Math.hypot(tx - light.x, ty - light.y) > 0.5 ||
-          (!reduced && intro < 1);
+          (!reduced && introStart !== null && intro < 1);
         const ambient = !reduced && (orb.vis > 0.001 || up > 0);
 
         if (dirty || settling || (ambient && now - lastDraw >= AMBIENT_MS)) {
@@ -161,7 +165,8 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
           const drawn = frame(gpu, (f) => f.pass(output, sky));
           if (!shown) {
             shown = true;
-            void drawn.done.then(() => !disposed && onFirstFrame());
+            // A device lost before the first submit rejects here; the lost handler falls back.
+            drawn.done.then(() => !disposed && onFirstFrame()).catch(() => {});
           }
         }
 
@@ -180,6 +185,11 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         hoverTarget = 0;
         request();
       };
+      const onMotionChange = (event: MediaQueryListEvent) => {
+        reduced = event.matches;
+        light.ready = false;
+        request();
+      };
       const onVisibility = () => {
         lastTick = 0;
         request();
@@ -189,6 +199,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       window.addEventListener("load", measure);
       document.documentElement.addEventListener("pointerleave", onLeave);
       document.addEventListener("visibilitychange", onVisibility);
+      motionQuery.addEventListener("change", onMotionChange);
       const canvasObserver = new ResizeObserver(resize);
       canvasObserver.observe(canvas);
       const pageObserver = new ResizeObserver(measure);
@@ -201,6 +212,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         window.removeEventListener("load", measure);
         document.documentElement.removeEventListener("pointerleave", onLeave);
         document.removeEventListener("visibilitychange", onVisibility);
+        motionQuery.removeEventListener("change", onMotionChange);
         canvasObserver.disconnect();
         pageObserver.disconnect();
       });

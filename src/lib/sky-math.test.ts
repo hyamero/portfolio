@@ -2,6 +2,7 @@ import { describe, expect, test } from "bun:test";
 
 import {
   approach,
+  armIntro,
   clamp,
   departure,
   ease,
@@ -118,5 +119,21 @@ describe("restingLight and approach", () => {
   test("approach eases by 1 - e^(-rate*dt)", () => {
     expect(approach(0, 10, 1, 3)).toBeCloseTo(10 * (1 - Math.exp(-3)));
     expect(approach(5, 5, 0.1)).toBe(5);
+  });
+});
+
+describe("armIntro", () => {
+  test("starts on the first visible frame with a hero", () => {
+    expect(armIntro(null, 1000, true, true)).toBe(1000);
+  });
+  test("waits while the tab is hidden", () => {
+    expect(armIntro(null, 1000, true, false)).toBeNull();
+  });
+  test("waits for a hero, and re-arms when the hero goes away", () => {
+    expect(armIntro(null, 1000, false, true)).toBeNull();
+    expect(armIntro(500, 1000, false, true)).toBeNull();
+  });
+  test("keeps a running intro", () => {
+    expect(armIntro(500, 1000, true, true)).toBe(500);
   });
 });
