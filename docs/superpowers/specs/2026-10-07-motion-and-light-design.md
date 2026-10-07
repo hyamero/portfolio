@@ -66,6 +66,7 @@ It is mounted once in `layout.tsx`, beside `<Sky />`, so every route has it.
   - `gsap.ticker.lagSmoothing(0)`.
   - `lenis.on("scroll", ScrollTrigger.update)`.
 - **Styles:** imports `lenis/dist/lenis.css`.
+- **Hand-over:** Lenis ignores native scrolls mid-glide and then writes its own position back. So a scroll key (PageUp, PageDown, Home, End, Space, the up and down arrows) or a focus change during a smooth glide stops and restarts Lenis, which drops the glide where it is and lets the native scroll stand.
 - **Sharing:** the instance is exposed through `flight.lenis` (§3.2) for `scrollToSection`.
 
 ### 3.2 `src/lib/flight.ts` (new): shared motion state
@@ -75,9 +76,9 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 | Field | Meaning |
 |---|---|
 | `scroll` | `window.scrollY` this tick, which Lenis has already applied. |
-| `velocity` | Scroll velocity in px/s, from `scroll` deltas over `dt`, clamped to ±6000. |
+| `velocity` | Scroll velocity in px/s, from `scroll` deltas over `dt`, clamped to ±6000. A change of more than 400 px in one tick is a jump (End, a late scroll restore, a hash), not a scroll, and has zero velocity. A 1.2 s glide across the page moves about 250 px in its first tick even at 30 fps. |
 | `pointer` | `{ x, y, nx, ny, active }`, where `active` is true for a fine pointer inside the window. |
-| `light` | The eased light in page space `{ x, y }`, plus `hover` (0..1). It is moved here from `renderer.ts`, with the same `approach()` easing and rest point (`restingLight(hero)`). |
+| `light` | The eased light in page space `{ x, y }`, plus `hover` (0..1). It is moved here from `renderer.ts`, with the same `approach()` easing and rest point (`restingLight(hero)`). The easing is only asymptotic, so the light lands on its target once within 0.5 px, and `hover` once within 0.002: a settled light then stops changing the frame. The light takes its resting place only once the hero is measured (or the pointer is active), so it never eases in from the page's corner. |
 | `coast` | `{ v, offset }`: the star coast (§4.2). |
 | `lenis` | The Lenis instance, or `null`. |
 
@@ -121,8 +122,9 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 
 **JS values, in `sky-math.ts` as pure functions with bun tests:**
 
-- `shed = ease(0.12, 0.85, dep)`, where `dep` is the existing `departure`.
-  - It is 0 at rest and full as the orb finishes fading.
+- `shed = ease(0.04, 0.4, dep)`, where `dep` is the existing `departure`.
+  - It is 0 at rest and full well before the orb finishes fading.
+  - The orb sinks at twice the page speed, so its limb leaves the viewport near `dep = 0.26` (at both 1440 × 900 and 390 × 844). Most of the shed has to happen before then to be seen. The first draft, `ease(0.12, 0.85, dep)`, peaked after the limb had gone.
 - `carry = ease(0, 0.35, dep) * (1 - 0.4 * rise)`.
   - The ribbon is present once the orb starts leaving and dims slightly as the horizon takes over.
 - `gather = rise`.
@@ -131,10 +133,10 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 #### Shed (`sky.wgsl`, inside the orb branch)
 
 - Above the limb, so `outward.y < 0` and `0 < dOrb < 0.9 R`, wisps stream away from the limb in page-up.
-- **Texture:** `fbm` advected along `-outward`, with its phase offset by `shed * 2.0`. That makes the wisps visibly peel as you scroll; they don't depend on time alone.
+- **Texture:** `fbm` at `(angle * 14, along * 1.6 − shed * 2.5 − t * 0.03)`, thresholded `smoothstep(0.42, 0.8)` and fading `exp(−1.6 · along)` toward the tip. That makes narrow streamers that visibly peel as you scroll; they don't depend on time alone.
 - **Length:** grows with `shed`, from `0.15 R` to `0.9 R`.
 - **Colour:** from the band blue (`0.47, 0.70, 0.96`) at the limb to the nebula blue (`0.16, 0.24, 0.52`) at the tip.
-- **Brightness:** at most 0.18 added luminance. The trail's strength is `shed * (1 - vis*0.5)`, so it brightens as the orb fades. The light hands over; it doesn't vanish.
+- **Brightness:** at most about 0.3 added luminance, right at the limb, thinning well before the hero copy (strength 0.45). The first draft's 0.18 read as part of the halo. The trail's strength is `shed * (1 - vis*0.5)`, so it brightens as the orb fades. The light hands over; it doesn't vanish. The shed is gone before Work, so §2.2's contrast is unaffected (measured ≥ 4.82:1 at 1440 and ≥ 5.03:1 at 390).
 - The orb's current geometry, rings and flares are unchanged.
 
 #### Carry (new branch, after the nebula)
@@ -173,7 +175,7 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
   - `rate` is `COAST_DECAY` when `target` has the same sign as `coast.v` (or is 0) and a smaller magnitude. Otherwise it is `COAST_RISE`.
   - Two rates are needed because Lenis already eases the scroll to a stop over about a second. A single fast rate would let go in step with Lenis and leave no visible coast.
 - The coast is at rest when `|coast.v| < COAST_REST` and `|velocity| < COAST_REST`. Then `coast.v` snaps to 0 and the sky stops drawing.
-- The first tick after load primes `scroll` with zero velocity, so loading mid-page or at a hash gives no kick.
+- The first tick after load primes `scroll` with zero velocity, so loading mid-page or at a hash gives no kick. Later jumps (§3.2) give none either.
 - **Reduced motion:** `coast.v = 0` always.
 - **Size:** after a stop from the cap, the remaining glide is at most `800 / 2 = 400` px of virtual scroll.
   - The near layer moves about 68 px on screen in that time, and the far layer about 16 px.
@@ -309,7 +311,7 @@ On `li[data-project]:hover`, or `:focus-within`:
   - It fades to 0 opacity when `null`.
 - **Link positions:** read on refresh, never during a scroll tick.
 - **Accessibility:** the active link gets `aria-current="true"`. It is removed when the section is inactive.
-- **Reduced motion:** `x` and `opacity` are set instantly.
+- **Reduced motion:** `x` and `opacity` are set instantly. The preference is read on every move, so a change while the page is open applies at once.
 
 ### 6.4 Headline blur-in
 
