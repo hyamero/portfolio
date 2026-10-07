@@ -43,8 +43,13 @@
     box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
   }
   .hairline {
-    background: linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
+    --line: linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
+    background-image: var(--line);
     transform-origin: left center;
+  }
+  .rule {
+    --line: linear-gradient(rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.07));
+    background-image: var(--line);
   }
   .grid-lines {
     pointer-events: none;
@@ -75,11 +80,12 @@
   }
   .line-link svg {
     flex: none;
-    transition: transform 0.5s var(--ease-out-quint);
+    transition: translate 0.5s var(--ease-out-quint);
   }
 
   /* Round "Visit" button beside each project name. */
   .visit {
+    position: relative;
     flex: none;
     display: inline-flex;
     align-items: center;
@@ -95,7 +101,7 @@
       color 0.3s ease;
   }
   .visit svg {
-    transition: transform 0.5s var(--ease-out-quint);
+    transition: translate 0.5s var(--ease-out-quint);
   }
 
   /* "Send a signal.": an underline draws out from the left. */
@@ -123,20 +129,20 @@
 /* Hover only where a real pointer can hover; keyboard focus gets the same states. */
 @media (hover: hover) {
   .line-link:hover::after { opacity: 0.85; }
-  .line-link:hover svg[data-dir="ne"] { transform: translate(2px, -2px); }
-  .line-link:hover svg[data-dir="s"] { transform: translateY(3px); }
-  .line-link:hover svg[data-dir="n"] { transform: translateY(-3px); }
+  .line-link:hover svg[data-dir="ne"] { translate: 2px -2px; }
+  .line-link:hover svg[data-dir="s"] { translate: 0 3px; }
+  .line-link:hover svg[data-dir="n"] { translate: 0 -3px; }
   .visit:hover { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
-  .visit:hover svg { transform: translate(2px, -2px); }
+  .visit:hover svg { translate: 2px -2px; }
   .say:hover { color: var(--color-glow); }
   .say:hover::after { opacity: 0.5; transform: scaleX(1); }
 }
 .line-link:focus-visible::after { opacity: 0.85; }
-.line-link:focus-visible svg[data-dir="ne"] { transform: translate(2px, -2px); }
-.line-link:focus-visible svg[data-dir="s"] { transform: translateY(3px); }
-.line-link:focus-visible svg[data-dir="n"] { transform: translateY(-3px); }
+.line-link:focus-visible svg[data-dir="ne"] { translate: 2px -2px; }
+.line-link:focus-visible svg[data-dir="s"] { translate: 0 3px; }
+.line-link:focus-visible svg[data-dir="n"] { translate: 0 -3px; }
 .visit:focus-visible { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
-.visit:focus-visible svg { transform: translate(2px, -2px); }
+.visit:focus-visible svg { translate: 2px -2px; }
 .say:focus-visible { color: var(--color-glow); }
 .say:focus-visible::after { opacity: 0.5; transform: scaleX(1); }
 
@@ -169,5 +175,45 @@
   .animate-twinkle,
   .animate-flare {
     animation: none;
+  }
+}
+
+/* Edge light: the cursor light catches these 1 px lines and rings; edge-light.tsx writes the variables. */
+[data-catch-light] {
+  --lx: -999px;
+  --ly: -999px;
+  --lb: 999px;
+  --lo: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .hairline,
+  .rule {
+    background-image:
+      radial-gradient(180px circle at var(--lx) var(--ly), rgb(201 220 255 / calc(0.7 * var(--lo))), transparent 70%),
+      var(--line);
+  }
+  /* A ::before twin of the ::after rule, so the rule's own low opacity doesn't dim the glint. */
+  .line-link::before,
+  .say::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: var(--edge);
+    height: 1px;
+    pointer-events: none;
+    background: radial-gradient(160px circle at var(--lx) calc(var(--edge) - var(--lb)), rgb(201 220 255 / calc(0.9 * var(--lo))), transparent 70%);
+  }
+  .line-link::before { --edge: 9px; }
+  .say::before { --edge: 0.06em; }
+  /* The ring catches the light on its 1 px border only. */
+  .visit::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(120px circle at var(--lx) var(--ly), rgb(201 220 255 / calc(0.8 * var(--lo))), transparent 70%);
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
   }
 }

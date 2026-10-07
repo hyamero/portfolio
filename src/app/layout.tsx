@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 
+import EdgeLight from "@/components/edge-light";
 import SiteHeader from "@/components/site-header";
 import SmoothScroll from "@/components/smooth-scroll";
 import Sky from "@/components/sky/sky";
@@ -57,6 +58,7 @@ export default function RootLayout({
         <SkyGrain />
         <Sky />
         <SmoothScroll />
+        <EdgeLight />
         <SiteHeader />
         {children}
       </body>

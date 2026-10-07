@@ -19,7 +19,7 @@ export default function Work() {
         >
           Selected work
         </h2>
-        <ol className="border-b border-white/7">
+        <ol>
           {projects.map((project) => (
             <li
               key={project.id}
@@ -27,7 +27,7 @@ export default function Work() {
               data-project
               className="relative flex scroll-mt-18 flex-wrap gap-x-12 gap-y-7 pt-10 pb-12 md:scroll-mt-24 md:gap-y-9 md:pt-14 md:pb-[72px]"
             >
-              <div aria-hidden="true" data-hairline className="hairline absolute inset-x-0 top-0 h-px" />
+              <div aria-hidden="true" data-hairline data-catch-light className="hairline absolute inset-x-0 top-0 h-px" />
               <div className="flex flex-[1_1_340px] flex-col items-start gap-5">
                 <span className="text-[13px] text-dim tabular-nums">
                   {project.year}
@@ -38,6 +38,8 @@ export default function Work() {
                   </h3>
                   <a
                     className="visit"
+                    data-catch-light
+                    data-magnet
                     href={project.url}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -63,6 +65,7 @@ export default function Work() {
             </li>
           ))}
         </ol>
+        <div aria-hidden="true" data-catch-light className="rule h-px" />
       </div>
     </section>
   );

@@ -36,11 +36,13 @@ export default function Hero() {
           aria-label="Start here"
           className="mt-[26px] flex flex-wrap justify-center gap-x-8 gap-y-1 text-base tracking-tight md:mt-[34px] md:gap-x-10 md:gap-y-2"
         >
-          <ScrollLink to="work" className="line-link">
+          <ScrollLink to="work" className="line-link" data-catch-light data-magnet>
             Selected work <Arrow dir="s" size={16} />
           </ScrollLink>
           <a
             className="line-link"
+            data-catch-light
+            data-magnet
             href={siteConfig.links.resume}
             target="_blank"
             rel="noopener noreferrer"

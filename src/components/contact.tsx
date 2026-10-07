@@ -33,6 +33,7 @@ export default function Contact() {
           Contact
         </h2>
         <a
+          data-catch-light
           className="say mt-5 text-[clamp(2.75rem,6.4vw,5.75rem)] leading-[1.1] font-medium tracking-[-0.07em] md:mt-[26px]"
           href={siteConfig.links.email}
         >
@@ -43,6 +44,8 @@ export default function Contact() {
             <li key={link.label}>
               <a
                 className="line-link"
+                data-catch-light
+                data-magnet
                 href={link.href}
                 {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
               >
@@ -54,7 +57,7 @@ export default function Contact() {
       </div>
       <footer className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-2.5 text-[13px] font-light tracking-tight text-mute md:pb-3.5 md:text-sm">
         <p>© {YEAR} Dale Bañares</p>
-        <ScrollLink to="home" className="line-link">
+        <ScrollLink to="home" className="line-link" data-catch-light data-magnet>
           Back to top <Arrow dir="n" size={14} />
         </ScrollLink>
       </footer>
