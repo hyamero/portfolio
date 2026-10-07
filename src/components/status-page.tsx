@@ -8,7 +8,7 @@ export function StatusPage({ title }: { title: string }) {
       <h1 className="text-[clamp(2.5rem,6.4vw,5.75rem)] leading-[1.1] font-medium tracking-[-0.07em] text-balance">
         {title}
       </h1>
-      <Link href="/" className="line-link text-base tracking-tight text-mute">
+      <Link href="/" data-catch-light className="line-link text-base tracking-tight text-mute">
         Return home <Arrow dir="ne" size={13} />
       </Link>
     </main>
