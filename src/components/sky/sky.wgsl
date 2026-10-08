@@ -166,7 +166,8 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
       let body = exp(-(off * off) / (width * width));
       let ends = smoothstep(workTop - 400.0, workTop + 300.0, page.y)
                * (1.0 - smoothstep(contactTop, contactTop + 200.0, page.y));
-      let readability = mix(0.55, 1.0, smoothstep(0.32, 0.4, abs(css.x - W * 0.5) / W));
+      // Dimmed across the whole text column, which reaches ~0.44 W from the centre.
+      let readability = mix(0.55, 1.0, smoothstep(0.44, 0.5, abs(css.x - W * 0.5) / W));
       // At most ~0.10 added luminance.
       col += vec3f(0.2, 0.34, 0.7) * smoothstep(0.3, 0.75, n) * body * ends * readability * carry * 0.3;
     }
