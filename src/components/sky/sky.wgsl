@@ -35,14 +35,26 @@ fn hash21(q: vec2f) -> f32 {
   return fract(p.x * p.y);
 }
 
+// The noise lattice's hash, in integers. hash21 amplifies rounding, and some compilers (DXC, on
+// Windows) fold `(i + 1) * k` into `i * k + k`: neighbouring cells then disagree at their shared
+// edge and the noise shows seams. Integer maths is exact on every backend.
+fn hashCell(c: vec2f) -> f32 {
+  let i = bitcast<vec2u>(vec2i(c));
+  var h = (i.x * 1597334677u) ^ (i.y * 3812015801u);
+  h = (h ^ (h >> 16u)) * 0x7feb352du;
+  h = (h ^ (h >> 15u)) * 0x846ca68bu;
+  h = h ^ (h >> 16u);
+  return f32(h >> 8u) / 16777215.0;
+}
+
 fn noise(p: vec2f) -> f32 {
   let i = floor(p);
   let f = fract(p);
   let u = f * f * (3.0 - 2.0 * f);
-  let a = hash21(i);
-  let b = hash21(i + vec2f(1.0, 0.0));
-  let c = hash21(i + vec2f(0.0, 1.0));
-  let d = hash21(i + vec2f(1.0, 1.0));
+  let a = hashCell(i);
+  let b = hashCell(i + vec2f(1.0, 0.0));
+  let c = hashCell(i + vec2f(0.0, 1.0));
+  let d = hashCell(i + vec2f(1.0, 1.0));
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
@@ -154,7 +166,8 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
       let body = exp(-(off * off) / (width * width));
       let ends = smoothstep(workTop - 400.0, workTop + 300.0, page.y)
                * (1.0 - smoothstep(contactTop, contactTop + 200.0, page.y));
-      let readability = mix(0.55, 1.0, smoothstep(0.32, 0.4, abs(css.x - W * 0.5) / W));
+      // Dimmed across the whole text column, which reaches ~0.44 W from the centre.
+      let readability = mix(0.55, 1.0, smoothstep(0.44, 0.5, abs(css.x - W * 0.5) / W));
       // At most ~0.10 added luminance.
       col += vec3f(0.2, 0.34, 0.7) * smoothstep(0.3, 0.75, n) * body * ends * readability * carry * 0.3;
     }
