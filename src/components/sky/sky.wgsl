@@ -35,14 +35,26 @@ fn hash21(q: vec2f) -> f32 {
   return fract(p.x * p.y);
 }
 
+// The noise lattice's hash, in integers. hash21 amplifies rounding, and some compilers (DXC, on
+// Windows) fold `(i + 1) * k` into `i * k + k`: neighbouring cells then disagree at their shared
+// edge and the noise shows seams. Integer maths is exact on every backend.
+fn hashCell(c: vec2f) -> f32 {
+  let i = bitcast<vec2u>(vec2i(c));
+  var h = (i.x * 1597334677u) ^ (i.y * 3812015801u);
+  h = (h ^ (h >> 16u)) * 0x7feb352du;
+  h = (h ^ (h >> 15u)) * 0x846ca68bu;
+  h = h ^ (h >> 16u);
+  return f32(h >> 8u) / 16777215.0;
+}
+
 fn noise(p: vec2f) -> f32 {
   let i = floor(p);
   let f = fract(p);
   let u = f * f * (3.0 - 2.0 * f);
-  let a = hash21(i);
-  let b = hash21(i + vec2f(1.0, 0.0));
-  let c = hash21(i + vec2f(0.0, 1.0));
-  let d = hash21(i + vec2f(1.0, 1.0));
+  let a = hashCell(i);
+  let b = hashCell(i + vec2f(1.0, 0.0));
+  let c = hashCell(i + vec2f(0.0, 1.0));
+  let d = hashCell(i + vec2f(1.0, 1.0));
   return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
 }
 
