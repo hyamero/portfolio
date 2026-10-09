@@ -23,11 +23,6 @@ export function skyDpr(deviceDpr: number, width: number, height: number) {
   );
 }
 
-/** How far the page has scrolled through the hero, 0..1. */
-export function departure(scrollY: number, hero: Rect) {
-  return clamp((scrollY - hero.top) / Math.max(hero.height, 1));
-}
-
 /** How far Contact has come up into the viewport, 0..1. */
 export function rise(scrollY: number, viewportHeight: number, contact: Rect) {
   return clamp(
@@ -49,30 +44,6 @@ export function introProgress(elapsedMs: number) {
   return 1 - (1 - clamp(elapsedMs / INTRO_MS)) ** 3;
 }
 
-/**
- * The hero orb: `apex` is the top of its limb. It rises into place with the intro, then sinks
- * twice as fast as the page scrolls, so the departing copy never sits on the bright limb.
- */
-export function orbFrame(hero: Rect, intro: number, dep: number) {
-  const { width: W, height: H } = hero;
-  return {
-    cx: hero.left + W / 2,
-    apex: hero.top + H * (0.68 + 0.1 * (1 - intro)) + dep * H * 2,
-    radius: Math.max(0.62 * W, 0.95 * H) * (0.97 + 0.03 * intro),
-    vis: H > 0 ? intro * (1 - ease(0.2, 0.8, dep)) : 0,
-  };
-}
-
-/** The closing horizon behind Contact: a wide arc whose top climbs with `rise`. */
-export function horizonFrame(contact: Rect, rise: number) {
-  return {
-    cx: contact.left + contact.width / 2,
-    top: contact.top + contact.height - (0.02 + 0.13 * rise) * contact.height,
-    radius: Math.max(contact.width * 2.2, 2600),
-    halfWidth: contact.width * 0.37,
-  };
-}
-
 /** Where the light rests without a pointer: above the hero, a little left of center. */
 export function restingLight(hero: Rect) {
   return {
@@ -87,8 +58,9 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
 }
 
 /**
- * The orb's trail (spec §4.1): its atmosphere sheds off the limb as it sets, carries on as a
- * ribbon of nebula through Work, and gathers back into the horizon as Contact rises.
+ * The horizon's trail (motion spec §4.1, eclipse spec §5.4): its atmosphere sheds off the rim as it
+ * settles (`dep` is how far it has settled), carries on as a ribbon of nebula through Work, and
+ * gathers back into the resting horizon as Contact rises.
  */
 export function trailFrame(dep: number, up: number, reduced: boolean, hasWork: boolean) {
   if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
