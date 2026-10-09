@@ -6,11 +6,8 @@ import {
   clamp,
   COAST,
   coastStep,
-  departure,
   ease,
-  horizonFrame,
   introProgress,
-  orbFrame,
   restingLight,
   rise,
   skyDpr,
@@ -51,12 +48,7 @@ describe("skyDpr", () => {
   });
 });
 
-describe("departure and rise", () => {
-  test("departure runs 0..1 across the hero", () => {
-    expect(departure(0, hero)).toBe(0);
-    expect(departure(480, hero)).toBe(0.5);
-    expect(departure(5000, hero)).toBe(1);
-  });
+describe("rise", () => {
   test("rise starts when Contact's top meets the viewport bottom", () => {
     expect(rise(3000 - 900, 900, contact)).toBe(0);
     expect(rise(3000 - 900 + 410, 900, contact)).toBeCloseTo(0.5);
@@ -64,7 +56,6 @@ describe("departure and rise", () => {
   });
   test("a missing anchor never divides by zero", () => {
     const none: Rect = { left: 0, top: 0, width: 0, height: 0 };
-    expect(Number.isFinite(departure(100, none))).toBe(true);
     expect(Number.isFinite(rise(100, 900, none))).toBe(true);
   });
 });
@@ -74,44 +65,6 @@ describe("introProgress", () => {
     expect(introProgress(-100)).toBe(0);
     expect(introProgress(1200)).toBeCloseTo(0.875);
     expect(introProgress(2400)).toBe(1);
-  });
-});
-
-describe("orbFrame", () => {
-  test("rests at 68% of the hero once the intro is done", () => {
-    const orb = orbFrame(hero, 1, 0);
-    expect(orb.cx).toBe(720);
-    expect(orb.apex).toBeCloseTo(960 * 0.68);
-    expect(orb.radius).toBeCloseTo(Math.max(0.62 * 1440, 0.95 * 960));
-    expect(orb.vis).toBe(1);
-  });
-  test("starts 10% lower and 3% smaller during the intro", () => {
-    const orb = orbFrame(hero, 0, 0);
-    expect(orb.apex).toBeCloseTo(960 * 0.78);
-    expect(orb.radius).toBeCloseTo(0.97 * 912);
-    expect(orb.vis).toBe(0);
-  });
-  test("sinks twice as fast as the page scrolls and is gone by 80% departure", () => {
-    const half = orbFrame(hero, 1, 0.5);
-    expect(half.apex).toBeCloseTo(960 * 0.68 + 960);
-    expect(half.vis).toBeCloseTo(0.5);
-    expect(orbFrame(hero, 1, 0.8).vis).toBe(0);
-  });
-  test("is invisible without a hero", () => {
-    expect(orbFrame({ left: 0, top: 0, width: 0, height: 0 }, 1, 0).vis).toBe(0);
-  });
-});
-
-describe("horizonFrame", () => {
-  test("sits 2% above Contact's bottom at rest and 15% when risen", () => {
-    expect(horizonFrame(contact, 0).top).toBeCloseTo(3820 - 0.02 * 820);
-    expect(horizonFrame(contact, 1).top).toBeCloseTo(3820 - 0.15 * 820);
-  });
-  test("is a wide arc centered on Contact", () => {
-    const h = horizonFrame(contact, 1);
-    expect(h.cx).toBe(720);
-    expect(h.radius).toBe(Math.max(1440 * 2.2, 2600));
-    expect(h.halfWidth).toBeCloseTo(1440 * 0.37);
   });
 });
 
@@ -142,16 +95,15 @@ describe("armIntro", () => {
 });
 
 describe("trailFrame", () => {
-  test("nothing sheds at the top, and the whole trail has shed as the orb finishes fading", () => {
+  test("nothing sheds before the settle, and the whole trail has shed well before it ends", () => {
     expect(trailFrame(0, 0, false, true).shed).toBe(0);
     expect(trailFrame(0.85, 0, false, true).shed).toBe(1);
     expect(trailFrame(1, 0, false, true).shed).toBe(1);
   });
-  test("most of the shed happens while the setting limb is still in view", () => {
-    // The orb sinks at twice the page speed, so its limb leaves the viewport near dep 0.26.
+  test("most of the shed happens in the first quarter of the settle, while the horizon still moves", () => {
     expect(trailFrame(0.26, 0, false, true).shed).toBeGreaterThan(0.5);
   });
-  test("shed grows monotonically with departure", () => {
+  test("shed grows monotonically with the settle", () => {
     let last = -1;
     for (let d = 0; d <= 1; d += 0.05) {
       const { shed } = trailFrame(d, 0, false, true);
@@ -159,7 +111,7 @@ describe("trailFrame", () => {
       last = shed;
     }
   });
-  test("the ribbon appears as the orb leaves and dims as the horizon takes over", () => {
+  test("the ribbon appears as the horizon settles and dims as Contact rises", () => {
     expect(trailFrame(0, 0, false, true).carry).toBe(0);
     expect(trailFrame(0.35, 0, false, true).carry).toBe(1);
     expect(trailFrame(1, 1, false, true).carry).toBeCloseTo(0.6);

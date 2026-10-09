@@ -1,5 +1,6 @@
-// The page's one sky, drawn behind everything in page space: nebula, the hero orb with its orbital
-// paths, stars, the closing horizon and grain. Lengths are CSS pixels; y grows down the page.
+// The page's one sky, drawn behind everything in page space: nebula, the body (board 09's eclipse,
+// which the camera flies into until it is board 02's horizon), stars and grain. Lengths are CSS
+// pixels; y grows down the page.
 struct Params {
   resolution: vec2f,
   // The light, in page space: the pointer while hovering, else resting above the hero.
@@ -11,23 +12,29 @@ struct Params {
   scroll: f32,
   hover: f32,
   time: f32,
-  // Hero orb: center x, apex y (top of the limb), radius, visibility.
-  orb: vec4f,
-  // Contact horizon: center x, top y, radius, rise.
-  foot: vec4f,
-  footWidth: f32,
-  heroHeight: f32,
+  // The viewport's height: the shed's scale.
+  viewHeight: f32,
+  // The body (spec §5.3): centre x, centre y (page), radius, visibility.
+  body: vec4f,
+  // The bead, which becomes the sun: x, y (page), morph (0 eclipse .. 1 horizon), brightness.
+  sun: vec4f,
+  // Reach past the edge of the edge ring, inner glow and outer haze (px), and the rays' strength.
+  halo: vec4f,
+  // The bead's glare in px: core radius, glare radius, horizontal and vertical streak half-lengths.
+  glare: vec4f,
+  // How far the horizon has settled toward its rest line, 0..1.
+  settle: f32,
   // Where the trail's ribbon runs, in page y: the top of Work and the top of Contact.
   span: vec2f,
-  // The orb's trail (shed, carry, gather; 0..1) and, in w, the stars' virtual scroll (scroll + coast).
+  // The trail (shed, carry, gather; 0..1) and, in w, the stars' virtual scroll (scroll + coast).
   trail: vec4f,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
 
-const GLOW = 1.0;
 const NEBULA = 1.0;
 const GRAIN = 1.0;
+const TAU = 6.2831853;
 
 fn hash21(q: vec2f) -> f32 {
   var p = fract(q * vec2f(123.34, 456.21));
@@ -91,13 +98,193 @@ fn stars(p: vec2f, t: f32, density: f32, size: f32) -> f32 {
   return step(density, s) * (1.0 - smoothstep(0.0, size, d)) * tw;
 }
 
-fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
-  let tw = 0.7 + 0.3 * sin(t * 1.3 + phase);
-  let ax = abs(d.x);
-  let ay = abs(d.y);
-  let spikes = exp(-ay / 0.8) * exp(-ax / 13.0) + exp(-ax / 0.8) * exp(-ay / 13.0);
-  let core = exp(-length(d) / 2.0);
-  return (spikes * 0.55 + core * 0.9) * tw;
+// Interpolation between two CSS gradient stops at x0 and x1: the boards' layers are ported stop by stop.
+fn stop(x: f32, x0: f32, x1: f32) -> f32 {
+  return clamp((x - x0) / (x1 - x0), 0.0, 1.0);
+}
+
+// From a to b on a log scale: a reach that shrinks from a share of R to a few px does so evenly.
+fn geo(a: f32, b: f32, m: f32) -> f32 {
+  return a * pow(b / a, m);
+}
+
+// A CSS box-shadow's falloff past its spread. The blurred edge is a normal CDF; this is its logistic fit.
+fn shadow(d: f32, spread: f32, blur: f32) -> f32 {
+  return 1.0 / (1.0 + exp(clamp(1.702 * (d - spread) / max(blur * 0.5, 0.001), -30.0, 30.0)));
+}
+
+// Turns v anticlockwise on screen (y down) by a radians.
+fn turn(v: vec2f, a: f32) -> vec2f {
+  let c = cos(a);
+  let s = sin(a);
+  return vec2f(v.x * c + v.y * s, -v.x * s + v.y * c);
+}
+
+// Board 09's outer haze, x past the edge as a share of its reach.
+fn haze09(x: f32) -> vec3f {
+  if (x < 0.179) {
+    let k = stop(x, 0.0, 0.179);
+    return mix(vec3f(37.0, 55.0, 115.0), vec3f(30.0, 46.0, 100.0), k) / 255.0 * mix(0.116, 0.08, k);
+  }
+  let k = stop(x, 0.179, 1.0);
+  return mix(vec3f(30.0, 46.0, 100.0), vec3f(12.0, 18.0, 40.0), k) / 255.0 * mix(0.08, 0.0, k);
+}
+
+// Board 09's inner glow.
+fn glow09(x: f32) -> vec3f {
+  if (x < 0.0833) {
+    let k = stop(x, 0.0, 0.0833);
+    return mix(vec3f(214.0, 227.0, 255.0), vec3f(176.0, 200.0, 255.0), k) / 255.0 * mix(0.513, 0.24, k);
+  }
+  if (x < 0.303) {
+    let k = stop(x, 0.0833, 0.303);
+    return mix(vec3f(176.0, 200.0, 255.0), vec3f(130.0, 160.0, 236.0), k) / 255.0 * mix(0.24, 0.1, k);
+  }
+  if (x < 0.633) {
+    let k = stop(x, 0.303, 0.633);
+    return mix(vec3f(130.0, 160.0, 236.0), vec3f(96.0, 126.0, 214.0), k) / 255.0 * mix(0.1, 0.035, k);
+  }
+  return vec3f(96.0, 126.0, 214.0) / 255.0 * mix(0.035, 0.0, stop(x, 0.633, 1.0));
+}
+
+// Board 09's ring hugging the edge.
+fn ring09(x: f32) -> vec3f {
+  if (x < 0.213) {
+    let k = stop(x, 0.0, 0.213);
+    return mix(vec3f(246.0, 249.0, 255.0), vec3f(214.0, 228.0, 255.0), k) / 255.0 * mix(0.9, 0.38, k);
+  }
+  if (x < 0.606) {
+    let k = stop(x, 0.213, 0.606);
+    return mix(vec3f(214.0, 228.0, 255.0), vec3f(201.0, 220.0, 255.0), k) / 255.0 * mix(0.38, 0.1, k);
+  }
+  return vec3f(201.0, 220.0, 255.0) / 255.0 * mix(0.1, 0.0, stop(x, 0.606, 1.0));
+}
+
+// One of board 09's streamers: up to its peak and back down, by CSS conic angle in degrees.
+fn ray(deg: f32, a0: f32, peak: f32, a1: f32) -> f32 {
+  return min(stop(deg, a0, peak), 1.0 - stop(deg, peak, a1));
+}
+
+// Board 09's seven streamers. Their angles run clockwise from 12 o'clock, as CSS conic angles do.
+fn rays09(deg: f32) -> f32 {
+  var a = ray(deg, 0.0, 8.0, 18.0) * 0.16;
+  a = max(a, ray(deg, 52.0, 61.0, 70.0) * 0.1);
+  a = max(a, ray(deg, 95.0, 104.0, 116.0) * 0.18);
+  a = max(a, ray(deg, 160.0, 172.0, 182.0) * 0.12);
+  a = max(a, ray(deg, 236.0, 246.0, 258.0) * 0.15);
+  a = max(a, ray(deg, 284.0, 292.0, 301.0) * 0.1);
+  return max(a, ray(deg, 330.0, 340.0, 352.0) * 0.14);
+}
+
+// Board 09's dark disc, lit a little from its upper left; q is in the body's own frame.
+fn disc09(q: vec2f, R: f32) -> vec3f {
+  let f = length(q - vec2f(-0.28, -0.36) * R) / (1.8676 * R);
+  if (f < 0.52) {
+    return mix(vec3f(12.0, 15.0, 24.0), vec3f(5.0, 6.0, 10.0), stop(f, 0.0, 0.52)) / 255.0;
+  }
+  return mix(vec3f(5.0, 6.0, 10.0), vec3f(2.0, 2.0, 3.0), stop(f, 0.52, 1.0)) / 255.0;
+}
+
+// Board 02's ground: flat, with a thin lit band just inside the edge. depth is px inside it.
+fn ground02(depth: f32) -> vec3f {
+  if (depth < 6.0) {
+    return mix(vec3f(8.0, 12.0, 24.0), vec3f(5.0, 8.0, 15.0), stop(depth, 0.0, 6.0)) / 255.0;
+  }
+  return mix(vec3f(5.0, 8.0, 15.0), vec3f(2.0, 3.0, 5.0), stop(depth, 6.0, 36.0)) / 255.0;
+}
+
+// Board 02's band along the horizon, centred on its apex.
+fn band02(p: vec2f, apex: vec2f, sx: f32) -> vec3f {
+  let e = length(vec2f((p.x - apex.x) / (1400.0 * sx), (p.y - apex.y) / 100.0));
+  return vec3f(96.0, 136.0, 224.0) / 255.0 * 0.13 * max(1.0 - e, 0.0);
+}
+
+// Board 02's bloom around the sun.
+fn bloom02(p: vec2f, sun: vec2f, sx: f32) -> vec3f {
+  let e = length(vec2f((p.x - sun.x) / (700.0 * sx), (p.y - sun.y) / 170.0));
+  if (e < 0.42) {
+    let k = stop(e, 0.0, 0.42);
+    return mix(vec3f(150.0, 184.0, 248.0), vec3f(84.0, 120.0, 206.0), k) / 255.0 * mix(0.3, 0.12, k);
+  }
+  if (e < 0.7) {
+    let k = stop(e, 0.42, 0.7);
+    return mix(vec3f(84.0, 120.0, 206.0), vec3f(40.0, 60.0, 120.0), k) / 255.0 * mix(0.12, 0.04, k);
+  }
+  return vec3f(40.0, 60.0, 120.0) / 255.0 * mix(0.04, 0.0, stop(e, 0.7, 1.0));
+}
+
+// Board 02's rim mask (spec §5.3): full near the sun, about a tenth at the screen's edges. s is the
+// arc length from the sun, positive to the right.
+fn rimMask(s: f32, W: f32) -> f32 {
+  let sigma = select(0.21 * W, 0.18 * W, s < 0.0);
+  let k = max(abs(s) - 0.05 * W, 0.0) / sigma;
+  return 0.1 + 0.9 * exp(-k * k);
+}
+
+// One of Baily's beads, on the edge `deg` degrees anticlockwise from the bead.
+fn baily(p: vec2f, C: vec2f, R: f32, ub: vec2f, deg: f32, r: f32, spread: f32, blur: f32, a: f32) -> vec3f {
+  let d = length(p - (C + turn(ub, radians(deg)) * R)) - r;
+  return vec3f(1.0 - smoothstep(-0.5, 0.5, d)) + vec3f(236.0, 243.0, 255.0) / 255.0 * a * shadow(d, spread, blur);
+}
+
+// A pink prominence licking up from the edge, `deg` degrees anticlockwise from the bead: colour and
+// alpha, painted over the ring as the board paints it.
+fn prominence(p: vec2f, C: vec2f, R: f32, ub: vec2f, deg: f32, along: f32, up: f32) -> vec4f {
+  let dir = turn(ub, radians(deg));
+  let local = p - (C + dir * (R + 2.5));
+  let e = length(vec2f(dot(local, vec2f(-dir.y, dir.x)) / along, dot(local, dir) / up));
+  if (e >= 1.0) {
+    return vec4f(0.0);
+  }
+  if (e < 0.6) {
+    let k = stop(e, 0.0, 0.6);
+    return vec4f(mix(vec3f(255.0, 150.0, 170.0), vec3f(255.0, 110.0, 140.0), k) / 255.0, mix(0.9, 0.35, k));
+  }
+  return vec4f(vec3f(255.0, 110.0, 140.0) / 255.0, mix(0.35, 0.0, stop(e, 0.6, 1.0)));
+}
+
+// The bead's glare (spec §5.3): a camera effect sized in px, from board 09's diamond to board 02's
+// sun as m goes 0 to 1. g is the pixel's offset from the bead.
+fn glareAt(g: vec2f, m: f32) -> vec3f {
+  let core = params.glare.x;
+  let reach = params.glare.y;
+  let r = length(g);
+  var c = vec3f(0.0);
+  if (r < reach) {
+    let x = r / reach;
+    var a09 = mix(0.07, 0.0, stop(x, 0.44, 1.0));
+    var c09 = vec3f(201.0, 220.0, 255.0) / 255.0;
+    if (x < 0.05) {
+      let k = stop(x, 0.0, 0.05);
+      a09 = mix(0.95, 0.7, k);
+      c09 = mix(vec3f(255.0), vec3f(240.0, 246.0, 255.0), k) / 255.0;
+    } else if (x < 0.18) {
+      let k = stop(x, 0.05, 0.18);
+      a09 = mix(0.7, 0.26, k);
+      c09 = mix(vec3f(240.0, 246.0, 255.0), vec3f(201.0, 220.0, 255.0), k) / 255.0;
+    } else if (x < 0.44) {
+      a09 = mix(0.26, 0.07, stop(x, 0.18, 0.44));
+    }
+    let k02 = stop(x, 0.0, 0.22);
+    var a02 = mix(0.9, 0.35, k02);
+    var c02 = mix(vec3f(255.0), vec3f(214.0, 228.0, 255.0), k02) / 255.0;
+    if (x >= 0.22) {
+      let k = stop(x, 0.22, 1.0);
+      a02 = mix(0.35, 0.0, k);
+      c02 = mix(vec3f(214.0, 228.0, 255.0), vec3f(201.0, 220.0, 255.0), k) / 255.0;
+    }
+    c += c09 * a09 * (1.0 - m) + c02 * a02 * m;
+  }
+  // The streaks: 1 px lines, brightest at the bead and gone at their ends.
+  let streak = vec3f(240.0, 246.0, 255.0) / 255.0;
+  c += streak * mix(0.8, 0.85, m) * max(1.0 - abs(g.x) / params.glare.z, 0.0) * clamp(1.0 - abs(g.y), 0.0, 1.0);
+  c += streak * mix(0.65, 0.6, m) * max(1.0 - abs(g.y) / params.glare.w, 0.0) * clamp(1.0 - abs(g.x), 0.0, 1.0);
+  // The core and its two glows (box-shadows on the boards).
+  let d = r - core;
+  c += vec3f(1.0 - smoothstep(-0.5, 0.5, d));
+  c += vec3f(0.85) * shadow(d, mix(5.0, 3.0, m), mix(14.0, 10.0, m));
+  c += vec3f(201.0, 220.0, 255.0) / 255.0 * mix(0.45, 0.4, m) * shadow(d, mix(14.0, 10.0, m), mix(44.0, 34.0, m));
+  return c;
 }
 
 @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
@@ -105,31 +292,27 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
   let css = frag / params.dpr;
   let page = css + vec2f(0.0, params.scroll);
   let W = params.resolution.x / params.dpr;
-  let H = max(params.heroHeight, 1.0);
+  let sx = W / 1440.0;
   let t = params.time;
   let bg = vec3f(0.024, 0.027, 0.039);
   var col = bg;
   var occ = 1.0;
 
-  let C = vec2f(params.orb.x, params.orb.y + params.orb.z);
-  let R = max(params.orb.z, 1.0);
-  let vis = params.orb.w;
+  // The body (spec §5.3). m blends every layer from board 09's eclipse to board 02's horizon.
+  let C = params.body.xy;
+  let R = max(params.body.z, 1.0);
+  let vis = params.body.w;
+  let B = params.sun.xy;
+  let m = params.sun.z;
   let rel = page - C;
   let dist = length(rel);
-  let dOrb = dist - R;
-
-  let fc = vec2f(params.foot.x, params.foot.y + params.foot.z);
-  let dFoot = length(page - fc) - params.foot.z;
-  let rise = params.foot.w;
+  let d = dist - R;
 
   // Nebula: domain-warped fbm that drifts on its own and lags the scroll (it moves at 45%),
-  // gathering around the orb, along the page margins and above the horizon.
+  // gathering along the page margins.
   var side = smoothstep(0.26, 0.5, abs(css.x - W * 0.5) / W);
   side *= 0.3 + 0.7 * noise(vec2f(page.y * 0.0012, step(W * 0.5, css.x) * 5.0));
-  var env = vis * exp(-max(dOrb, 0.0) / (R * 0.5)) * step(-60.0, dOrb)
-          + side * 0.55
-          + rise * exp(-max(dFoot, 0.0) / 300.0) * step(-40.0, dFoot) * 0.9;
-  env *= NEBULA;
+  let env = side * 0.55 * NEBULA;
   if (env > 0.003) {
     let q = vec2f(page.x, page.y - params.scroll * 0.55) / 560.0;
     let tt = t * 0.02;
@@ -154,9 +337,10 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
   let contactTop = params.span.y;
   if (carry > 0.003 && page.y > workTop - 400.0 && page.y < contactTop + 200.0) {
     let deep = page.y - params.scroll * 0.55;
+    // Near Contact the ribbon bends into the resting horizon's sun (spec §5.5).
     let bend = gather * smoothstep(contactTop - 900.0, contactTop, page.y);
     let path = W * (0.5 + 0.3 * sin(deep / 900.0 + 1.1) + 0.08 * sin(deep / 310.0));
-    let cx = mix(path, params.foot.x, bend);
+    let cx = mix(path, B.x, bend);
     let off = abs(page.x - cx);
     if (off < W * 0.5) {
       let width = W * mix(0.22, 0.08, bend);
@@ -173,88 +357,104 @@ fn flare(d: vec2f, t: f32, phase: f32) -> f32 {
     }
   }
 
-  // The orb: a lit limb, a flowing atmosphere band and a dark body that occludes the sky.
-  if (vis > 0.001 && dOrb < R * 1.2) {
-    let v = vis * (1.0 - smoothstep(-0.02 * H, 0.34 * H, rel.y));
-    let d = dOrb / R;
-    let outward = rel / max(dist, 0.0001);
-    let facing = dot(outward, normalize(params.light - C)) * 0.5 + 0.5;
-    let spin = t * 0.01;
-    let around = vec2f(
-      outward.x * cos(spin) - outward.y * sin(spin),
-      outward.x * sin(spin) + outward.y * cos(spin),
-    );
-    var flow = 0.5;
-    if (abs(d) < 0.8) {
-      flow = fbm(around * 4.0 + vec2f(0.0, d * 7.0 - t * 0.06));
-    }
-    let inside = 1.0 - smoothstep(-0.0025, 0.0025, d);
-    let halo = exp(-max(d, 0.0) * 6.0) * (0.3 + 0.7 * facing) * (0.75 + 0.5 * flow);
-    let depth = max(-d, 0.0);
-    let band = mix(vec3f(0.02, 0.04, 0.14), vec3f(0.47, 0.7, 0.96), 1.0 - smoothstep(0.012, 0.28, depth));
-    let bandFade = 1.0 - 0.92 * smoothstep(0.18, 0.6, depth);
-    let atmos = band * bandFade * (0.45 + 0.55 * facing) * (0.8 + 0.4 * flow) * 0.85 * (0.6 + 0.4 * GLOW);
-    let body = max(atmos, vec3f(0.01, 0.012, 0.03));
-    let outside = col + vec3f(0.3, 0.38, 0.43) * halo * 0.6 * GLOW;
-    var planet = mix(outside, body, inside);
-    planet += vec3f(0.78, 0.87, 1.0) * exp(-abs(dOrb) / 5.5) * (0.35 + 0.65 * facing) * 0.85 * GLOW;
-    col = mix(col, planet, v);
-    occ *= mix(1.0, smoothstep(0.02, 0.3, d), v);
+  if (vis > 0.001 && d < max(params.halo.z, 170.0 * m) + 4.0) {
+    // The body's own frame, turned so the bead sits where board 09 has it: its upper left.
+    let ub = (B - C) / R;
+    let rest = vec2f(-0.70710678, -0.70710678);
+    let spin = atan2(ub.x * rest.y - ub.y * rest.x, dot(ub, rest));
+    let q = vec2f(rel.x * cos(spin) - rel.y * sin(spin), rel.x * sin(spin) + rel.y * cos(spin));
 
-    // Orbital paths: two hairlines on the orb's shoulders, clear of the headline, and two flares.
-    let lw = max(0.7, 0.8 / params.dpr);
-    let r1 = R + 110.0;
-    let r2 = R + 310.0;
-    let shoulder = smoothstep(0.27, 0.36, abs(page.x - C.x) / W) * (1.0 - smoothstep(-0.3, 0.0, outward.y));
-    let rings = exp(-abs(dist - r1) / lw) * 0.085 + exp(-abs(dist - r2) / lw) * 0.065;
-    col += vec3f(0.79, 0.86, 1.0) * rings * shoulder * vis;
-    let f1 = C + vec2f(sin(0.55), -cos(0.55)) * r2;
-    let f2 = C + vec2f(sin(-0.62), -cos(-0.62)) * r1;
-    col += vec3f(0.86, 0.92, 1.0) * (flare(page - f1, t, 0.0) + flare(page - f2, t, 2.2) * 0.75) * vis;
+    // Past the edge, board 09's haze, glow, rays and ring fade out as board 02's band and bloom
+    // fade in. Their reaches shrink from 09's (a share of R) to 02's (px) as the camera nears.
+    if (d > -2.0) {
+      let x = max(d, 0.0);
+      let breathe = 0.93 - 0.07 * cos(t * TAU / 7.0);
+      var halo = haze09(x / params.halo.z) + glow09(x / params.halo.y) * breathe + ring09(x / params.halo.x);
+      if (params.halo.w > 0.001) {
+        // Undo the streamers' CSS transform, scale(1.35, 0.92) rotate(-16deg), to find the conic angle.
+        let a = radians(16.0);
+        let s = vec2f(q.x / 1.35, q.y / 0.92);
+        let l = vec2f(s.x * cos(a) - s.y * sin(a), s.x * sin(a) + s.y * cos(a));
+        var deg = degrees(atan2(l.x, -l.y));
+        if (deg < 0.0) {
+          deg += 360.0;
+        }
+        let rx = (length(l) - R) / params.halo.z;
+        let fade = select(1.0 - 0.55 * stop(rx, 0.0, 0.1775), 0.45 * (1.0 - stop(rx, 0.1775, 0.617)), rx > 0.1775);
+        halo += vec3f(201.0, 220.0, 255.0) / 255.0 * rays09(deg) * fade * params.halo.w;
+      }
+      col += (halo * (1.0 - m) + (band02(page, vec2f(C.x, C.y - R), sx) + bloom02(page, B, sx)) * m) * vis;
+    }
+
+    // The ground is opaque, so it hides the nebula, the ribbon and the stars behind it.
+    let inside = (1.0 - smoothstep(-0.75, 0.75, d)) * vis;
+    col = mix(col, mix(disc09(q, R), ground02(max(-d, 0.0)), m), inside);
+    occ *= mix(1.0, smoothstep(0.0, 2.0, d), vis);
+
+    // The edge: board 09's even ring of light gathers into board 02's rim, brightest near the sun.
+    // Once the horizon rests, the bright stretch leans toward the cursor, as Contact's horizon did.
+    if (d > -1.5 && d < 120.0) {
+      let n = rel / max(dist, 0.0001);
+      let lean = 0.5 * params.hover * params.settle * (params.light.x - B.x);
+      let arc = R * atan2(ub.x * n.y - ub.y * n.x, dot(ub, n)) - lean;
+      let mask = mix(1.0, rimMask(arc, W), m);
+      let line = clamp(1.0 - abs(d - 0.5), 0.0, 1.0);
+      let g1 = 0.7 * shadow(d, 1.0, geo(9.0, 4.0, m));
+      let g2 = mix(0.22, 0.4, m) * shadow(d, mix(5.0, 6.0, m), geo(30.0, 22.0, m));
+      // Gather: as the ribbon's wisps arrive, the rim lights up (spec §5.5).
+      let arrive = 1.0 + 0.25 * gather * smoothstep(0.6, 1.0, gather);
+      let edge = mix(vec3f(246.0, 249.0, 255.0), vec3f(240.0, 246.0, 255.0), m) / 255.0 * mix(0.92, 0.95, m) * line
+               + mix(vec3f(226.0, 236.0, 255.0), vec3f(214.0, 228.0, 255.0), m) / 255.0 * g1
+               + mix(vec3f(160.0, 190.0, 255.0), vec3f(130.0, 168.0, 244.0), m) / 255.0 * g2;
+      let faint = vec3f(150.0, 180.0, 240.0) / 255.0 * 0.28 * m * line;
+      col += (edge * mask * arrive + faint) * smoothstep(-0.5, 0.5, d) * vis;
+    }
+
+    // Board 09's Baily's beads and pink prominences, placed from the bead so they turn with it.
+    let feature = (1.0 - smoothstep(0.0, 0.35, m)) * vis;
+    if (feature > 0.001 && d > -14.0 && d < 16.0) {
+      for (var i = 0; i < 2; i++) {
+        let pr = prominence(page, C, R, ub, select(65.0, -167.0, i == 0), select(4.5, 7.0, i == 0), select(2.6, 4.0, i == 0));
+        col = mix(col, pr.rgb, pr.a * feature);
+      }
+      var beads = baily(page, C, R, ub, 13.0, 1.5, 2.0, 6.0, 0.75);
+      beads += baily(page, C, R, ub, -13.0, 1.5, 2.0, 6.0, 0.75);
+      beads += baily(page, C, R, ub, -22.0, 1.0, 1.0, 5.0, 0.65);
+      col += beads * feature;
+    }
   }
 
-  // Shed: as the orb sets, its atmosphere peels off the limb and streams up the page. It brightens
-  // as the orb fades, then hands over to the ribbon once the orb is gone.
+  // The bead's glare sits over everything. It pulses as board 09's diamond, then as 02's glint.
+  if (vis > 0.001 && length(page - B) < max(params.glare.y, max(params.glare.z, params.glare.w)) + 80.0) {
+    let pulse = mix(0.91 - 0.09 * cos(t * TAU / 5.2), 0.89 - 0.11 * cos(t * TAU / 6.0), m);
+    col += glareAt(page - B, m) * params.sun.w * pulse * vis;
+  }
+
+  // Shed: as the horizon settles, its atmosphere peels off the rim around the sun and streams up
+  // the page, then fades as it comes to rest and the ribbon takes over (spec §5.4).
   let shed = params.trail.x;
-  let shedK = shed * (1.0 - 0.5 * vis) * smoothstep(0.0, 0.15, vis);
-  let shedLen = R * mix(0.15, 0.9, shed);
-  if (shedK > 0.001 && rel.y < 0.0 && dOrb > 0.0 && dOrb < shedLen) {
-    let dir = rel / max(dist, 0.0001);
-    // 0 straight up the page, growing toward the shoulders.
-    let ang = atan2(dir.x, -dir.y);
-    let along = dOrb / shedLen;
-    let q = vec2f(ang * 14.0, along * 1.6 - shed * 2.5 - t * 0.03);
+  let shedK = shed * (1.0 - 0.5 * vis) * smoothstep(0.0, 0.15, vis) * (1.0 - smoothstep(0.5, 1.0, params.settle));
+  let Rs = 0.95 * params.viewHeight;
+  let shedLen = Rs * mix(0.15, 0.9, shed);
+  if (shedK > 0.001 && d > 0.0 && d < shedLen) {
+    let lat = (page.x - B.x) / Rs;
+    let along = d / shedLen;
+    let q = vec2f(lat * 14.0, along * 1.6 - shed * 2.5 - t * 0.03);
     let n = fbm(q + vec2f(fbm3(q * 0.8) * 1.2, 0.0));
     let streak = smoothstep(0.42, 0.8, n) * exp(-along * 1.6) * (1.0 - smoothstep(0.7, 1.0, along));
-    let crown = 1.0 - smoothstep(0.6, 1.1, abs(ang));
+    let crown = 1.0 - smoothstep(0.6, 1.1, abs(lat));
     let tint = mix(vec3f(0.47, 0.7, 0.96), vec3f(0.16, 0.24, 0.52), smoothstep(0.0, 0.8, along));
-    // At most ~0.3 added luminance, at the limb; it thins out well below the copy.
+    // At most ~0.3 added luminance, at the rim.
     col += tint * streak * crown * shedK * 0.45;
   }
 
-  // The closing horizon: the orb again, low and wide, its lit arc leaning toward the pointer.
-  if (rise > 0.001 && dFoot < 560.0 && dFoot > -400.0) {
-    let hw = max(params.footWidth, 1.0);
-    let a = (page.x - mix(params.foot.x, params.light.x, params.hover)) / (hw * 0.95);
-    let b = (page.x - params.foot.x) / (hw * 1.3);
-    let facing = (0.3 + 0.7 * exp(-a * a)) * exp(-b * b);
-    let flow = noise(vec2f(page.x * 0.0045 - t * 0.08, dFoot * 0.02));
-    let above = step(0.0, dFoot);
-    let rim = exp(-abs(dFoot) / 6.4);
-    let atmo = exp(-max(dFoot, 0.0) / 64.0) * above * (0.75 + 0.5 * flow);
-    let inner = exp(min(dFoot, 0.0) / 41.0) * (1.0 - above);
-    let ground = (1.0 - above) * (1.0 - smoothstep(-24.0, 0.0, dFoot)) * rise;
-    col = mix(col, bg * 0.8, ground);
-    // Gather: the ribbon's wisps run along the arc into its centre, and the rim lights as they arrive.
-    let arrive = 1.0 + 0.25 * gather * smoothstep(0.6, 1.0, gather);
-    let inward = abs(page.x - params.foot.x) / hw;
-    let wq = vec2f(inward * 2.5 + t * 0.04 + gather * 1.5, max(dFoot, 0.0) / 90.0);
-    let wisp = smoothstep(0.55, 0.85, fbm3(wq)) * exp(-max(dFoot, 0.0) / 180.0) * above;
-    let h = vec3f(0.78, 0.87, 1.0) * rim * 0.95 * arrive + vec3f(0.3, 0.42, 0.62) * (atmo * 0.55 + inner * 0.32);
-    col += h * facing * rise * GLOW;
+  // Gather: the ribbon's wisps run along the resting rim into the sun (spec §5.5).
+  if (gather > 0.001 && vis > 0.001 && d > 0.0 && d < 400.0) {
+    let inward = abs(page.x - B.x) / (0.37 * W);
+    let wq = vec2f(inward * 2.5 + t * 0.04 + gather * 1.5, d / 90.0);
+    let wisp = smoothstep(0.55, 0.85, fbm3(wq)) * exp(-d / 180.0);
     // At most ~0.08 added luminance.
-    col += vec3f(0.3, 0.45, 0.85) * wisp * gather * 0.12;
-    occ *= mix(1.0, smoothstep(0.0, 14.0, dFoot), rise);
+    col += vec3f(0.3, 0.45, 0.85) * wisp * gather * 0.12 * vis;
   }
 
   // Stars in three depths. Each layer moves at its own share of the stars' virtual scroll, so
