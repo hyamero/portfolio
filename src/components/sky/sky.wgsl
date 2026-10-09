@@ -12,6 +12,10 @@ struct Params {
   scroll: f32,
   hover: f32,
   time: f32,
+  // 1 for the front pass, which draws only the ground over the content (spec §5.6), else 0.
+  layer: f32,
+  // The front canvas's top in the viewport, CSS px; 0 for the back canvas.
+  origin: f32,
   // The viewport's height: the shed's scale.
   viewHeight: f32,
   // The body (spec §5.3): centre x, centre y (page), radius, visibility.
@@ -289,7 +293,9 @@ fn glareAt(g: vec2f, m: f32) -> vec3f {
 
 @fragment fn fs_main(@location(0) uv: vec2f) -> @location(0) vec4f {
   let frag = uv * params.resolution;
-  let css = frag / params.dpr;
+  let css = frag / params.dpr + vec2f(0.0, params.origin);
+  // The same screen pixel in both passes, so the grain and dither match across the rim.
+  let screen = frag + vec2f(0.0, params.origin * params.dpr);
   let page = css + vec2f(0.0, params.scroll);
   let W = params.resolution.x / params.dpr;
   let sx = W / 1440.0;
@@ -308,12 +314,20 @@ fn glareAt(g: vec2f, m: f32) -> vec3f {
   let dist = length(rel);
   let d = dist - R;
 
+  // The front pass keeps only the ground and the rim; above them it is clear.
+  let front = params.layer > 0.5;
+  if (front && (vis <= 0.001 || d > 3.0)) {
+    return vec4f(0.0);
+  }
+  // Deep in the ground the nebula and the ribbon are hidden anyway.
+  let buried = front && d < -2.0 && vis > 0.999;
+
   // Nebula: domain-warped fbm that drifts on its own and lags the scroll (it moves at 45%),
   // gathering along the page margins.
   var side = smoothstep(0.26, 0.5, abs(css.x - W * 0.5) / W);
   side *= 0.3 + 0.7 * noise(vec2f(page.y * 0.0012, step(W * 0.5, css.x) * 5.0));
   let env = side * 0.55 * NEBULA;
-  if (env > 0.003) {
+  if (!buried && env > 0.003) {
     let q = vec2f(page.x, page.y - params.scroll * 0.55) / 560.0;
     let tt = t * 0.02;
     let w = vec2f(fbm3(q + vec2f(0.0, tt)), fbm3(q + vec2f(5.2, 1.3) + vec2f(-tt * 0.8, tt * 0.3)));
@@ -335,7 +349,7 @@ fn glareAt(g: vec2f, m: f32) -> vec3f {
   let gather = params.trail.z;
   let workTop = params.span.x;
   let contactTop = params.span.y;
-  if (carry > 0.003 && page.y > workTop - 400.0 && page.y < contactTop + 200.0) {
+  if (!buried && carry > 0.003 && page.y > workTop - 400.0 && page.y < contactTop + 200.0) {
     let deep = page.y - params.scroll * 0.55;
     // Near Contact the ribbon bends into the resting horizon's sun (spec §5.5).
     let bend = gather * smoothstep(contactTop - 900.0, contactTop, page.y);
@@ -467,8 +481,14 @@ fn glareAt(g: vec2f, m: f32) -> vec3f {
   col += vec3f(st * occ);
 
   let lum = dot(col, vec3f(0.2126, 0.7152, 0.0722));
-  let g = hash21(floor(frag) * 0.7311 + 13.17) - 0.5;
+  let g = hash21(floor(screen) * 0.7311 + 13.17) - 0.5;
   col += g * GRAIN * (0.02 + 0.07 * lum);
-  col += (hash21(frag + fract(t) * 91.0) - 0.5) / 255.0;
-  return vec4f(max(col, vec3f(0.0)), 1.0);
+  col += (hash21(screen + fract(t) * 91.0) - 0.5) / 255.0;
+  let rgb = max(col, vec3f(0.0));
+  if (front) {
+    // Opaque up to 1.5 px above the rim, so the rim line sits over the content; clear by 3 px.
+    let a = 1.0 - smoothstep(1.5, 3.0, d);
+    return vec4f(rgb * a, a);
+  }
+  return vec4f(rgb, 1.0);
 }

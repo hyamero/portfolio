@@ -56,7 +56,8 @@ export default function Contact() {
           ))}
         </ul>
       </div>
-      <footer className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-2.5 text-[13px] font-light tracking-tight text-mute md:pb-3.5 md:text-sm">
+      {/* Above the sky's front layer, so it sits on the ground (spec §3.4). */}
+      <footer className="px-gutter relative z-40 mx-auto flex w-full max-w-[1440px] flex-wrap items-center justify-between gap-x-6 gap-y-2 pb-2.5 text-[13px] font-light tracking-tight text-mute md:pb-3.5 md:text-sm">
         <p>© {YEAR} Dale Bañares</p>
         <ScrollLink to="home" className="line-link" data-catch-light data-magnet>
           Back to top <Arrow dir="n" size={14} />

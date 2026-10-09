@@ -25,14 +25,18 @@ const NO_BODY: Body = { C: [0, -1e5], R: 1, B: [0, -1e5] };
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 
 /**
- * Draws the page's sky into the fixed `canvas` on flight's tick. Frames are drawn on demand: when
- * anything the sky reads has changed, while the intro eases, and at ~30fps while the body is still
- * moving (spec §5.8).
+ * Draws the page's sky into the fixed `canvas` on flight's tick, and the resting horizon's ground
+ * into `front`, over the content (spec §5.6). Frames are drawn on demand: when anything the sky
+ * reads has changed, while the intro eases, and at ~30fps while the body is still moving.
  */
-export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
+export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
   let disposed = false;
   let measure = () => {};
-  const teardown: (() => void)[] = [startFlight()];
+  const hideFront = () => {
+    front.style.visibility = "hidden";
+    front.style.clipPath = "";
+  };
+  const teardown: (() => void)[] = [startFlight(), hideFront];
 
   void (async () => {
     const maybeGpu = await getGpu();
@@ -49,33 +53,37 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         alphaMode: "opaque",
       });
       teardown.push(() => output.dispose());
+      // The ground over the content writes premultiplied alpha: clear above the rim.
+      const frontOutput = surface(gpu, front, { autoResize: false, alphaMode: "premultiplied" });
+      teardown.push(() => frontOutput.dispose());
 
-      const sky = effect(gpu, skySource, {
-        set: {
-          params: {
-            resolution: output.size,
-            light: [0, 0],
-            pointer: [0.5, 0.5],
-            dpr: 1,
-            scroll: 0,
-            hover: 0,
-            time: flight.reduced ? 8 : 0,
-            viewHeight: 1,
-            body: [0, 0, 1, 0],
-            sun: [0, 0, 0, 0],
-            halo: [1, 1, 1, 0],
-            glare: [1, 1, 1, 1],
-            settle: 0,
-            span: [0, 0],
-            trail: [0, 0, 0, 0],
-          },
-        },
-      });
-      await sky.compile({ colors: [output.format] });
+      const initial = {
+        resolution: output.size,
+        light: [0, 0],
+        pointer: [0.5, 0.5],
+        dpr: 1,
+        scroll: 0,
+        hover: 0,
+        time: flight.reduced ? 8 : 0,
+        layer: 0,
+        origin: 0,
+        viewHeight: 1,
+        body: [0, 0, 1, 0],
+        sun: [0, 0, 0, 0],
+        halo: [1, 1, 1, 0],
+        glare: [1, 1, 1, 1],
+        settle: 0,
+        span: [0, 0],
+        trail: [0, 0, 0, 0],
+      };
+      const sky = effect(gpu, skySource, { set: { params: initial } });
+      const ground = effect(gpu, skySource, { set: { params: { ...initial, layer: 1 } } });
+      await Promise.all([sky.compile({ colors: [output.format] }), ground.compile({ colors: [frontOutput.format] })]);
       if (disposed) return;
 
       let cssWidth = 1;
       let cssHeight = 1;
+      let frontTop = 0;
       let hero: Rect = EMPTY_RECT;
       let eclipse: Rect = EMPTY_RECT;
       let work: Rect = EMPTY_RECT;
@@ -84,9 +92,12 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       let lastDraw = 0;
       let dirty = true;
       let shown = false;
+      let frontShown = false;
       let introStart: number | null = null;
       // What the last frame was drawn from; a tick that matches it draws nothing.
       const last = new Float64Array(13).fill(Number.NaN);
+      // What the ground was last drawn from. It doesn't move with the scroll, so it redraws only when these change.
+      const lastGround = new Float64Array(16).fill(Number.NaN);
 
       // Layout is read only here, never inside a tick.
       measure = () => {
@@ -103,7 +114,12 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         cssHeight = Math.max(canvas.clientHeight, 1);
         const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
         output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
+        const box = front.getBoundingClientRect();
+        frontTop = box.top;
+        frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
         dirty = true;
+        // Resizing clears the canvas.
+        lastGround.fill(Number.NaN);
       };
 
       const tick = (now: number) => {
@@ -137,6 +153,9 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, H, contact);
         const trail = trailFrame(settle, up, reduced, work.height > 0);
         const starScroll = scrollY + flight.coast.offset;
+        const bead = beadFlash(intro);
+        // The ground covers the content from the runway's end on (spec §5.6).
+        const frontOn = !reduced && hasEclipse && scrollY >= cam.end;
 
         const inputs = [
           scrollY, starScroll, light.x, light.y, light.hover, pointer.nx, pointer.ny, reduced ? 1 : 0,
@@ -160,26 +179,52 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         dirty = false;
         const halo = haloFrame(morph, body.R);
         const glare = sunFrame(morph, W);
-        sky.set({
-          params: {
-            resolution: output.size,
-            dpr: output.size[0] / cssWidth,
-            scroll: scrollY,
-            light: [light.x, light.y],
-            pointer: [pointer.nx, pointer.ny],
-            hover: light.hover,
-            time,
-            viewHeight: H,
-            body: [body.C[0], body.C[1] + scrollY, body.R, vis],
-            sun: [body.B[0], body.B[1] + scrollY, morph, beadFlash(intro)],
-            halo: [halo.ring, halo.glow, halo.haze, halo.rays],
-            glare: [glare.core, glare.glare, glare.streakH, glare.streakV],
-            settle,
-            span: [work.top, contact.height ? contact.top : work.top + work.height],
-            trail: [trail.shed, trail.carry, trail.gather, starScroll],
-          },
+        const params = {
+          resolution: output.size,
+          dpr: output.size[0] / cssWidth,
+          scroll: scrollY,
+          light: [light.x, light.y],
+          pointer: [pointer.nx, pointer.ny],
+          hover: light.hover,
+          time,
+          layer: 0,
+          origin: 0,
+          viewHeight: H,
+          body: [body.C[0], body.C[1] + scrollY, body.R, vis],
+          sun: [body.B[0], body.B[1] + scrollY, morph, bead],
+          halo: [halo.ring, halo.glow, halo.haze, halo.rays],
+          glare: [glare.core, glare.glare, glare.streakH, glare.streakV],
+          settle,
+          span: [work.top, contact.height ? contact.top : work.top + work.height],
+          trail: [trail.shed, trail.carry, trail.gather, starScroll],
+        };
+        sky.set({ params });
+
+        if (frontOn !== frontShown) {
+          frontShown = frontOn;
+          front.style.visibility = frontOn ? "visible" : "hidden";
+        }
+        const groundInputs = [
+          frontOn ? 1 : 0, body.C[0], body.C[1], body.R, body.B[0], body.B[1], morph, vis, bead, settle,
+          light.hover > 0 ? light.x : 0, light.hover, time, W, H, frontTop,
+        ];
+        let groundChanged = false;
+        groundInputs.forEach((value, i) => {
+          if (value !== lastGround[i]) {
+            lastGround[i] = value;
+            groundChanged = true;
+          }
         });
-        const done = frame(gpu, (f) => f.pass(output, sky)).done;
+        const drawGround = frontOn && groundChanged;
+        if (drawGround) {
+          ground.set({ params: { ...params, resolution: frontOutput.size, layer: 1, origin: frontTop } });
+          // Hit-testing follows the planet: the ground takes the clicks, the clear sky above it doesn't.
+          front.style.clipPath = `circle(${(body.R + 3).toFixed(1)}px at ${body.C[0].toFixed(1)}px ${(body.C[1] - frontTop).toFixed(1)}px)`;
+        }
+        const done = frame(gpu, (f) => {
+          f.pass(output, sky);
+          if (drawGround) f.pass(frontOutput, ground);
+        }).done;
         if (!shown) {
           shown = true;
           // A device lost before the first submit rejects here; the lost handler falls back.
@@ -194,6 +239,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       document.addEventListener("visibilitychange", onVisibility);
       const canvasObserver = new ResizeObserver(resize);
       canvasObserver.observe(canvas);
+      canvasObserver.observe(front);
       const pageObserver = new ResizeObserver(measure);
       pageObserver.observe(document.body);
       void document.fonts.ready.then(() => !disposed && measure());
@@ -209,6 +255,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       void gpu.gpu.lost.then(() => {
         if (disposed) return;
         offTick();
+        hideFront();
         onFallback();
       });
 
@@ -216,6 +263,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       measure();
     } catch (error) {
       console.error(error);
+      hideFront();
       if (!disposed) onFallback();
     }
   })();
