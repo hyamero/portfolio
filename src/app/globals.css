@@ -203,6 +203,14 @@
   visibility: hidden;
 }
 
+/* The resting horizon's ground covers the bottom of the screen (spec §3.4), so focus and anchor
+   scrolling stop above it. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-sky="live"] {
+    scroll-padding-bottom: calc(14lvh + 24px);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-twinkle,
   .animate-breathe,

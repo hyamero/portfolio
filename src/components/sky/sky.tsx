@@ -5,20 +5,25 @@ import { useEffect, useRef, useState } from "react";
 
 type SkyHandle = { measure(): void; dispose(): void };
 
-/** The fixed vgpu sky behind every page; the CSS sky (fallback.tsx) shows until it's live. */
+/**
+ * The fixed vgpu sky behind every page, and the resting horizon's ground over the content (spec
+ * §5.6). The CSS sky (fallback.tsx) shows until it's live.
+ */
 export default function Sky() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const frontRef = useRef<HTMLCanvasElement>(null);
   const handleRef = useRef<SkyHandle | null>(null);
   const [shown, setShown] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas || !("gpu" in navigator)) return;
+    const front = frontRef.current;
+    if (!canvas || !front || !("gpu" in navigator)) return;
     let cancelled = false;
     void import("./renderer").then(({ mountSky }) => {
       if (cancelled) return;
-      handleRef.current = mountSky(canvas, {
+      handleRef.current = mountSky(canvas, front, {
         onFirstFrame: () => setShown(true),
         onFallback: () => {
           setShown(false);
@@ -47,11 +52,20 @@ export default function Sky() {
     handleRef.current?.measure();
   }, [pathname]);
 
+  const fade = `transition-opacity duration-1200 ${shown ? "opacity-100" : "opacity-0"}`;
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      className={`pointer-events-none fixed inset-x-0 top-0 -z-1 h-lvh w-full transition-opacity duration-1200 ${shown ? "opacity-100" : "opacity-0"}`}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className={`pointer-events-none fixed inset-x-0 top-0 -z-1 h-lvh w-full ${fade}`}
+      />
+      {/* The renderer shows it from the runway's end and clips its hit area to the planet. */}
+      <canvas
+        ref={frontRef}
+        aria-hidden="true"
+        className={`invisible fixed inset-x-0 top-[62lvh] z-30 h-[38lvh] w-full ${fade}`}
+      />
+    </>
   );
 }
