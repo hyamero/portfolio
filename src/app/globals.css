@@ -42,6 +42,23 @@
     background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
     box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
   }
+  /* The header's mark: board 09's eclipse in miniature. */
+  .eclipse-mark {
+    background: #05060a;
+    box-shadow: 0 0 0 1px rgb(240 246 255 / 0.92), 0 0 7px 1px rgb(201 220 255 / 0.55);
+  }
+  /* The statement's full stop: a small bead that breathes. */
+  .full-stop {
+    display: inline-block;
+    width: 0.15em;
+    height: 0.15em;
+    margin-left: 0.07em;
+    border-radius: 50%;
+    vertical-align: baseline;
+    background: #f4f8ff;
+    box-shadow: 0 0 0.05em 0.01em rgb(244 248 255 / 0.9), 0 0 0.3em 0.06em rgb(201 220 255 / 0.32);
+    animation: breathe 5.2s ease-in-out infinite;
+  }
   .hairline {
     --line: linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
     background-image: var(--line);
@@ -155,15 +172,30 @@
   0%, 100% { opacity: 0.3; }
   50% { opacity: 0.95; }
 }
-@keyframes flare {
-  0%, 100% { opacity: 0.55; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1); }
+/* The CSS sky's eclipse and horizon (fallback.tsx), and the statement's full stop. */
+@keyframes breathe {
+  0%, 100% { opacity: 0.86; }
+  50% { opacity: 1; }
+}
+@keyframes bead {
+  0%, 100% { opacity: 0.82; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.04); }
+}
+@keyframes glint {
+  0%, 100% { opacity: 0.78; transform: scaleX(0.94); }
+  50% { opacity: 1; transform: scaleX(1); }
 }
 @utility animate-twinkle {
   animation: twinkle 3.6s ease-in-out infinite;
 }
-@utility animate-flare {
-  animation: flare 4.8s ease-in-out infinite;
+@utility animate-breathe {
+  animation: breathe 7s ease-in-out infinite;
+}
+@utility animate-bead {
+  animation: bead 5.2s ease-in-out infinite;
+}
+@utility animate-glint {
+  animation: glint 6s ease-in-out infinite;
 }
 
 /* The vgpu sky paints over all of this once it's live (see sky.tsx). */
@@ -173,7 +205,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .animate-twinkle,
-  .animate-flare {
+  .animate-breathe,
+  .animate-bead,
+  .animate-glint,
+  .full-stop {
     animation: none;
   }
 }
