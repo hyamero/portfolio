@@ -1,7 +1,7 @@
 # Eclipse to horizon: the hero as one camera move
 
 - **Date:** 2026-10-09
-- **Status:** Draft for review
+- **Status:** Draft for review, revised after the first preview
 - **Builds on:** [portfolio redesign](2026-10-07-portfolio-redesign-design.md) ("the redesign spec") and [motion and light](2026-10-07-motion-and-light-design.md) ("the motion spec"). Everything there stands unless this spec changes it.
 - **Boards:** 09 · Eclipse, full stop and 02 · Horizon, on the "Portfolio Hero Variants" Claude Design canvas. Appendices A and B copy their layer values, so this spec doesn't depend on the canvas.
 
@@ -13,23 +13,30 @@ The hero opens on board 09, with the statement on the left and an eclipse on the
 - The bright bead on its edge slides round to the top.
 - The edge flattens into board 02's horizon, and the bead becomes 02's sunrise.
 
-As Work comes up, the horizon sets and sheds the blue trail that already runs through Work into the Contact horizon.
+As Work comes up, the horizon settles slowly to a rest line near the bottom of the screen and stays there for the rest of the page:
 
-The sky draws all of it, so the edge stays sharp at any zoom. A GSAP timeline, scrubbed by scroll, choreographs it. Work, Contact, the Contact horizon, the edge light and the micro-interactions are unchanged.
+- Content rises from behind it, as if from behind the planet.
+- While it settles, its glow sheds into the blue trail that runs through Work, and the trail gathers back into it at Contact.
+- It becomes Contact's horizon, and the footer sits on its ground.
+
+The sky draws all of it, so the edge stays sharp at any zoom. A GSAP timeline, scrubbed by scroll, choreographs the hero. The content of Work and Contact, the edge light and the micro-interactions are unchanged.
 
 Confirmed with the owner on 2026-10-09:
 
-- **Ends:** 09's composition at rest, and 02's horizon asset at the end, without 02's typography.
-- **Handoff:** once formed, the horizon sets and sheds the existing trail. Work and Contact keep their look.
+- **Ends:** 09's composition at rest, and 02's horizon asset at the end of the hero, without 02's typography.
 - **Approach:** the eclipse and the horizon are one body in `sky.wgsl`. A scroll-scrubbed GSAP timeline choreographs the body and also fades the copy.
-- **Story:** runway, copy out, approach (zoom, pan, level), morph, hold and set, as §4 describes.
+- **Story:** runway, copy out, approach (zoom, pan, level), morph and hold, as §4 describes.
+- **After the hold** (feedback on the first preview): the horizon sinks slowly and stays down instead of leaving, and the text is revealed from behind it.
 
 Decided in this spec, for the owner's review:
 
+- **One horizon:** the resting horizon replaces Contact's own. The footer sits on its ground. Once the horizon rests, its rim leans toward the cursor, as Contact's horizon does today.
+- **Rest line:** 86% of the screen's height, where Contact's horizon ends today. About 14% of the screen below it is ground.
+- **Still at rest:** once settled, the horizon stops pulsing, so the sky draws nothing while you read.
 - **Logo:** the header's orb dot becomes 09's eclipse mark. The section marker stays the small blue orb.
 - **Page-in:** the halo fades in, then the bead flashes and settles, like the diamond ring at the end of totality.
-- **Cursor light:** the eclipse ignores it, since the sun behind the disc is its light. The Contact horizon still leans toward the cursor.
-- **Fallbacks:** reduced motion drops the runway and the zoom. The CSS sky shows the two end frames one after the other down the page, without animating between them (§7).
+- **Cursor light in the hero:** the eclipse ignores it, since the sun behind the disc is its light.
+- **Fallbacks:** reduced motion drops the runway, the zoom and the reveal. The CSS sky shows the two end frames one after the other down the page, without animating between them (§7).
 
 ## 2. Success criteria
 
@@ -42,23 +49,36 @@ Decided in this spec, for the owner's review:
    - The sun is on the edge at 0.38 × W (±1 px).
    - Side by side with board 02, the layers match by eye, with no text on screen.
 3. **One move.**
-   - In between, the bead stays on the edge.
+   - Between rest and hold, the bead stays on the edge.
    - Its screen position, the disc's radius and every layer weight change continuously with scroll.
    - Scrolling back reverses it exactly. Nothing catches up over time.
-4. **Sets into the trail.** After the runway, the horizon sinks 1:1 with the scroll and sheds. The motion spec's §2.1 checks for the Work rows and the page bottom still pass.
-5. **Readable.** At scroll 0, the sky behind each dim word of the statement keeps `--color-dim` at 4.5:1 or better, measured as in the motion spec's §2.2. Work's check is unchanged.
-6. **Smooth.** The redesign spec's §2.4 holds through the runway on a production build:
+4. **Settles and stays.**
+   - After the runway, the horizon eases down to its rest line, 86% of H, over one screen of scroll. It starts at 0.44× the scroll speed and slows to a stop.
+   - It stays there to the end of the page and never fades.
+   - The motion spec's §2.1 checks for the Work rows and the page bottom still pass, with the trail gathering into the resting rim.
+5. **Revealed from behind.**
+   - Content below the rim is hidden behind the ground and appears as it rises past the rim.
+   - The footer stays visible on the ground.
+   - A click on the ground never reaches the content behind it.
+   - Focus and anchor scrolling stop with the target above the rim.
+6. **Readable.**
+   - At scroll 0, the sky behind each dim word of the statement keeps `--color-dim` at 4.5:1 or better, measured as in the motion spec's §2.2.
+   - Work's statement words keep 4.5:1 once they're 120 px above the rim. Words still rising past the sun's glare, below that line, are exempt.
+7. **Smooth.** The redesign spec's §2.4 holds through the runway and the settle on a production build:
    - p95 frame time 17 ms or less
    - no frame over 50 ms
    - CLS under 0.05
-7. **Cheap at rest.** The motion spec's §2.4 holds, with "the orb" read as "the body". The body draws ambient frames (30 fps at most) only while it's visible.
-8. **Works everywhere.**
-   - **Reduced motion:** no runway and no zoom. The still eclipse scrolls away with the page, and the statement shows at once.
-   - **Touch:** native scroll scrubs the same story.
-   - **No WebGPU:** the CSS eclipse at the top and the CSS horizon in the runway, both still.
+8. **Cheap at rest.**
+   - The motion spec's §2.4 holds, with "the orb" read as "the body".
+   - The body draws ambient frames (30 fps at most) only in the hero, the runway and the settle.
+   - Once it rests, with no scroll and the pointer still, the sky makes 0 GPU calls. Content scrolls under the front layer without redrawing it.
+9. **Works everywhere.**
+   - **Reduced motion:** no runway, zoom, settle or reveal. The still eclipse scrolls away with the page, Contact keeps a still horizon, and the statement shows at once.
+   - **Touch:** native scroll scrubs the same story, and the reveal line never jitters.
+   - **No WebGPU:** the CSS eclipse at the top and the CSS horizon in the runway, both still. Contact keeps its CSS horizon and there's no reveal.
    - **No JavaScript:** as without WebGPU, with the statement visible.
-9. **Windows.** On the owner's Windows PC, in Chrome and Firefox, the edge, halo and horizon show no seams or faceting.
-10. **Green checks:** lint, typecheck, `bun test`, `bunx vgpu check src/components/sky/sky.wgsl` and `next build`.
+10. **Windows.** On the owner's Windows PC, in Chrome and Firefox, the edge, halo and horizon show no seams or faceting.
+11. **Green checks:** lint, typecheck, `bun test`, `bunx vgpu check src/components/sky/sky.wgsl` and `next build`.
 
 ## 3. Hero
 
@@ -102,6 +122,11 @@ Decided in this spec, for the owner's review:
 - The logo's dot becomes 09's eclipse mark, `.eclipse-mark` in `globals.css`: 13 px, `#05060a`, with `box-shadow: 0 0 0 1px rgb(240 246 255 / 0.92), 0 0 7px 1px rgb(201 220 255 / 0.55)`.
 - `.orb-dot` stays for the section marker.
 
+### 3.4 The rest of the page
+
+- **Footer:** Contact's footer gets a `z-index` above the sky's front layer (§5.6), so it sits on the ground, visible and clickable.
+- **Scroll padding:** while the sky is live and motion is on, `html` gets `scroll-padding-bottom: calc(14lvh + 24px)`, so focus and anchor scrolling stop above the rim.
+
 ## 4. The scroll story
 
 ### 4.1 Timeline
@@ -126,7 +151,7 @@ One GSAP timeline in `motion.tsx`, under `prefers-reduced-motion: no-preference`
 - **State:**
   - The four channels live on `flight.eclipse`, each 0..1. The sky reads them every tick.
   - On refresh, the trigger writes its end scroll position to `flight.eclipse.end`.
-  - So the set (§5.2) starts exactly where the timeline stops, even when ScrollTrigger ignores a mobile toolbar resize.
+  - So the settle (§5.2) starts exactly where the timeline stops, even when ScrollTrigger ignores a mobile toolbar resize.
 - **Same tick:** `scrub: true` sets the timeline's progress inside `ScrollTrigger.update`. Lenis calls that on the shared tick, before the sky draws, so the sky and the copy never disagree by a frame.
 - **Reduced motion:** there's no timeline and the channels stay at 0. If the setting changes mid-page, `matchMedia` reverts them.
 
@@ -138,6 +163,8 @@ One GSAP timeline in `motion.tsx`, under `prefers-reduced-motion: no-preference`
 - **`morph`:** the eclipse's layers become the horizon's (§5.3).
 
 Pan and level start a beat after the zoom, so the bead doesn't pass under the fading copy. Morph starts later still, so the first stretch reads as a pure zoom.
+
+After the timeline, the settle (§5.2) is plain scroll maths in the renderer, like the orb's setting was.
 
 ## 5. The sky
 
@@ -166,12 +193,16 @@ Pan and level start a beat after the zoom, so the bead doesn't pass under the fa
   - `C = B − R · u(phi)`
 
   The bead is always on the edge. All channels at 0 give the start, and all at 1 give the end.
-- **Set:** once the scroll passes `flight.eclipse.end`:
-  - The body moves down the viewport 1:1 with the scroll, as the orb did: `C.y` and `B.y` gain `max(0, scroll − end)`.
-  - `dep = clamp((scroll − end) / H)`. This is `departure` with the runway's end as the top.
-  - `vis = intro · (1 − ease(0.2, 0.8, dep))`.
-  - The trail is `trailFrame(dep, rise, reduced, hasWork)`, unchanged.
-- **Reduced motion:** the start frame, fixed in page space so it scrolls away with the hero. `vis` is 1 and there is no set.
+- **Settle (`settleFrame`):** once the scroll passes `flight.eclipse.end`:
+  - `s = clamp((scroll − end) / H)`.
+  - `C.y` and `B.y` gain `(REST − 0.64) · H · (1 − (1 − s)²)`, with `REST = 0.86`.
+  - So the horizon eases from 64% to 86% over one screen, starting at 0.44× the scroll speed, and then stays.
+  - `vis = intro`. It never fades.
+  - The trail is `trailFrame(s, rise, reduced, hasWork)`, unchanged.
+- **Reduced motion (`stillFrame`):**
+  - Until the scroll passes the middle of Work, the body is the start frame, fixed in page space so it scrolls away with the hero.
+  - After that, it's the horizon at rest, fixed in page space where Contact's horizon ends today: centred on Contact, apex 0.15 × Contact's height above its bottom, radius 25/6 · W.
+  - The switch happens while neither is on screen. `vis` is 1.
 
 ### 5.3 The body (`sky.wgsl`, replacing the orb)
 
@@ -204,9 +235,9 @@ The shader draws every layer in Appendices A and B analytically around `C` and `
     - vertical streak half-length 150 → 70
   - The horizontal streak stays horizontal on screen. By the hold it lies along the level edge as 02's glint.
   - The glare is additive and sits over everything.
-- **Body fill:**
+- **Body fill and ground:**
   - 09's dark radial fill becomes 02's flat ground, with its thin lit band just inside the edge. Those stops are 36 px and 6 px at every width.
-  - The body hides the stars, with a 2 px soft edge.
+  - The ground hides the stars, the nebula and the ribbon, with a 2 px soft edge, so nothing below the rim changes with scroll.
 - **Pulses:** 09's bead pulse (5.2 s) and breathing glow (7 s) crossfade into 02's glint pulse (6 s) by `m`. No pulse changes period mid-scroll.
 - **Intro:**
   - `vis` follows the intro: 2.4 s, from the redesign spec.
@@ -214,21 +245,54 @@ The shader draws every layer in Appendices A and B analytically around `C` and `
 - **Horizontal sizes** in Appendix B (band, bloom, glint and mask) scale with W / 1440. Vertical sizes and the sun's core and bloom stay in px.
 - **Angles:** any angular term wraps across ±π, so there's no seam at the disc's left.
 - **No float hashing:** the body hashes nothing in floats. Any noise goes through `hashCell`, from the seams fix.
-- **Light:** the body ignores `light` and `hover`.
-- **Nebula:** the orb's nebula term is removed. The margin and horizon terms stay.
+- **Light:**
+  - The eclipse ignores `light` and `hover`.
+  - Once the horizon rests, the centre of the rim's bright stretch leans toward the cursor, as Contact's horizon does today: `mix(sun.x, light.x, 0.5 · hover · s)`.
+- **Nebula:** the orb's and the Contact horizon's nebula terms are removed. The margin term stays.
 
 ### 5.4 Shed
 
-The shed now peels off the setting horizon instead of the orb.
+The shed now peels off the settling horizon instead of the setting orb.
 
 - **Scale:** `Rs = 0.95 H` stands in for the orb's radius, which was about 0.95 × the hero's height, so the streamers keep their size.
 - **Length:** `Rs · mix(0.15, 0.9, shed)`, measured up from the edge.
 - **Across:**
   - `lat = (x − sun.x) / Rs` replaces the angle from the top. The shed gathers around the sun instead of spanning the whole 6,000 px arc.
   - The crown is `1 − smoothstep(0.6, 1.1, |lat|)`.
-- **Unchanged:** texture, colour and strength are as in the motion spec's §4.1. Carry and gather are unchanged too.
+- **Fading:** its strength also fades as the horizon comes to rest, × `(1 − ease(0.5, 1, s))`, handing over to the ribbon.
+- **Unchanged:** texture, colour and strength are as in the motion spec's §4.1. Carry is unchanged too.
 
-### 5.5 Uniforms
+### 5.5 Gather
+
+Contact's horizon (`foot`) is removed, and the resting horizon takes its place.
+
+- The ribbon's bend near `contactTop` aims at the sun's x instead of `foot.x`.
+- The gather wisps run along the resting rim toward the sun.
+- The rim gains `+ 0.25 · gather · smoothstep(0.6, 1, gather)` as they arrive.
+- `gather` is Contact's `rise`, as today.
+
+### 5.6 The front layer: content behind the horizon
+
+The reveal comes from a second canvas that draws the ground over the content.
+
+- **Canvas:** `sky-front`, fixed over the bottom 38% of the large viewport (from 0.62 H down), above the page content and below the header and the footer.
+- **Pass:**
+  - A second effect from `sky.wgsl` draws it, with `layer = 1` and `origin` set to the canvas's top in the viewport, in the same frame as the back canvas.
+  - Pixels more than 3 px above the rim return transparent at once.
+  - The rest are computed exactly as in the back pass and written premultiplied, with alpha 1 up to 1.5 px above the rim, falling to 0 by 3 px.
+- **Result:**
+  - The ground, the rim line and the sun's lower glare sit over the content, pixel for pixel the same as behind it.
+  - Everything above the rim stays behind the content.
+  - Because the layer is fixed, the reveal line never jitters, even when touch scrolling moves the content a frame ahead of the sky.
+- **Active:** from the runway's end onward. Before that it's cleared, so the hero copy never goes behind the eclipse.
+- **Draws:** only when the body or its light changes, which means during the settle, on a resize, or when the cursor's lean moves. At rest, content scrolls under it with no draws.
+- **Pointer:**
+  - `pointer-events: auto`, with a `clip-path: circle()` that matches the planet.
+  - The ground takes clicks meant for hidden content, and the clear area above the rim lets clicks through.
+  - The clip follows the body during the settle and is static at rest.
+- **Off:** not under reduced motion or without WebGPU. A lost device takes it down with the back canvas.
+
+### 5.7 Uniforms
 
 New fields on `Params`. The WGSL order respects `vec4f` alignment.
 
@@ -238,16 +302,20 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
 | `sun: vec4f` | `B.x`, `B.y` (page), `morph`, bead brightness |
 | `halo: vec4f` | ring, glow and haze reach (px), rays |
 | `glare: vec4f` | core, glare, horizontal and vertical streak (px) |
+| `settle: f32` | `s`, for the cursor's lean and the shed's fade |
+| `layer: f32` | 0 for the back pass, 1 for the front |
+| `origin: f32` | the front canvas's top in the viewport (px) |
 
-`orb` and `heroHeight` are removed. Everything else is unchanged.
+`orb`, `heroHeight`, `foot` and `footWidth` are removed. Everything else is unchanged.
 
-### 5.6 Frame policy
+### 5.8 Frame policy
 
-- The four channels and `end` join the renderer's change check, so a resize or a reduced-motion switch redraws.
-- **Ambient:**
-  - Applies while the body is visible: `vis > 0.001` and its reach overlaps the viewport.
+- The four channels, `end` and `settle` join the renderer's change check, so a resize or a reduced-motion switch redraws.
+- **Ambient (back canvas):**
+  - Applies while the body is visible (`vis > 0.001` and its reach overlaps the viewport) and still moving: in the hero, the runway and the settle (`s < 1`).
   - Frames come at most every 33 ms, and time advances.
-  - That covers the eclipse at rest, the runway and the set until the horizon leaves.
+  - At rest, time stops for the body as it does for the ribbon in Work.
+- **Front canvas:** draws only when its own inputs change (§5.6).
 - Otherwise, the frame policy is as in the motion spec's §4.4.
 
 ## 6. Page-in
@@ -258,22 +326,24 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
 ## 7. Fallbacks
 
 - **Reduced motion:**
-  - No runway and no timeline.
-  - The shader draws the still eclipse in the stage, scrolling with the page. Time stays frozen as today, so nothing pulses.
+  - No runway, timeline, settle or front layer.
+  - The shader draws the still eclipse in the stage, scrolling with the page, and a still horizon at Contact (`stillFrame`, §5.2). Time stays frozen as today, so nothing pulses.
   - The trail is as today under reduced motion.
 - **No WebGPU (the CSS sky):** the two end frames, one after the other down the page.
   - **CSS eclipse:** Appendix A's layers in the eclipse box, with their CSS animations.
   - **CSS horizon:** Appendix B's layers in the runway, with the rim at 64% of the runway's height, where the shader's hold frame would put it.
-  - **Live sky:** both are `.sky-fallback`, so they're hidden once the sky is live.
+  - **Contact:** keeps its CSS horizon (`ContactSky`), and there's no reveal.
+  - **Live sky:** all of these are `.sky-fallback`, so they're hidden once the sky is live.
   - **Stars:** the hero's twinkle stars stay, with a few added above the CSS horizon.
 - **No JavaScript:** as without WebGPU. The statement is visible through the existing `<noscript>` rule.
 - **Touch:** native scroll scrubs the same story.
 
 ## 8. Removals
 
-- `orbFrame` and its tests.
+- `orbFrame`, `horizonFrame` and `departure`, with their tests.
 - The shader's orb branch: limb, atmosphere band, halo, orbit rings and flares.
-- The `orb` and `heroHeight` uniforms.
+- The shader's Contact horizon branch.
+- The `orb`, `heroHeight`, `foot` and `footWidth` uniforms.
 - The CSS orb, rings, flares and glows in `HeroSky`.
 - "02 Drift", the hero's grid lines, the centred headline and the lede.
 
@@ -281,21 +351,23 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
 
 | File | Change |
 |---|---|
-| `src/lib/eclipse.ts` (new) | `startFrame`, `endFrame`, `bodyFrame`, `setFrame`, `haloFrame`, `sunFrame`, `beadFlash`, `CAMERA_KEYS` |
+| `src/lib/eclipse.ts` (new) | `startFrame`, `endFrame`, `bodyFrame`, `settleFrame`, `stillFrame`, `haloFrame`, `sunFrame`, `beadFlash`, `CAMERA_KEYS`, `REST` |
 | `src/lib/eclipse.test.ts` (new) | §10's unit tests |
 | `src/lib/flight.ts` | `eclipse` state: `zoom`, `pan`, `level`, `morph`, `end` |
-| `src/lib/sky-math.ts` and its test | `orbFrame` removed |
+| `src/lib/sky-math.ts` and its test | `orbFrame`, `horizonFrame` and `departure` removed |
 | `src/components/hero.tsx` | stage, statement, links, eclipse box and runway |
 | `src/components/motion.tsx` | the eclipse timeline replaces "02 Drift"; the statement's stagger |
-| `src/components/sky/renderer.ts` | measures the eclipse box; computes the frames, uniforms and frame policy |
-| `src/components/sky/sky.wgsl` | the body replaces the orb; the shed is adapted; new uniforms |
+| `src/components/sky/sky.tsx` | the front canvas |
+| `src/components/sky/renderer.ts` | measures the eclipse box; computes the frames and uniforms; drives both passes and the front canvas's clip |
+| `src/components/sky/sky.wgsl` | the body replaces the orb and the Contact horizon; the shed and gather are adapted; the front pass; new uniforms |
 | `src/components/sky/fallback.tsx` | the CSS eclipse and the CSS horizon replace the CSS orb |
-| `src/components/site-header.tsx`, `src/app/globals.css` | the eclipse mark |
-| `docs/superpowers/specs/2026-10-07-*.md` | once shipped, the hero, orb, drift and fallback sections point here |
+| `src/components/contact.tsx` | the footer's `z-index` |
+| `src/components/site-header.tsx`, `src/app/globals.css` | the eclipse mark; the scroll padding |
+| `docs/superpowers/specs/2026-10-07-*.md` | once shipped, the hero, orb, drift, Contact horizon and fallback sections point here |
 
 ## 10. Verification
 
-- **Checks:** §2.10.
+- **Checks:** §2.11.
 - **Unit (bun, written first):**
   - **`startFrame`:** centre and radius from the box, and the bead at 135° on the edge.
   - **`endFrame`**, at 1440 × 900 and 390 × 844:
@@ -307,7 +379,12 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
     - For 100 sampled channel sets, `|B − C| = R`.
     - `R` rises with `zoom` by a constant ratio per step.
     - A 0.001 step in any channel moves `B` by less than 1 px and changes `R` by less than 0.5%.
-  - **`setFrame`:** nothing moves before `end`. After it, the body moves down 1:1 with the scroll, and `vis` follows `1 − ease(0.2, 0.8, dep)`.
+  - **`settleFrame`:**
+    - Nothing moves before `end`.
+    - The apex reaches 0.86 H one screen after `end` and stays there.
+    - It never moves faster than 0.44× the scroll, and it never moves up.
+    - `vis` stays at the intro's value.
+  - **`stillFrame`:** the eclipse is in the hero before the switch, and the horizon sits at Contact after it. At the switch, neither is within the viewport at 1440 × 900 or 390 × 844.
   - **`haloFrame` and `sunFrame`:** 09's values at `m` = 0, 02's at `m` = 1, and monotone in between.
   - **`beadFlash`:** 0 at 0 and at 0.5, a peak of at least 1.4 near 0.8, and within 0.01 of 1 at 1.
   - **`CAMERA_KEYS`**, built into a GSAP timeline on a plain object (GSAP core runs in bun):
@@ -319,21 +396,29 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
   - **Screenshots** at these points, judged by eye against boards 09 and 02 (§2.1–2.4):
     - scroll 0
     - 25%, 50% and 75% of the runway
-    - the hold and mid-set
+    - the hold, mid-settle and at rest
     - the Work rows and the bottom
   - **Geometry:**
     - At scroll 0, the pixel at the eclipse box's centre is dark and the edge at `R` is bright.
     - At the hold, the brightest pixel in the row at 0.64 H is within 2 px of 0.38 W.
-  - **Contrast (§2.5):** at scroll 0, hide the text, sample the sky behind each dim word, and assert at least 4.5:1.
-  - **Smooth and idle (§2.6, §2.7):** run the scripted wheel scroll through the runway. Once the horizon has gone, assert 0 GPU calls in Work with the pointer still.
-  - **Reduced motion:** the hero is the stage alone, the statement shows at once, and the eclipse scrolls away with the page.
-  - **No WebGPU** (Firefox with WebGPU off): the CSS eclipse at the top, the CSS horizon in the runway, and no console errors.
+    - At rest, the rim's apex is at 0.86 H (±1 px).
+  - **Reveal (§2.5):**
+    - With a Work row straddling the rim, pixels just below the rim show the ground and pixels just above show the row's text.
+    - At the bottom of the page, the footer's text is visible.
+    - A click on the ground over a hidden link doesn't navigate.
+    - Tabbing to a link that's behind the ground scrolls it above the rim.
+  - **Contrast (§2.6):**
+    - At scroll 0, hide the text, sample the sky behind each dim word, and assert at least 4.5:1.
+    - In Work, the same check applies to each word that's 120 px or more above the rim.
+  - **Smooth and idle (§2.7, §2.8):** run the scripted wheel scroll through the runway and the settle. Once the horizon rests, assert 0 GPU calls in Work with the pointer still.
+  - **Reduced motion:** the hero is the stage alone, the statement shows at once, the eclipse scrolls away with the page, and Contact shows a still horizon.
+  - **No WebGPU** (Firefox with WebGPU off): the CSS eclipse at the top, the CSS horizon in the runway, Contact's CSS horizon, and no console errors.
   - **Nav:**
     - "Selected work" from the top lands with the first row clear of the header.
     - "Back to top" from Contact returns to scroll 0 with the eclipse whole.
 - **Manual:**
-  - The owner's Windows PC, in Chrome and Firefox: no seams on the edge, halo or horizon, and a smooth scrub.
-  - Safari on macOS and iOS.
+  - The owner's Windows PC, in Chrome and Firefox: no seams on the edge, halo or horizon, and a smooth scrub and settle.
+  - Safari on macOS and iOS: the front layer lines up with the back, and touch scrolling reveals cleanly.
 
 ## 11. Risks
 
@@ -341,7 +426,11 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
 |---|---|
 | The shader port drifts from the boards | The appendices carry the exact values. Both end frames are compared side by side with the boards. |
 | The halo floods the screen mid-zoom | Extents blend geometrically down to px sizes (§5.3). Screenshots at 25%, 50% and 75% of the runway check it. |
-| The halo behind the statement hurts legibility at rest | The §2.5 gate. If it fails, the halo is dimmed across the copy column, like the ribbon's readability term. |
+| The halo behind the statement hurts legibility at rest | The §2.6 gate. If it fails, the halo is dimmed across the copy column, like the ribbon's readability term. |
+| The front layer drifts from the back | Both come from the same shader and uniforms, drawn in the same frame. Playwright checks the reveal line at rest. |
+| Hidden content can still be clicked or focused | The front canvas takes pointer events inside the planet, and the scroll padding keeps focus above the rim. |
+| The ground costs reading space | The rest line is one constant, `REST`, for tuning. 14% of the screen is the starting point. |
+| Words rising past the sun are hard to read | They're in transit, and the §2.6 gate starts 120 px above the rim. If that's not enough, the sun's glare dims at rest. |
 | Precision with R near 10,000 px | f32 keeps about 0.001 px there, and nothing hashes floats (§5.3). |
 | A seam where an angle wraps | Angular terms wrap across ±π (§5.3). |
 | The sky and the timeline disagree on where the runway ends | The renderer reads the trigger's own end from `flight.eclipse.end`. |
