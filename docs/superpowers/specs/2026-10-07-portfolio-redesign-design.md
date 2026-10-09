@@ -87,6 +87,8 @@ Decisions confirmed with the owner on 2026-10-07:
 
 ### 3.3 Hero (`#home`)
 
+> Superseded by the [eclipse to horizon spec](2026-10-09-eclipse-to-horizon-design.md), §3: board 09's statement and eclipse, over a runway.
+
 - **Box:** at least 960 px tall (880 px below 760 px wide), `overflow: hidden`.
 - **Copy:** centred, with a 200 px top pad (132 px on mobile).
   - **h1:** "Software engineer" plus a block line "and designer." in `glow`.
@@ -163,11 +165,13 @@ The shader is a port of the prototype's fragment shader, with the same constants
    - **Orbit hairlines:** two, at R + 110 and R + 310, drawn only on the orb's shoulders, clear of the headline.
    - **Flares:** two twinkling four-point flares on those orbits.
    - It is drawn where `vis > 0`, fading out below the orb's center by `smoothstep(-0.02H, 0.34H)`.
+   - **Superseded:** the eclipse-to-horizon spec's body replaces the orb (§5.3).
 4. **Horizon** (Contact): a circle of radius max(2.2 × contactW, 2600), centered under Contact.
    - Its top sits at contactBottom − (0.02 + 0.13 × rise) × contactH.
    - **Rim, atmosphere and inner glow:** falloffs over 6.4, 64 and 41 px, at weights 0.95, 0.55 and 0.32.
    - **Lit arc:** leans toward the pointer's x by hover, with a half-width of 0.37 × contactW.
    - **Surface:** dark below the rim, and occludes the stars.
+   - **Superseded:** the resting horizon replaces it (eclipse-to-horizon spec §5.5).
 5. **Stars:** two hashed layers at 0.85× scroll parallax, twinkling, with an 8 px pointer parallax on hover. Occluded by the orb and the horizon.
 6. **Grain and dither:** luminance-weighted static grain, then ±0.5/255 dither. A grain lever multiplies the grain, default 1.
 
@@ -231,7 +235,7 @@ Pure functions live in `src/lib/sky-math.ts` and are unit-tested with `bun test`
   - It becomes `live` 1.3 s after the first frame, once the canvas has faded in over 1.2 s.
   - It returns to `css` if init fails or the device is lost.
 - **Fallback layers:** `.sky-fallback`, at `z-index: -2`, ported verbatim from the canvas markup.
-  - **Hero:** the radial glows, 14 twinkle stars, the orbit rings, two flares, the orb gradient and the limb.
+  - **Hero:** the radial glows, 14 twinkle stars, the orbit rings, two flares, the orb gradient and the limb. Superseded by the eclipse-to-horizon spec's §7.
   - **Contact:** the glow, 6 twinkle stars and the CSS horizon disc with its box-shadow.
   - **Whole page:** an SVG grain.
   - They become `visibility: hidden` under `[data-sky=live]`.

@@ -111,6 +111,8 @@ A module singleton. It is not React state and causes no re-renders. One `gsap.ti
 
 ### 4.1 Trail: shed, carry, gather
 
+> The shed now peels off the settling horizon, and the trail gathers into the resting one: see the [eclipse to horizon spec](2026-10-09-eclipse-to-horizon-design.md), §5.4–5.5.
+
 **New anchor:** `data-sky-anchor="work"` on `#work`.
 
 **Uniforms.** New fields on `Params` (WGSL order respects `vec4f` alignment):
@@ -314,6 +316,8 @@ On `li[data-project]:hover`, or `:focus-within`:
 - **Reduced motion:** `x` and `opacity` are set instantly. The preference is read on every move, so a change while the page is open applies at once.
 
 ### 6.4 Headline blur-in
+
+> The hero's words are now the statement's, staggered 0.04 s: see the [eclipse to horizon spec](2026-10-09-eclipse-to-horizon-design.md), §6.
 
 - **Markup:** the hero `h1` and `.say` render each word in a server-side `<span data-head-word class="inline-block">`. The h1's `text-glow` span keeps wrapping its words.
   - The `h1` loses `data-rise`, and its words animate instead.
