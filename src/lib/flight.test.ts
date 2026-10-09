@@ -12,6 +12,9 @@ const fresh = () => {
 };
 
 describe("flight", () => {
+  test("the hero's camera starts on board 09, with no runway end yet", () => {
+    expect(createFlight().eclipse).toEqual({ zoom: 0, pan: 0, level: 0, morph: 0, end: Number.POSITIVE_INFINITY });
+  });
   test("the first tick primes the scroll without a velocity kick", () => {
     const s = fresh();
     advance(s, 2400, 0, DT);

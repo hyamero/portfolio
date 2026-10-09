@@ -22,6 +22,11 @@ export function createFlight() {
     /** The stars' coast: a velocity and the virtual scroll it has added. */
     coast: { v: 0, offset: 0 },
     hero: EMPTY_RECT,
+    /**
+     * The hero's camera (spec §4.1): motion.tsx scrubs the channels and the sky reads them. `end` is
+     * the scroll position where the runway ends, written on refresh; until then nothing settles.
+     */
+    eclipse: { zoom: 0, pan: 0, level: 0, morph: 0, end: Number.POSITIVE_INFINITY },
     reduced: false,
     lenis: null as Lenis | null,
   };
