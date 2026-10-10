@@ -1,0 +1,26 @@
+{
+  "hash": "8323e8b8cfe4dbbb0f28311a159f88809e251e4125575b6c8aa188bbd24ce644",
+  "stills": {
+    "eclipse.avif": {
+      "size": [
+        2048,
+        2048
+      ],
+      "bytes": 11264
+    },
+    "horizon-1440.avif": {
+      "size": [
+        2880,
+        768
+      ],
+      "bytes": 6349
+    },
+    "horizon-390.avif": {
+      "size": [
+        780,
+        464
+      ],
+      "bytes": 2454
+    }
+  }
+}
