@@ -18,8 +18,8 @@ export const PHI0 = (3 * Math.PI) / 4;
 export const REST = 0.86;
 const HOLD = 0.64;
 const SUN_X = 0.38;
-// 02's 12,000 px circle at 1440 px wide.
-const RADIUS_PER_WIDTH = 25 / 6;
+/** The horizon's radius per px of viewport width: 02's 12,000 px circle at 1440 px wide. */
+export const RADIUS_PER_WIDTH = 25 / 6;
 
 /** The on-screen unit vector for an angle measured anticlockwise from +x with y up. */
 const unit = (phi: number): Vec => [Math.cos(phi), -Math.sin(phi)];
@@ -95,9 +95,17 @@ export function haloFrame(m: number, R: number) {
   return { ring: geo(0.18 * R, 22, m), glow: geo(1.2 * R, 100, m), haze: geo(2.4 * R, 100, m), rays: 1 - ease(0, 0.5, m) };
 }
 
-/** The bead's glare in px, a camera effect that doesn't scale with the zoom, becoming 02's sun (spec §5.3). */
+/**
+ * The sun's glare in px, a camera effect that doesn't scale with the zoom: 09's diamond at m 0, 02's
+ * sun at m 1 (sky polish spec §4.4). The streaks' sizes are exponential decay lengths.
+ */
 export function sunFrame(m: number, W: number) {
-  return { core: geo(5, 3, m), glare: geo(120, 60, m), streakH: geo(200, (560 * W) / 1440, m), streakV: geo(150, 70, m) };
+  return { core: geo(2, 1.75, m), glare: geo(120, 60, m), streakH: geo(85, (140 * W) / 1440, m), streakV: geo(60, 24, m) };
+}
+
+/** How far Baily's beads are open over the intro: shut until 0.45, closed into the diamond by 0.8 (sky polish spec §6). */
+export function beadOpen(intro: number) {
+  return mix(-2, 0.12, ease(0.45, 0.8, intro));
 }
 
 /** The bead's brightness over the intro: dark until halfway, a 1.5× flash at 0.8, then 1 (spec §5.3). */

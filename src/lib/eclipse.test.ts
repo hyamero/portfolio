@@ -4,6 +4,7 @@ import gsap from "gsap";
 import {
   addCameraTweens,
   beadFlash,
+  beadOpen,
   bodyFrame,
   CAMERA_KEYS,
   endFrame,
@@ -188,8 +189,8 @@ describe("stillFrame", () => {
   });
 });
 
-describe("haloFrame and sunFrame", () => {
-  test("start at board 09's sizes and end at board 02's", () => {
+describe("haloFrame", () => {
+  test("starts at board 09's reaches and ends at board 02's", () => {
     const a = haloFrame(0, 200);
     expect(a.ring).toBeCloseTo(36);
     expect(a.glow).toBeCloseTo(240);
@@ -200,14 +201,8 @@ describe("haloFrame and sunFrame", () => {
     expect(b.glow).toBeCloseTo(100);
     expect(b.haze).toBeCloseTo(100);
     expect(b.rays).toBe(0);
-    expect(sunFrame(0, 1440)).toEqual({ core: 5, glare: 120, streakH: 200, streakV: 150 });
-    const s = sunFrame(1, 1440);
-    expect(s.core).toBeCloseTo(3);
-    expect(s.glare).toBeCloseTo(60);
-    expect(s.streakH).toBeCloseTo(560);
-    expect(s.streakV).toBeCloseTo(70);
   });
-  test("move one way between the two", () => {
+  test("moves one way between the two", () => {
     let last = haloFrame(0, 1000);
     for (let i = 1; i <= 20; i++) {
       const h = haloFrame(i / 20, 1000);
@@ -218,8 +213,46 @@ describe("haloFrame and sunFrame", () => {
       last = h;
     }
   });
-  test("lose the rays by halfway", () => {
+  test("loses the rays by halfway", () => {
     expect(haloFrame(0.5, 1000).rays).toBe(0);
+  });
+});
+
+describe("sunFrame", () => {
+  test("starts at 09's diamond and ends at 02's sun", () => {
+    expect(sunFrame(0, 1440)).toEqual({ core: 2, glare: 120, streakH: 85, streakV: 60 });
+    const s = sunFrame(1, 1440);
+    expect(s.core).toBeCloseTo(1.75);
+    expect(s.glare).toBeCloseTo(60);
+    expect(s.streakH).toBeCloseTo(140);
+    expect(s.streakV).toBeCloseTo(24);
+    expect(sunFrame(1, 390).streakH).toBeCloseTo(37.92, 2);
+  });
+  test("moves one way between the two at every width", () => {
+    for (const W of [390, 1440, 2560]) {
+      const a = sunFrame(0, W);
+      const b = sunFrame(1, W);
+      let last = a;
+      for (let i = 1; i <= 20; i++) {
+        const s = sunFrame(i / 20, W);
+        for (const k of ["core", "glare", "streakH", "streakV"] as const) {
+          expect((s[k] - last[k]) * Math.sign(b[k] - a[k])).toBeGreaterThanOrEqual(0);
+        }
+        last = s;
+      }
+    }
+  });
+});
+
+describe("beadOpen", () => {
+  test("keeps the beads shut until 0.45 and closed into the diamond from 0.8", () => {
+    expect(beadOpen(0)).toBe(-2);
+    expect(beadOpen(0.45)).toBe(-2);
+    expect(beadOpen(0.8)).toBeCloseTo(0.12, 9);
+    expect(beadOpen(1)).toBeCloseTo(0.12, 9);
+  });
+  test("opens one way", () => {
+    for (let i = 1; i <= 50; i++) expect(beadOpen(i / 50)).toBeGreaterThanOrEqual(beadOpen((i - 1) / 50));
   });
 });
 
