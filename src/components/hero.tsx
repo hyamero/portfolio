@@ -21,8 +21,8 @@ export default function Hero() {
           className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_0] mask-[radial-gradient(ellipse_58%_60%_at_50%_72%,#000_0%,rgb(0_0_0/0.5)_46%,transparent_78%)]"
         />
         <div className="px-gutter mx-auto w-full max-w-[1440px]">
-          <div data-hero-copy data-sky-text="hero" className="relative z-1 max-w-[740px]">
-            <h1 className="text-[clamp(1.875rem,3.4vw,3rem)] leading-[1.16] font-normal tracking-[-0.045em] text-pretty text-dim">
+          <div data-hero-copy data-sky-text="hero" className="relative z-1 max-w-[540px]">
+            <h1 className="text-[clamp(1.0625rem,1.3vw,1.1875rem)] leading-[1.5] font-normal tracking-[-0.015em] text-pretty text-dim">
               {words.map((word, i) => (
                 <Fragment key={i}>
                   {i > 0 && " "}
@@ -39,7 +39,7 @@ export default function Hero() {
                 </Fragment>
               ))}
             </h1>
-            <nav data-rise aria-label="Start here" className="mt-8 flex flex-wrap gap-x-9 gap-y-1 text-base tracking-tight">
+            <nav data-rise aria-label="Start here" className="mt-7 flex flex-wrap gap-x-9 gap-y-1 text-base tracking-tight">
               <ScrollLink to="work" className="line-link" data-catch-light data-magnet>
                 Selected work <Arrow dir="s" size={16} />
               </ScrollLink>
@@ -59,8 +59,8 @@ export default function Hero() {
             </nav>
           </div>
         </div>
-        {/* The planet rises under the copy, right of the middle: the box is its whole disc, its top the arc's apex. */}
-        <div aria-hidden="true" className="relative mt-[clamp(96px,16vh,200px)] min-h-[200px] flex-1">
+        {/* The planet rises low and right of the middle, wherever the copy ends: the box is its whole disc, its top the arc's apex. */}
+        <div aria-hidden="true" className="absolute inset-x-0 top-[clamp(400px,62svh,620px)] bottom-0">
           <div data-sky-anchor="planet" className="absolute top-0 left-[62%] aspect-square w-[max(128vw,1120px)] -translate-x-1/2">
             <PlanetSky />
           </div>
