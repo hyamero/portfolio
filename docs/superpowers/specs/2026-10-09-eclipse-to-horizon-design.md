@@ -206,6 +206,8 @@ After the timeline, the settle (§5.2) is plain scroll maths in the renderer, li
 
 ### 5.3 The body (`sky.wgsl`, replacing the orb)
 
+> The body's layers were rebuilt in the [sky polish round](2026-10-10-sky-polish-design.md) (§3–§4): its corona, air and lens replace the board ports below.
+
 The shader draws every layer in Appendices A and B analytically around `C` and `R`, with `d = |p − C| − R`, the distance in px outside the edge. `morph`, written `m` below, blends them.
 
 - **Extents:**
@@ -324,6 +326,8 @@ New fields on `Params`. The WGSL order respects `vec4f` alignment.
 - The eclipse lights up as §5.3's intro describes. The bead's flash lands about 1.25 s after the sky starts, as the last words begin to resolve.
 
 ## 7. Fallbacks
+
+> The CSS sky is now shader-rendered stills and a star map: see the [sky polish round](2026-10-10-sky-polish-design.md) §6–§7.
 
 - **Reduced motion:**
   - No runway, timeline, settle or front layer.
