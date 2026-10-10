@@ -61,10 +61,10 @@ describe("rise", () => {
 });
 
 describe("introProgress", () => {
-  test("eases out over 2.4 s", () => {
+  test("eases out over 3.6 s", () => {
     expect(introProgress(-100)).toBe(0);
-    expect(introProgress(1200)).toBeCloseTo(0.875);
-    expect(introProgress(2400)).toBe(1);
+    expect(introProgress(1800)).toBeCloseTo(0.875);
+    expect(introProgress(3600)).toBe(1);
   });
 });
 

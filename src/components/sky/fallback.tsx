@@ -23,12 +23,13 @@ export function SkyStars() {
 
 /**
  * The hero's planet (sky polish spec §7.3), filling its box: a disc of the planet's navy core, and the
- * shader's still screen-blended over it, which fades in as the live sky's dawn does.
+ * shader's still screen-blended over it. Both fade in as the live sky's body does, so the disc never
+ * shows ahead of the canvas.
  */
 export function PlanetSky() {
   return (
     <div aria-hidden="true" className="sky-fallback pointer-events-none absolute inset-0">
-      <div className="absolute inset-0 -z-2 rounded-full" style={{ background: CORE_FILL }} />
+      <div className="css-dawn absolute inset-0 -z-2 rounded-full" style={{ background: CORE_FILL }} />
       <div
         className="css-dawn absolute -z-2 bg-size-[100%_100%] mix-blend-screen"
         style={{ ...PLANET.box, backgroundImage: `url(${PLANET.src})` }}

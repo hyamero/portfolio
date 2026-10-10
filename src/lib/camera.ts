@@ -75,6 +75,11 @@ export function stillFrame(
   return { body: withSun([cx, apex + R], R), morph: 1 };
 }
 
+/** The body's opacity over the intro: it fades in from nothing, rather than pop in, before it's fully lit. */
+export function planetAppear(intro: number) {
+  return ease(0, 0.85, intro);
+}
+
 /** How far the intro has lit the planet: from 15% of it to its end. The shader lights the rim first, then the air. */
 export function planetDawn(intro: number) {
   return ease(0.15, 1, intro);

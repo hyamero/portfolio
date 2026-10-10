@@ -13,7 +13,7 @@ export function ease(a: number, b: number, x: number) {
 // A pixel budget, not a fixed ratio: the sky covers the whole viewport on every frame.
 const PIXEL_BUDGET = 2.2e6;
 const MAX_DPR = 1.25;
-const INTRO_MS = 2400;
+const INTRO_MS = 3600;
 
 export function skyDpr(deviceDpr: number, width: number, height: number) {
   return Math.min(
@@ -39,7 +39,7 @@ export function armIntro(start: number | null, now: number, hasHero: boolean, vi
   return start ?? (visible ? now : null);
 }
 
-/** The orb's page-in, eased out (cubic) over 2.4 s. */
+/** The orb's page-in, eased out (cubic) over 3.6 s. */
 export function introProgress(elapsedMs: number) {
   return 1 - (1 - clamp(elapsedMs / INTRO_MS)) ** 3;
 }

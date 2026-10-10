@@ -57,8 +57,12 @@ describe("skyParams", () => {
   test("the hero's strength follows the copy", () => {
     expect(skyParams(input({ copy: 0.25 })).params.textK).toEqual([0.25, 1, 1, 0]);
   });
-  test("the body shows from the first frame, at full strength", () => {
-    expect(skyParams(input({ intro: 0 })).params.body[3]).toBe(1);
+  test("the body fades in over the intro, rather than appear at full strength", () => {
+    expect(skyParams(input({ intro: 0 })).params.body[3]).toBe(0);
+    const mid = skyParams(input({ intro: 0.4 })).params.body[3];
+    expect(mid).toBeGreaterThan(0.2);
+    expect(mid).toBeLessThan(0.9);
+    expect(skyParams(input({ intro: 1 })).params.body[3]).toBe(1);
     expect(skyParams(input({ body: null })).params.body[3]).toBe(0);
   });
   test("the intro lights the planet", () => {
