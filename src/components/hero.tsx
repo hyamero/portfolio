@@ -16,7 +16,7 @@ export default function Hero() {
     <section id="home" data-sky-anchor="hero" className="relative overflow-hidden">
       <HeroStars />
       <div className="px-gutter mx-auto flex min-h-[880px] max-w-[1440px] flex-wrap-reverse items-center justify-between gap-x-16 gap-y-10 pt-[120px] pb-20 md:min-h-[960px]">
-        <div data-hero-copy className="relative z-1 max-w-[740px] min-w-0 flex-[1_1_560px]">
+        <div data-hero-copy data-sky-text="hero" className="relative z-1 max-w-[740px] min-w-0 flex-[1_1_560px]">
           <h1 className="text-[clamp(1.875rem,3.4vw,3rem)] leading-[1.16] font-normal tracking-[-0.045em] text-pretty text-dim">
             {words.map((word, i) => (
               <Fragment key={i}>

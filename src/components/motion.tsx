@@ -59,6 +59,8 @@ export default function Motion({ children }: { children: React.ReactNode }) {
           },
         });
         camera.to("[data-hero-copy]", { y: -COPY_OUT.lift, opacity: 0, ease: "none", duration: COPY_OUT.end }, 0);
+        // The sky's text mask follows the copy out (sky polish spec §3.3).
+        camera.to(flight.eclipse, { copy: 0, ease: "none", duration: COPY_OUT.end }, 0);
         addCameraTweens(camera, flight.eclipse);
 
         // 03 Focus: each hairline draws in, then its statement lights up word by word.
@@ -97,6 +99,7 @@ export default function Motion({ children }: { children: React.ReactNode }) {
         return () => {
           // Reduced motion has no runway, so nothing may settle.
           flight.eclipse.end = Number.POSITIVE_INFINITY;
+          flight.eclipse.copy = 1;
           words.forEach((word) => word.style.removeProperty("opacity"));
         };
       });
