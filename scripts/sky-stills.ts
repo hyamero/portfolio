@@ -9,7 +9,6 @@ import { resolveShader } from "@vgpu/wgsl/runtime";
 import { effect, init, sampler, target } from "vgpu/node";
 
 import { INTERIOR, ROOT, screenInverse, STAR_CHECK_ENTRY, STILLS, STILLS_ENTRY, stillsHash, type Still } from "@/components/sky/stills-source";
-import { sunFrame } from "@/lib/eclipse";
 import { brightStars } from "@/lib/star-field";
 
 const OUT = path.join(ROOT, "public/sky");
@@ -28,7 +27,6 @@ const stillsShader = (await resolveShader({ entry: STILLS_ENTRY })).wgsl;
 async function render(still: Still) {
   const [w, h] = still.size;
   const out = target(gpu, { size: still.size, format: "rgba16float" });
-  const glare = sunFrame(still.sun[2], still.W);
   const params = {
     resolution: still.size,
     dpr: still.dpr,
@@ -37,7 +35,7 @@ async function render(still: Still) {
     beads: still.beads,
     body: [...still.body, 1],
     sun: still.sun,
-    glare: [glare.core, glare.glare, glare.streakH, glare.streakV],
+    glare: still.glare,
   };
   effect(gpu, stillsShader, { set: { params } }).draw(out);
   const px = await out.color.readFloats({ mipLevel: 0, region: "all" });
