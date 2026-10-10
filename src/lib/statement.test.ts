@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { parseStatement, plainStatement, readProgress, wordOpacity } from "./statement";
+import { parseStatement, plainStatement, readProgress, wordBlur, wordOpacity } from "./statement";
 
 const umamin =
   "A social platform for sending and receiving encrypted anonymous messages. Reached almost *3 million users* with more than *17.5 million page visits.*";
@@ -43,6 +43,18 @@ describe("wordOpacity", () => {
   });
   test("words light in reading order", () => {
     expect(wordOpacity(0.3, 0, 22)).toBeGreaterThan(wordOpacity(0.3, 5, 22));
+  });
+});
+
+describe("wordBlur", () => {
+  test("a dim word is out of focus, and a lit one sharp, with no filter left on it", () => {
+    expect(wordBlur(0.16)).toBe("blur(4.00px)");
+    expect(wordBlur(1)).toBe("none");
+  });
+  test("comes into focus as the word lights", () => {
+    const px = (o: number) => Number.parseFloat(wordBlur(o).slice(5));
+    expect(px(0.58)).toBeCloseTo(2, 9);
+    expect(px(0.3)).toBeGreaterThan(px(0.6));
   });
 });
 

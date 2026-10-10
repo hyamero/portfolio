@@ -25,6 +25,12 @@ export function wordOpacity(progress: number, index: number, count: number) {
   return clamp((progress * (count + 6) - index) / 4, 0.16, 1);
 }
 
+/** A read-along word's blur, from 4 px while dim to none once fully lit. */
+export function wordBlur(opacity: number) {
+  const px = (4 * (1 - opacity)) / (1 - 0.16);
+  return px > 0.01 ? `blur(${px.toFixed(2)}px)` : "none";
+}
+
 /**
  * A statement's read-along progress. Near the page bottom its trigger's end can sit past the last
  * scroll position, so the light finishes at the bottom instead of leaving the last words dim.

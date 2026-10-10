@@ -7,7 +7,7 @@ import { useRef } from "react";
 
 import { addCameraTweens, COPY_OUT } from "@/lib/camera";
 import { flight } from "@/lib/flight";
-import { readProgress, wordOpacity } from "@/lib/statement";
+import { readProgress, wordBlur, wordOpacity } from "@/lib/statement";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
 
@@ -20,28 +20,29 @@ export default function Motion({ children }: { children: React.ReactNode }) {
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         // 01 Rise: the statement resolves word by word from a soft blur, then the links fade up, as
-        // the planet lights. Its ~20 words stagger at half the old headline's pace.
-        const blur = { opacity: 0, y: 16, filter: "blur(10px)" };
-        const clear = { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.6, ease: "power4.out", clearProps: "filter" };
+        // the planet lights. A gentle ease keeps the blur on screen long enough to read as a focus pull.
+        const blur = { opacity: 0, y: 10, filter: "blur(8px)" };
+        const clear = { opacity: 1, y: 0, filter: "blur(0px)", duration: 1.8, ease: "power2.out", clearProps: "filter" };
         const heroWords = gsap.utils.toArray<HTMLElement>("#home [data-head-word]");
         gsap
           .timeline({ delay: 0.5 })
-          .fromTo(heroWords, blur, { ...clear, stagger: 0.04 }, 0)
+          .fromTo(heroWords, blur, { ...clear, stagger: 0.06 }, 0)
           .fromTo(
             gsap.utils.toArray<HTMLElement>("[data-rise]"),
-            { opacity: 0, y: 16 },
-            { opacity: 1, y: 0, duration: 1.6, ease: "power4.out", stagger: 0.14 },
-            Math.max(heroWords.length - 1, 0) * 0.04 + 0.14,
+            { ...blur, filter: "blur(6px)" },
+            { ...clear, stagger: 0.14 },
+            Math.max(heroWords.length - 1, 0) * 0.06 + 0.3,
           );
 
         // "Send a signal." resolves once as it comes into view: a blur tied to scroll would read as
         // a rendering fault, so this one reveal isn't scrubbed.
         const sayWords = gsap.utils.toArray<HTMLElement>(".say [data-head-word]");
         if (sayWords.length) {
-          gsap.fromTo(sayWords, blur, {
+          gsap.fromTo(sayWords, { ...blur, y: 16, filter: "blur(12px)" }, {
             ...clear,
-            stagger: 0.1,
-            scrollTrigger: { trigger: sayWords[0], start: "top 85%", once: true },
+            duration: 2,
+            stagger: 0.14,
+            scrollTrigger: { trigger: sayWords[0], start: "top 80%", once: true },
           });
         }
 
@@ -80,10 +81,12 @@ export default function Motion({ children }: { children: React.ReactNode }) {
           if (!statement) return;
           const own = gsap.utils.toArray<HTMLElement>("[data-word]", statement);
           words.push(...own);
-          // One trigger per statement, writing each word's opacity: cheaper than a tween per word.
+          // One trigger per statement, writing each word's opacity and blur: cheaper than a tween per word.
           const paint = (progress: number) =>
             own.forEach((word, i) => {
-              word.style.opacity = String(wordOpacity(progress, i, own.length));
+              const opacity = wordOpacity(progress, i, own.length);
+              word.style.opacity = String(opacity);
+              word.style.filter = wordBlur(opacity);
             });
           const update = (self: ScrollTrigger) =>
             paint(readProgress(self.scroll(), self.start, self.end, ScrollTrigger.maxScroll(window)));
@@ -100,7 +103,10 @@ export default function Motion({ children }: { children: React.ReactNode }) {
           // Reduced motion has no runway, so nothing may settle.
           flight.camera.end = Number.POSITIVE_INFINITY;
           flight.camera.copy = 1;
-          words.forEach((word) => word.style.removeProperty("opacity"));
+          words.forEach((word) => {
+            word.style.removeProperty("opacity");
+            word.style.removeProperty("filter");
+          });
         };
       });
 
