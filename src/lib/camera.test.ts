@@ -5,6 +5,7 @@ import {
   addCameraTweens,
   bodyFrame,
   CAMERA_KEYS,
+  discIn,
   endFrame,
   planetAppear,
   planetDawn,
@@ -242,5 +243,18 @@ describe("CAMERA_KEYS", () => {
       }
     }
     tl.kill();
+  });
+});
+
+describe("discIn", () => {
+  const body = { C: [700, 1400] as Vec, R: 920, B: [700, 480] as Vec };
+  test("places the viewport's disc in a page box's own px", () => {
+    expect(discIn(body, { left: 0, top: 0, width: 1440, height: 960 }, 0)).toEqual({ x: 700, y: 1400, r: 920 });
+  });
+  test("follows the scroll, since the box scrolls with the page and the disc doesn't", () => {
+    expect(discIn(body, { left: 20, top: 100, width: 1440, height: 960 }, 300)).toEqual({ x: 680, y: 1600, r: 920 });
+  });
+  test("has no disc without a body", () => {
+    expect(discIn(null, { left: 0, top: 0, width: 1440, height: 960 }, 0).r).toBe(0);
   });
 });

@@ -70,6 +70,14 @@
       linear-gradient(90deg, rgb(168 184 214 / 0.065) 1px, transparent 1px);
     background-size: 64px 64px;
   }
+  /* The live planet draws behind the page, so the renderer cuts the hero's grid round its disc
+     (--disc-*, in the grid's px); the CSS sky's planet sits in front of it on its own. */
+  .grid-hero {
+    mask-image:
+      radial-gradient(circle at var(--disc-x, 0) var(--disc-y, 0), transparent calc(var(--disc-r, -40px) + 1px), #000 calc(var(--disc-r, -40px) + 20px)),
+      radial-gradient(ellipse 58% 60% at 50% 72%, #000 0%, rgb(0 0 0 / 0.5) 46%, transparent 78%);
+    mask-composite: intersect;
+  }
 
   /* Underlined text link: the rule brightens and the arrow nudges toward where it goes. */
   .line-link {
