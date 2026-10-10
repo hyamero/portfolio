@@ -90,11 +90,6 @@ export function stillFrame(
   return { body: { C: [cx, apex + R], R, B: [cx + dx, apex + R - Math.sqrt(R * R - dx * dx)] }, morph: 1 };
 }
 
-/** Each halo layer's reach past the edge (px), from board 09's (a share of R) to 02's, and the rays' strength (spec §5.3). */
-export function haloFrame(m: number, R: number) {
-  return { ring: geo(0.18 * R, 22, m), glow: geo(1.2 * R, 100, m), haze: geo(2.4 * R, 100, m), rays: 1 - ease(0, 0.5, m) };
-}
-
 /**
  * The sun's glare in px, a camera effect that doesn't scale with the zoom: 09's diamond at m 0, 02's
  * sun at m 1 (sky polish spec §4.4). The streaks' sizes are exponential decay lengths.

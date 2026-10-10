@@ -20,6 +20,8 @@ export default function Sky() {
     const canvas = canvasRef.current;
     const front = frontRef.current;
     if (!canvas || !front || !("gpu" in navigator)) return;
+    // The CSS diamond waits while the live sky may still take over (sky polish spec §6).
+    document.documentElement.dataset.sky = "pending";
     let cancelled = false;
     void import("./renderer").then(({ mountSky }) => {
       if (cancelled) return;
