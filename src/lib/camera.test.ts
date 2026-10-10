@@ -6,6 +6,7 @@ import {
   bodyFrame,
   CAMERA_KEYS,
   endFrame,
+  planetAppear,
   planetDawn,
   REST,
   settleFrame,
@@ -193,6 +194,14 @@ describe("planetDawn", () => {
   });
   test("lights one way", () => {
     for (let i = 1; i <= 50; i++) expect(planetDawn(i / 50)).toBeGreaterThanOrEqual(planetDawn((i - 1) / 50));
+  });
+});
+
+describe("planetAppear", () => {
+  test("fades the body in from nothing, done before the dawn is", () => {
+    expect(planetAppear(0)).toBe(0);
+    expect(planetAppear(0.85)).toBe(1);
+    for (let i = 1; i <= 50; i++) expect(planetAppear(i / 50)).toBeGreaterThanOrEqual(planetAppear((i - 1) / 50));
   });
 });
 

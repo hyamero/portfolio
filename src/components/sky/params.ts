@@ -1,4 +1,4 @@
-import { planetDawn, type Body } from "@/lib/camera";
+import { planetAppear, planetDawn, type Body } from "@/lib/camera";
 import { pulseAge } from "@/lib/signal";
 import { clamp, type Rect } from "@/lib/sky-math";
 
@@ -68,7 +68,7 @@ const rect = (r: Rect) => [r.left, r.top, r.width, r.height] as const;
 /** The sky's uniforms for one frame (spec §3.3), and what the front canvas is drawn from. */
 export function skyParams(s: SkyInput) {
   const body = s.body ?? NO_BODY;
-  const vis = s.body ? 1 : 0;
+  const vis = s.body ? planetAppear(s.intro) : 0;
   const age = pulseAge(s.now, s.signal.at);
   const dawn = planetDawn(s.intro);
   const params = {
