@@ -183,11 +183,13 @@ export struct StarFrame {
   quiet: f32,
   // The band-space rect the Milky Way cache covers: origin, size.
   map: vec4f,
+  // The band's drift down band space (2.5% of the virtual scroll, held inside the cache).
+  drift: f32,
 }
 
 // The sky behind everything, in linear light: the background, the cached Milky Way and four depths of stars.
 export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampler) -> vec3f {
-  let mwOff = vec2f(0.0, f.scroll * 0.025) + f.par * 0.3;
+  let mwOff = vec2f(0.0, f.drift) + f.par * 0.3;
   let band = textureSampleLevel(cache, samp, (css + mwOff - f.map.xy) / f.map.zw, 0.0).rgb;
   // The cursor's light lifts the band's dust like a lamp in fog; text dims both.
   var col = (band * 0.004 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);

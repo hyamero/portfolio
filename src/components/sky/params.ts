@@ -1,6 +1,6 @@
 import { beadFlash, beadOpen, sunFrame, type Body } from "@/lib/eclipse";
 import { pulseAge } from "@/lib/signal";
-import type { Rect } from "@/lib/sky-math";
+import { clamp, type Rect } from "@/lib/sky-math";
 
 /** The band-space rect the Milky Way cache covers (spec §3.5): origin and size, CSS px. */
 export type BandMap = { origin: readonly [number, number]; size: readonly [number, number] };
@@ -94,6 +94,9 @@ export function skyParams(s: SkyInput) {
     textC: rect(s.text.contact),
     textK: [s.copy, 1, 1, 0],
     band: [...s.band.origin, ...s.band.size],
+    // The coast's offset grows with every scroll, so the band stops drifting at its cache's edge
+    // rather than smear the edge across the sky. At 2.5% of the scroll the stop can't be seen.
+    bandDrift: clamp(DRIFT * s.starScroll, s.band.origin[1] + 8, s.band.origin[1] + s.band.size[1] - s.H - 8),
   };
   // The front canvas holds still on screen, so it reads the body in viewport px and ignores the scroll.
   const lit = s.light.hover > 0;

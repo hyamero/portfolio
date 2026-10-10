@@ -87,6 +87,20 @@ describe("skyParams", () => {
   });
 });
 
+describe("bandDrift", () => {
+  test("follows 2.5% of the stars' virtual scroll", () => {
+    expect(skyParams(input({ starScroll: 3000 })).params.bandDrift).toBeCloseTo(75, 9);
+  });
+  test("keeps the band inside its cache however far the coast wanders", () => {
+    const band = bandExtent(1440, 900, 6000);
+    for (const starScroll of [-1e6, -5000, 0, 3000, 9000, 1e6]) {
+      const drift = skyParams(input({ starScroll, band })).params.bandDrift;
+      expect(drift - 8).toBeGreaterThanOrEqual(band.origin[1]);
+      expect(drift + 900 + 8).toBeLessThanOrEqual(band.origin[1] + band.size[1]);
+    }
+  });
+});
+
 describe("frontKey", () => {
   test("ignores the scroll while the body holds still on screen", () => {
     const a = skyParams(input({ scroll: 5000, frontOn: true })).frontKey;
