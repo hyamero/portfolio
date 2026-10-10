@@ -1,4 +1,4 @@
-// The sun and the lens (spec §4.4, Appendix A.5), in linear light.
+// The sun (spec §4.4, Appendix A.5), in linear light.
 
 // The sun's glare, one glare from 09's diamond (m 0) to 02's sun on the horizon (m 1). g: px from the
 // sun; d: the pixel's height above the limb; size: sunFrame's core radius, glare radius, and
@@ -25,22 +25,4 @@ export fn sunGlare(g: vec2f, m: f32, d: f32, size: vec4f) -> vec3f {
 // The sun's slow pulse: 09's diamond breathing over 5.2 s, crossfading into 02's 6 s glint.
 export fn sunPulse(t: f32, m: f32) -> f32 {
   return mix(0.91 - 0.09 * cos(t * 6.2831853 / 5.2), 0.89 - 0.11 * cos(t * 6.2831853 / 6.0), m);
-}
-
-fn ghost(p: vec2f, c: vec2f, r: f32, tint: vec3f) -> vec3f {
-  let d = length(p - c);
-  let disc = 1.0 - smoothstep(r * 0.8, r, d);
-  let e = d - r * 0.9;
-  return tint * (0.010 * disc + 0.016 * exp(-(e * e) / (r * 0.06 + 0.8)));
-}
-
-// Lens ghosts on the line from the sun through the aim point: moving the aim swings them.
-export fn ghosts(p: vec2f, sun: vec2f, aim: vec2f) -> vec3f {
-  let axis = aim - sun;
-  var c = ghost(p, sun + axis * 0.3, 9.0, vec3f(0.55, 0.85, 1.0));
-  c += ghost(p, sun + axis * 0.58, 24.0, vec3f(0.75, 0.62, 1.0));
-  c += ghost(p, sun + axis * 0.86, 6.0, vec3f(1.0, 0.82, 0.58));
-  c += ghost(p, sun + axis * 1.22, 40.0, vec3f(0.5, 0.92, 0.82));
-  c += ghost(p, sun - axis * 0.24, 15.0, vec3f(0.85, 0.75, 1.0));
-  return c;
 }

@@ -1,5 +1,6 @@
 // The eclipse (spec §4.2, Appendix A.3), in linear light and the body's own frame, where the bead
 // sits at the upper left. q is CSS px from the moon's centre.
+import { overBg } from "./light.wgsl";
 import { fbm } from "./noise.wgsl";
 
 export fn angDiff(a: f32, b: f32) -> f32 {
@@ -13,23 +14,65 @@ export fn turn(v: vec2f, a: f32) -> vec2f {
   return vec2f(v.x * c + v.y * s, -v.x * s + v.y * c);
 }
 
-fn lobe(deg: f32, c: f32, w: f32) -> f32 {
-  var d = abs(deg - c);
-  d = min(d, 360.0 - d);
-  return exp(-(d * d) / (w * w));
+// From x0 to x1, clamped: board 09's layers are ported stop by stop from its CSS gradients.
+fn stop(x: f32, x0: f32, x1: f32) -> f32 {
+  return clamp((x - x0) / (x1 - x0), 0.0, 1.0);
 }
 
-// Board 09's seven streamers, wide at the base and narrowing outward like helmet streamers.
-fn streamers(deg: f32, x: f32) -> f32 {
-  let widen = 0.5 + 0.8 / x;
-  var s = 0.16 * lobe(deg, 8.0, 9.0 * widen);
-  s += 0.10 * lobe(deg, 61.0, 8.0 * widen);
-  s += 0.18 * lobe(deg, 104.0, 10.0 * widen);
-  s += 0.12 * lobe(deg, 172.0, 10.0 * widen);
-  s += 0.15 * lobe(deg, 246.0, 10.0 * widen);
-  s += 0.10 * lobe(deg, 292.0, 8.0 * widen);
-  s += 0.14 * lobe(deg, 340.0, 10.0 * widen);
-  return s / 0.18;
+// Board 09's outer haze, x past the limb as a share of its reach. Its colours add in display space.
+fn haze(x: f32) -> vec3f {
+  if (x < 0.179) {
+    let k = stop(x, 0.0, 0.179);
+    return mix(vec3f(37.0, 55.0, 115.0), vec3f(30.0, 46.0, 100.0), k) / 255.0 * mix(0.116, 0.08, k);
+  }
+  let k = stop(x, 0.179, 1.0);
+  return mix(vec3f(30.0, 46.0, 100.0), vec3f(12.0, 18.0, 40.0), k) / 255.0 * mix(0.08, 0.0, k);
+}
+
+// Board 09's inner glow.
+fn glow(x: f32) -> vec3f {
+  if (x < 0.0833) {
+    let k = stop(x, 0.0, 0.0833);
+    return mix(vec3f(214.0, 227.0, 255.0), vec3f(176.0, 200.0, 255.0), k) / 255.0 * mix(0.513, 0.24, k);
+  }
+  if (x < 0.303) {
+    let k = stop(x, 0.0833, 0.303);
+    return mix(vec3f(176.0, 200.0, 255.0), vec3f(130.0, 160.0, 236.0), k) / 255.0 * mix(0.24, 0.1, k);
+  }
+  if (x < 0.633) {
+    let k = stop(x, 0.303, 0.633);
+    return mix(vec3f(130.0, 160.0, 236.0), vec3f(96.0, 126.0, 214.0), k) / 255.0 * mix(0.1, 0.035, k);
+  }
+  return vec3f(96.0, 126.0, 214.0) / 255.0 * mix(0.035, 0.0, stop(x, 0.633, 1.0));
+}
+
+// Board 09's ring hugging the limb.
+fn ring(x: f32) -> vec3f {
+  if (x < 0.213) {
+    let k = stop(x, 0.0, 0.213);
+    return mix(vec3f(246.0, 249.0, 255.0), vec3f(214.0, 228.0, 255.0), k) / 255.0 * mix(0.9, 0.38, k);
+  }
+  if (x < 0.606) {
+    let k = stop(x, 0.213, 0.606);
+    return mix(vec3f(214.0, 228.0, 255.0), vec3f(201.0, 220.0, 255.0), k) / 255.0 * mix(0.38, 0.1, k);
+  }
+  return vec3f(201.0, 220.0, 255.0) / 255.0 * mix(0.1, 0.0, stop(x, 0.606, 1.0));
+}
+
+// One of board 09's streamers: up to its peak and back down, by CSS conic angle in degrees.
+fn ray(deg: f32, a0: f32, peak: f32, a1: f32) -> f32 {
+  return min(stop(deg, a0, peak), 1.0 - stop(deg, peak, a1));
+}
+
+// Board 09's seven streamers. Their angles run clockwise from 12 o'clock, as CSS conic angles do.
+fn rays(deg: f32) -> f32 {
+  var a = ray(deg, 0.0, 8.0, 18.0) * 0.16;
+  a = max(a, ray(deg, 52.0, 61.0, 70.0) * 0.1);
+  a = max(a, ray(deg, 95.0, 104.0, 116.0) * 0.18);
+  a = max(a, ray(deg, 160.0, 172.0, 182.0) * 0.12);
+  a = max(a, ray(deg, 236.0, 246.0, 258.0) * 0.15);
+  a = max(a, ray(deg, 284.0, 292.0, 301.0) * 0.1);
+  return max(a, ray(deg, 330.0, 340.0, 352.0) * 0.14);
 }
 
 // Board 09's conic angle (deg) and radius at q, undoing its streamers' scale(1.35, 0.92) rotate(−16deg).
@@ -44,29 +87,17 @@ fn boardFrame(q: vec2f) -> vec2f {
   return vec2f(deg, length(l));
 }
 
-// The corona. lean: the pointer's direction from the centre (xy) and its pull (z); quiet: the text mask.
-export fn corona(q: vec2f, R: f32, lean: vec3f, t: f32, quiet: f32) -> vec3f {
-  let r = length(q);
-  let x = max(r / R, 1.0);
-  let ang = atan2(q.x, -q.y);
-  let dp = angDiff(atan2(lean.x, -lean.y), ang);
-  // Farther out, features bend toward the pointer's side, as if it drew them.
-  let sa = ang + 0.2 * lean.z * (x - 1.0) * sin(dp) * exp(-(dp * dp) / 1.2);
-  let sdir = vec2f(sin(sa), -cos(sa));
-  let lx = log(x);
-  // Fine radial filaments, sampled round a circle so they have no seam, drifting very slowly.
-  let f1 = fbm(sdir * (58.0 + 2.4 * lx) + vec2f(t * 0.004, 0.0), 3, 91u);
-  let f2 = fbm(sdir * (17.0 + 1.5 * lx) + vec2f(0.0, t * 0.003), 3, 92u);
-  // Near the limb the glow smooths them.
-  let grain = 0.45 + 0.75 * smoothstep(1.0, 1.8, x);
-  let fine = clamp(1.0 + grain * (1.1 * (f1 - 0.5) + 0.6 * (f2 - 0.5)), 0.1, 1.8);
-  let b = boardFrame(sdir * r);
-  let env = 0.08 + 2.2 * streamers(b.x, max(b.y / R, 1.0));
-  let inner = pow(x, -20.0) + 0.1 * pow(x, -6.0);
-  let outer = 0.022 * pow(x, -2.6) * (1.0 - smoothstep(2.6, 4.0, x)) * (1.0 - 0.7 * quiet);
-  var I = inner * (0.85 + 0.15 * fine) + outer * env * fine;
-  I *= 1.0 + 0.45 * lean.z * exp(-(dp * dp) / 0.2);
-  return mix(vec3f(0.93, 0.96, 1.0), vec3f(0.58, 0.7, 1.0), smoothstep(1.02, 2.4, x)) * I;
+// The corona: board 09's ring, glow, haze and streamers, whose reaches are shares of R. quiet: the text mask.
+export fn corona(q: vec2f, R: f32, t: f32, quiet: f32) -> vec3f {
+  let d = max(length(q) - R, 0.0);
+  let haloReach = 2.4 * R;
+  let breathe = 0.93 - 0.07 * cos(t * 6.2831853 / 7.0);
+  let b = boardFrame(q);
+  let rx = (b.y - R) / haloReach;
+  let fade = select(1.0 - 0.55 * stop(rx, 0.0, 0.1775), 0.45 * (1.0 - stop(rx, 0.1775, 0.617)), rx > 0.1775);
+  let streamers = vec3f(201.0, 220.0, 255.0) / 255.0 * rays(b.x) * fade;
+  let c = ring(d / (0.18 * R)) + (glow(d / (1.2 * R)) * breathe + haze(d / haloReach) + streamers) * (1.0 - 0.7 * quiet);
+  return overBg(c);
 }
 
 // The moon's night side: earthshine on its maria, and a soft light from the bead's side (ub).
@@ -80,21 +111,16 @@ export fn moon(q: vec2f, R: f32, ub: vec2f) -> vec3f {
   return vec3f(0.55, 0.66, 1.0) * 0.003 * albedo * (0.4 + 0.6 * z) + vec3f(0.6, 0.7, 1.0) * 0.004 * toward * toward * toward;
 }
 
-// The chromosphere's pink arc by the bead, and Baily's beads: sunlight through the valleys of the
-// moon's rough limb. open > 0 lets light through; the intro raises it until they close into the diamond.
+// Baily's beads: sunlight through the valleys of the moon's rough limb by the bead (ub). open > 0 lets
+// light through; the intro raises it until they close into the diamond.
 export fn limbLight(q: vec2f, R: f32, ub: vec2f, open: f32) -> vec3f {
   let d = length(q) - R;
   let ang = atan2(q.x, -q.y);
   let db = angDiff(ang, atan2(ub.x, -ub.y));
-  let ch = exp(-(db * db) / 0.13);
-  let th = 0.7 + 2.4 * ch;
-  let hc = (d - 0.5 * th) / (0.5 * th + 0.35);
-  var c = vec3f(1.0, 0.24, 0.38) * 0.9 * ch * exp(-hc * hc);
   let profile = fbm(vec2f(ang * 24.0, 0.37), 3, 71u);
   let gap = (0.5 - profile) * 2.4 - abs(db) * 4.2 + open;
   let e = d - 0.5;
-  c += vec3f(1.0, 0.97, 0.94) * smoothstep(0.0, 0.2, gap) * (3.0 * exp(-(e * e) / 1.1) + 0.35 * exp(-(e * e) / 9.0));
-  return c;
+  return vec3f(1.0, 0.97, 0.94) * smoothstep(0.0, 0.2, gap) * (3.0 * exp(-(e * e) / 1.1) + 0.35 * exp(-(e * e) / 9.0));
 }
 
 // A prominence: a ragged flame of hydrogen pink on the limb, deg anticlockwise from the bead.

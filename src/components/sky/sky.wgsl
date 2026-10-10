@@ -1,8 +1,8 @@
 // The page's one sky, in page space and linear light (sky polish spec §3): the star field and the
-// Milky Way, the body the camera flies from board 09's eclipse to board 02's horizon, the sun and
-// its lens, and the trail. Lengths are CSS px; y grows down the page.
+// Milky Way, the body the camera flies from board 09's eclipse to board 02's horizon, the sun, and
+// the trail. Lengths are CSS px; y grows down the page.
 import { Body, bodyLight } from "./wgsl/body.wgsl";
-import { ghosts, sunGlare, sunPulse } from "./wgsl/lens.wgsl";
+import { sunGlare, sunPulse } from "./wgsl/lens.wgsl";
 import { encode, grain, LUMA, shoulder, textMask } from "./wgsl/light.wgsl";
 import { skyField, StarFrame } from "./wgsl/stars.wgsl";
 import { gather, nebula, ribbon, shed, Trail } from "./wgsl/trail.wgsl";
@@ -42,7 +42,7 @@ struct Params {
   // A hovered or focused Contact link's lift on the sun, 0..1.
   lift: f32,
   // The signal's pulse: age (s, < 0 for none), and travel (0 under reduced motion, which also stops
-  // the cursor's light, the aim and the corona's lean).
+  // the cursor's light).
   pulse: vec2f,
   // Page rects of the hero statement, Work's list and Contact's block (w 0 for none), and their strengths.
   textA: vec4f,
@@ -86,7 +86,7 @@ struct Params {
 
   let gathered = params.trail.z;
   let b = Body(params.body.xy, params.body.z, vis, B, m, params.beads, W, params.dpr, t, params.hover, params.light,
-               motion, params.settle, params.pulse.x, params.pulse.y, 1.0 + 0.25 * gathered * smoothstep(0.6, 1.0, gathered));
+               params.settle, params.pulse.x, params.pulse.y, 1.0 + 0.25 * gathered * smoothstep(0.6, 1.0, gathered));
   let bl = bodyLight(page, b, pl, quiet);
   // Where the corona or the air is bright, the stars wash out.
   let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
@@ -100,24 +100,13 @@ struct Params {
   col = mix(col, bl.night, bl.inside);
   col += bl.limb + shed(page, bl.d, tr) + gather(page, bl.d, tr);
 
-  // The sun brightens for a hovered link, flashes as a signal leaves, and flares near the pointer.
-  let near = params.hover * (1.0 - smoothstep(24.0, 180.0, length(params.light - B)));
-  var k = params.sun.w * sunPulse(t, m) * (1.0 + 0.6 * params.lift) * (1.0 + 0.7 * near) * vis;
+  // The sun brightens for a hovered link and flashes as a signal leaves.
+  var k = params.sun.w * sunPulse(t, m) * (1.0 + 0.6 * params.lift) * vis;
   if (params.pulse.x >= 0.0) {
     k *= 1.0 + 1.2 * exp(-5.0 * params.pulse.x);
   }
   if (k > 0.001 && length(page - B) < max(700.0, 4.0 * params.glare.z)) {
     col += sunGlare(page - B, m, bl.d, params.glare) * k;
-  }
-  // Lens ghosts, on the line from the sun through the frame's centre while the stars move, or
-  // through the pointer as it aims. The ground hides them, and the front pass never draws them.
-  if (!front) {
-    let aim = params.hover * motion * (1.0 - smoothstep(0.35 * W, 0.8 * W, length(params.light - B)));
-    let gk = k * (0.9 * smoothstep(100.0, 1400.0, abs(params.velocity)) + 0.6 * aim) * mix(1.0, smoothstep(-1.5, 1.5, bl.d), m);
-    if (gk > 0.001) {
-      let view = vec2f(W * 0.5, params.scroll + params.viewHeight * 0.5);
-      col += ghosts(page, B, mix(view, params.light, params.hover)) * gk;
-    }
   }
 
   let encoded = encode(shoulder(max(col, vec3f(0.0))));
