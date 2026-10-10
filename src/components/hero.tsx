@@ -15,7 +15,7 @@ export default function Hero() {
   return (
     <section id="home" data-sky-anchor="hero" className="relative overflow-hidden">
       {/* Clips the CSS sky's planet at the hero's foot, so it never reaches the runway's horizon. */}
-      <div className="relative flex min-h-[880px] flex-col overflow-hidden pt-[120px] md:min-h-[960px]">
+      <div className="relative flex min-h-[880px] flex-col overflow-hidden pt-[clamp(120px,calc(31svh-20px),280px)] md:min-h-[960px]">
         <div
           aria-hidden="true"
           className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_0] mask-[radial-gradient(ellipse_58%_60%_at_50%_72%,#000_0%,rgb(0_0_0/0.5)_46%,transparent_78%)]"
