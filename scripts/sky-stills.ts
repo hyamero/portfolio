@@ -32,10 +32,10 @@ async function render(still: Still) {
     dpr: still.dpr,
     W: still.W,
     time: still.time,
-    beads: still.beads,
+    dawn: still.dawn,
+    light: still.light,
     body: [...still.body, 1],
     sun: still.sun,
-    glare: still.glare,
   };
   effect(gpu, stillsShader, { set: { params } }).draw(out);
   const px = await out.color.readFloats({ mipLevel: 0, region: "all" });

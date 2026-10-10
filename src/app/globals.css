@@ -42,11 +42,6 @@
     background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
     box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
   }
-  /* The header's mark: board 09's eclipse in miniature. */
-  .eclipse-mark {
-    background: #05060a;
-    box-shadow: 0 0 0 1px rgb(240 246 255 / 0.92), 0 0 7px 1px rgb(201 220 255 / 0.55);
-  }
   /* The statement's full stop: a small bead that breathes. */
   .full-stop {
     display: inline-block;
@@ -168,17 +163,10 @@
   [data-rise], [data-head-word] { opacity: 0; }
 }
 
-/* The statement's full stop breathes; the CSS diamond pulses (fallback.tsx). */
+/* The statement's full stop breathes. */
 @keyframes breathe {
   0%, 100% { opacity: 0.86; }
   50% { opacity: 1; }
-}
-@keyframes bead {
-  0%, 100% { opacity: 0.82; transform: scale(0.92); }
-  50% { opacity: 1; transform: scale(1.04); }
-}
-@utility animate-bead {
-  animation: bead 5.2s ease-in-out infinite;
 }
 
 /* The vgpu sky paints over all of this once it's live (see sky.tsx). */
@@ -186,30 +174,30 @@
   visibility: hidden;
 }
 
-/* The CSS diamond (fallback.tsx, sky polish spec §6) plays only on the CSS sky. While the live sky is
-   pending it waits, unseen, inside its 1.6 s delay. */
-@keyframes diamond-in {
+/* The CSS planet's dawn (fallback.tsx) plays only on the CSS sky, as the live sky's intro does. While
+   the live sky is pending it waits, unseen, inside its delay. */
+@keyframes dawn-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.css-diamond {
-  animation: diamond-in 0.8s ease-out 1.6s both;
+.css-dawn {
+  animation: dawn-in 2s ease-out 0.6s both;
 }
-html:not([data-sky="css"]) .css-diamond {
+html:not([data-sky="css"]) .css-dawn {
   animation-play-state: paused;
 }
 @media (prefers-reduced-motion: reduce) {
-  .css-diamond { animation: none; }
-  html:not([data-sky="css"]) .css-diamond { visibility: hidden; }
+  .css-dawn { animation: none; }
+  html:not([data-sky="css"]) .css-dawn { visibility: hidden; }
 }
 
 /* The CSS horizon (fallback.tsx), sized from src/lib/stills.ts: keep them in step. Below 864 px the
    390 still stretches across with its heights pinned; from 864 px the 1440 still scales with the
-   width. The ground is an ellipse of radii 25/6 × the still's modelled width, matching its limb. Each
+   width. The ground is an ellipse of radii 2.2 × the still's modelled width, matching its limb. Each
    media query loads only its own still. */
 .horizon-ground {
-  width: 833.3333%;
-  height: 3250px;
+  width: 440%;
+  height: 1716px;
 }
 .horizon-still {
   height: 232px;
@@ -238,7 +226,6 @@ html:not([data-sky="css"]) .css-diamond {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-bead,
   .full-stop {
     animation: none;
   }

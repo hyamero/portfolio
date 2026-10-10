@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 
-import { endFrame } from "@/lib/eclipse";
+import { endFrame } from "@/lib/camera";
 import { EMPTY_RECT } from "@/lib/flight";
 import type { Rect } from "@/lib/sky-math";
 
@@ -25,6 +25,7 @@ const input = (over: Partial<SkyInput> = {}): SkyInput => ({
   time: 0,
   body: endFrame(1440, 900),
   morph: 1,
+  foot: null,
   settle: 0,
   intro: 1,
   trail: { shed: 0, carry: 0, gather: 0 },
@@ -60,12 +61,13 @@ describe("skyParams", () => {
     expect(skyParams(input({ intro: 0 })).params.body[3]).toBe(1);
     expect(skyParams(input({ body: null })).params.body[3]).toBe(0);
   });
-  test("the intro closes the beads and lights the diamond", () => {
-    const start = skyParams(input({ intro: 0 })).params;
-    expect(start.beads).toBe(-2);
-    expect(start.sun[3]).toBeCloseTo(0, 6);
-    const end = skyParams(input({ intro: 1 })).params;
-    expect(end.beads).toBeCloseTo(0.12, 9);
+  test("the intro lights the planet", () => {
+    expect(skyParams(input({ intro: 0 })).params.dawn).toBe(0);
+    expect(skyParams(input({ intro: 1 })).params.dawn).toBe(1);
+  });
+  test("the body's foot passes through, or sits past any page", () => {
+    expect(skyParams(input({ foot: 960 })).params.foot).toBe(960);
+    expect(skyParams(input()).params.foot).toBeGreaterThan(1e8);
   });
   test("the body moves to page space with the scroll", () => {
     const e = endFrame(1440, 900);

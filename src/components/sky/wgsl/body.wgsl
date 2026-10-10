@@ -1,17 +1,17 @@
-// The body (spec §4.2–4.3): board 09's eclipse, which the camera flies into until it's board 02's
+// The body (spec §4.2–4.3): the hero's planet, which the camera flies down to until it's the resting
 // horizon. Shared by sky.wgsl and stills.wgsl, so the CSS sky's stills can't drift from the live sky.
-import { atmosphere, bandBloom, groundNight } from "./air.wgsl";
-import { corona, limbLight, moon, prom, turn } from "./corona.wgsl";
+import { horizonLight } from "./air.wgsl";
+import { planetLight } from "./planet.wgsl";
 
 // One frame of the body. Positions share the caller's space.
 export struct Body {
   C: vec2f,
   R: f32,
   vis: f32,
-  // The bead, which becomes the sun; morph, 0 eclipse .. 1 horizon; how far Baily's beads are open.
+  // The sun; morph, 0 planet .. 1 horizon; how far the intro has lit the planet.
   B: vec2f,
   m: f32,
-  beads: f32,
+  dawn: f32,
   W: f32,
   dpr: f32,
   time: f32,
@@ -22,26 +22,25 @@ export struct Body {
   // The signal's pulse: its age (s, < 0 for none) and travel.
   age: f32,
   travel: f32,
-  // The rim's brightening as the trail gathers into it.
+  // The rim's brightening as the trail gathers into it and a Contact link lifts it.
   arrive: f32,
 }
 
 // What the body adds at p.
 export struct BodyLight {
-  // The corona and the air: light in front of the sky, which washes the stars out.
+  // The planet's halo and the air: light in front of the sky, which washes the stars out.
   front: vec3f,
-  // The moon's or the ground's own colour, and how much of p it covers.
+  // The planet's or the ground's own colour, and how much of p it covers.
   night: vec3f,
   inside: f32,
-  // Baily's beads and the prominences, over everything.
-  limb: vec3f,
   // p's height above the limb, px.
   d: f32,
 }
 
-// pl: the cursor's light at p; quiet: the text mask at p.
-export fn bodyLight(p: vec2f, b: Body, pl: f32, quiet: f32) -> BodyLight {
-  var out = BodyLight(vec3f(0.0), vec3f(0.0), 0.0, vec3f(0.0), 1e6);
+// hush: the hero copy's soft mask at p, which dims the planet's halo; quiet: the text mask, which dims
+// the horizon's air.
+export fn bodyLight(p: vec2f, b: Body, hush: f32, quiet: f32) -> BodyLight {
+  var out = BodyLight(vec3f(0.0), vec3f(0.0), 0.0, 1e6);
   if (b.vis <= 0.001) {
     return out;
   }
@@ -51,41 +50,32 @@ export fn bodyLight(p: vec2f, b: Body, pl: f32, quiet: f32) -> BodyLight {
   let dist = max(length(rel), 1e-4);
   let d = dist - R;
   out.d = d;
-  let ub = (b.B - b.C) / R;
-  let n = rel / dist;
-  let s = R * atan2(ub.x * n.y - ub.y * n.x, dot(ub, n));
-  // The body's own frame, turned so the bead sits where board 09 has it: its upper left.
-  let rest = vec2f(-0.70710678, -0.70710678);
-  let spin = atan2(ub.x * rest.y - ub.y * rest.x, dot(ub, rest));
-  let q = turn(rel, -spin);
-  let hsc = max(b.W / 1440.0, 0.6);
-  // The corona folds onto the limb as the camera nears: drawn as if the moon's radius were Rc, from
-  // R down to ~60 px, keeping each pixel's height above the limb. It turns the air's blue and fades.
-  let fadeC = (1.0 - m) * (1.0 - m) * (1.0 - m);
-  let Rc = R * pow(60.0 / R, sqrt(m));
-  if (fadeC > 0.001 && d > -2.0 && d < 2.4 * Rc) {
-    out.front += corona(q / dist * (Rc + max(d, 0.0)), Rc, b.time, quiet) * mix(vec3f(1.0), vec3f(0.55, 0.7, 1.0), m) * fadeC;
-  }
-  let airK = smoothstep(0.2, 0.95, m);
-  if (airK > 0.001 && d > -2.0 && d < 420.0 * hsc) {
-    // Once the horizon rests, the lit stretch leans toward the cursor.
-    let sl = s - 0.5 * b.hover * b.settle * (b.light.x - b.B.x);
-    let air = atmosphere(max(d, 0.0) / hsc, s, sl, b.W, b.age, b.travel) * (1.0 + 0.9 * pl) * b.arrive;
-    out.front += (air + bandBloom(p, b.C - vec2f(0.0, R), b.B, hsc, d)) * airK;
-  }
   out.inside = (1.0 - smoothstep(-0.6, 0.6, d * b.dpr)) * b.vis;
-  out.front *= (1.0 - out.inside) * b.vis;
-  // Only where the body covers the pixel: the moon's noise is too costly to spend on the open sky.
-  if (out.inside > 0.0) {
-    out.night = groundNight(max(-d, 0.0) / hsc);
-    if (m < 1.0) {
-      out.night = mix(moon(q, R, rest), out.night, m);
-    }
+  // The planet gives way to the horizon as the camera nears. The intro lights its rim first, then its air.
+  let planetK = (1.0 - m) * (1.0 - m);
+  let horizonK = smoothstep(0.2, 0.95, m);
+  var face = vec3f(0.0);
+  if (m < 1.0 && d < 1.4 * R + 330.0) {
+    let lit = vec2f(smoothstep(0.0, 0.6, b.dawn), smoothstep(0.25, 1.0, b.dawn));
+    let pl = planetLight(p, b.C, R, b.light, b.time, b.W, max(0.7, 0.8 / b.dpr), lit, hush);
+    out.front += pl.halo * planetK;
+    face = pl.face;
   }
-  let feature = (1.0 - smoothstep(0.0, 0.35, m)) * b.vis;
-  if (feature > 0.001 && abs(d) < 40.0) {
-    let flames = prom(q, R, rest, 65.0, 7.5, 9.5, 3u, b.time) + prom(q, R, rest, -167.0, 5.5, 7.0, 5u, b.time);
-    out.limb = (limbLight(q, R, rest, b.beads) + flames * (1.0 - out.inside)) * feature;
+  var ground = vec3f(0.0);
+  if (m > 0.0 && d < 560.0) {
+    let ub = (b.B - b.C) / R;
+    let n = rel / dist;
+    let s = R * atan2(ub.x * n.y - ub.y * n.x, dot(ub, n));
+    // Once the horizon rests, its lit lobe leans toward the cursor.
+    let lobe = mix(b.B.x, b.light.x, b.hover * b.settle);
+    // Heights scale with the width from 1440 down to 864 px, then hold, as the CSS sky's stills do.
+    let hl = horizonLight(p, d / max(b.W / 1440.0, 0.6), b.C.x, lobe, b.W, b.time, s, b.arrive, b.age, b.travel, quiet);
+    out.front += hl.air * horizonK;
+    ground = hl.ground;
+  }
+  out.front *= (1.0 - out.inside) * b.vis;
+  if (out.inside > 0.0) {
+    out.night = mix(ground, face, planetK);
   }
   return out;
 }

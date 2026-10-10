@@ -1,4 +1,4 @@
-import { beadFlash, beadOpen, sunFrame, type Body } from "@/lib/eclipse";
+import { planetDawn, type Body } from "@/lib/camera";
 import { pulseAge } from "@/lib/signal";
 import { clamp, type Rect } from "@/lib/sky-math";
 
@@ -26,9 +26,12 @@ export type SkyInput = {
   now: number;
   /** s; it advances only while something ambient runs. */
   time: number;
-  /** The body, or null on a page without an eclipse box. */
+  /** The body, or null on a page without a planet box. */
   body: Body | null;
   morph: number;
+  /** Page y where the body ends, fading out over the 200 px above: the hero's foot while the
+   * reduced-motion sky shows the planet in it; null for none. */
+  foot: number | null;
   settle: number;
   intro: number;
   trail: { shed: number; carry: number; gather: number };
@@ -46,6 +49,8 @@ export type SkyInput = {
 };
 
 const NO_BODY: Body = { C: [0, -1e5], R: 1, B: [0, -1e5] };
+// A foot no page reaches; WGSL has no infinity to pass.
+const NO_FOOT = 1e9;
 // The Milky Way drifts at 2.5% of the virtual scroll; the coast's offset can wander ~2000 px past the page's ends.
 const DRIFT = 0.025;
 const COAST_MARGIN = DRIFT * 2000;
@@ -64,10 +69,8 @@ const rect = (r: Rect) => [r.left, r.top, r.width, r.height] as const;
 export function skyParams(s: SkyInput) {
   const body = s.body ?? NO_BODY;
   const vis = s.body ? 1 : 0;
-  const glare = sunFrame(s.morph, s.W);
   const age = pulseAge(s.now, s.signal.at);
-  const flash = beadFlash(s.intro);
-  const beads = beadOpen(s.intro);
+  const dawn = planetDawn(s.intro);
   const params = {
     resolution: s.resolution,
     light: [s.light.x, s.light.y],
@@ -80,13 +83,13 @@ export function skyParams(s: SkyInput) {
     origin: 0,
     viewHeight: s.H,
     body: [body.C[0], body.C[1] + s.scroll, body.R, vis],
-    sun: [body.B[0], body.B[1] + s.scroll, s.morph, flash],
-    glare: [glare.core, glare.glare, glare.streakH, glare.streakV],
+    sun: [body.B[0], body.B[1] + s.scroll, s.morph],
+    foot: s.foot ?? NO_FOOT,
     settle: s.settle,
     span: s.span,
     trail: [s.trail.shed, s.trail.carry, s.trail.gather, s.starScroll],
     velocity: s.reduced ? 0 : s.velocity + s.coast,
-    beads,
+    dawn,
     lift: s.signal.lift,
     pulse: [age, s.reduced ? 0 : 1],
     textA: rect(s.text.hero),
@@ -101,7 +104,7 @@ export function skyParams(s: SkyInput) {
   // The front canvas holds still on screen, so it reads the body in viewport px and ignores the scroll.
   const lit = s.light.hover > 0;
   const frontKey = [
-    s.frontOn ? 1 : 0, body.C[0], body.C[1], body.R, body.B[0], body.B[1], s.morph, vis, flash, beads, s.settle,
+    s.frontOn ? 1 : 0, body.C[0], body.C[1], body.R, body.B[0], body.B[1], s.morph, vis, dawn, s.settle,
     s.light.hover, lit ? s.light.x : 0, lit ? s.light.y - s.scroll : 0, s.time, s.W, s.H, s.frontTop, s.signal.lift, age,
   ];
   return { params, frontKey };

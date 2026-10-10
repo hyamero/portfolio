@@ -28,7 +28,7 @@ export function createFlight() {
      * the scroll position where the runway ends, written on refresh; until then nothing settles.
      * `copy` is how much of the hero copy still shows, 1 → 0 as it lifts away; the sky's text mask follows it.
      */
-    eclipse: { zoom: 0, pan: 0, level: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 },
+    camera: { zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 },
     /**
      * Contact's signal (sky polish spec §5.6): a hovered or focused link's lift on the sun, easing
      * toward `target`, and the last click's time in ms on the tick's clock.

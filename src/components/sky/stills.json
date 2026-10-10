@@ -1,26 +1,26 @@
 {
-  "hash": "c1b505b9d91f974887ff0b8b477d3fdc0d281b93335ff110cca656d104b3ea73",
+  "hash": "f21eaf81dcce70fc01325652f5624123a5be41a5b37f4133daa5510a01b71516",
   "stills": {
-    "eclipse.avif": {
+    "planet.avif": {
       "size": [
-        2048,
-        2048
+        2560,
+        1536
       ],
-      "bytes": 9108
+      "bytes": 16074
     },
     "horizon-1440.avif": {
       "size": [
         2880,
         768
       ],
-      "bytes": 6131
+      "bytes": 5066
     },
     "horizon-390.avif": {
       "size": [
         780,
         464
       ],
-      "bytes": 2561
+      "bytes": 1901
     }
   }
 }

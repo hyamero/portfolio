@@ -3,9 +3,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { resolveShader } from "@vgpu/wgsl/runtime";
 
-import { endFrame, PHI0, sunFrame } from "@/lib/eclipse";
-import { BG, encode, GROUND, shoulder, type Rgb } from "@/lib/light";
-import { NARROW, WIDE } from "@/lib/stills";
+import { endFrame, startFrame } from "@/lib/camera";
+import { BG, CORE, encode, GROUND, shoulder, type Rgb } from "@/lib/light";
+import { NARROW, PLANET, WIDE } from "@/lib/stills";
 
 /*
  * What the CSS sky's stills are rendered from (sky polish spec §7.1), shared by the stills script
@@ -27,35 +27,39 @@ export type Still = {
   /** The layout width the frame models. */
   W: number;
   time: number;
-  /** C.x, C.y, R, then B.x, B.y, morph and the diamond's strength, in the still's CSS px. */
+  /** C.x, C.y, R, then B.x, B.y and morph, in the still's CSS px. */
   body: readonly [number, number, number];
-  sun: readonly [number, number, number, number];
-  /** sunFrame's core, glare and streak decays: part of the hash, so retuning them re-renders. */
-  glare: readonly [number, number, number, number];
-  beads: number;
-  /** What the CSS puts under the still where the body covers it: the black moon disc, or the ground. */
-  interior: "moon" | "ground";
+  sun: readonly [number, number, number];
+  /** How far the planet is lit, and the light it faces, in the still's CSS px. */
+  dawn: number;
+  light: readonly [number, number];
+  /** What the CSS puts under the still where the body covers it: the planet's core, or the ground. */
+  interior: "planet" | "ground";
 };
 
-function eclipse(): Omit<Still, "glare"> {
-  const C = 1024;
-  const R = 256;
+function planet(): Still {
+  // The hero's planet at 1440, where its radius is 0.64 W, rendered at PLANET.R px.
+  const R = 0.64 * 1440;
+  const dpr = PLANET.R / R;
+  const start = startFrame({ left: 0, top: 0.4 * R, width: 2 * R, height: 2 * R }, 0);
+  // The resting light (restingLight) as it sits from the planet at 1440 × 900: 0.42 W across, a
+  // quarter of the hero's 1860 px over its top, with the planet 0.62 W across and its apex at 563.
+  const light = [start.C[0] + 0.42 * 1440 - 0.62 * 1440, start.C[1] - 0.25 * 1860 - (563 + R)] as const;
   return {
-    file: "eclipse.avif",
-    size: [2048, 2048],
-    dpr: 1,
+    file: PLANET.src.slice("/sky/".length),
+    size: PLANET.size,
+    dpr,
     W: 1440,
-    // A quarter of the diamond's 5.2 s breath: the pulse at its mean.
-    time: 1.3,
-    body: [C, C, R],
-    sun: [C + R * Math.cos(PHI0), C - R * Math.sin(PHI0), 0, 0],
-    // Totality: the beads shut, no diamond (spec §6).
-    beads: -2,
-    interior: "moon",
+    time: 0,
+    body: [start.C[0], start.C[1], R],
+    sun: [start.B[0], start.B[1], 0],
+    light,
+    dawn: 1,
+    interior: "planet",
   };
 }
 
-function horizon(still: typeof WIDE | typeof NARROW): Omit<Still, "glare"> {
+function horizon(still: typeof WIDE | typeof NARROW): Still {
   // The hold frame with its apex `above` px from the top.
   const e = endFrame(still.W, still.above / 0.64);
   return {
@@ -66,18 +70,15 @@ function horizon(still: typeof WIDE | typeof NARROW): Omit<Still, "glare"> {
     // A quarter of the sun's 6 s glint: the pulse at its mean.
     time: 1.5,
     body: [e.C[0], e.C[1], e.R],
-    sun: [e.B[0], e.B[1], 1, 1],
-    beads: 0.12,
+    sun: [e.B[0], e.B[1], 1],
+    // Only the planet faces the light; without a pointer the horizon's lobe sits on the sun.
+    light: [e.B[0], e.B[1] - 400],
+    dawn: 1,
     interior: "ground",
   };
 }
 
-const withGlare = (still: Omit<Still, "glare">): Still => {
-  const g = sunFrame(still.sun[2], still.W);
-  return { ...still, glare: [g.core, g.glare, g.streakH, g.streakV] };
-};
-
-export const STILLS: readonly Still[] = [eclipse(), horizon(WIDE), horizon(NARROW)].map(withGlare);
+export const STILLS: readonly Still[] = [planet(), horizon(WIDE), horizon(NARROW)];
 
 /** Every file the stills are rendered from, relative to the repo. */
 export async function stillsFiles() {
@@ -106,4 +107,4 @@ export function screenInverse(col: Rgb, inside: number, interior: Rgb): Rgb {
   return [0, 1, 2].map((i) => unit((want[i] - under[i]) / (1 - under[i]))) as unknown as Rgb;
 }
 
-export const INTERIOR: Record<Still["interior"], Rgb> = { moon: [0, 0, 0], ground: GROUND };
+export const INTERIOR: Record<Still["interior"], Rgb> = { planet: CORE, ground: GROUND };

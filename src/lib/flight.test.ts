@@ -12,8 +12,8 @@ const fresh = () => {
 };
 
 describe("flight", () => {
-  test("the hero's camera starts on board 09, with no runway end yet", () => {
-    expect(createFlight().eclipse).toEqual({ zoom: 0, pan: 0, level: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 });
+  test("the hero's camera starts on the planet, with no runway end yet", () => {
+    expect(createFlight().camera).toEqual({ zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 });
   });
   test("the signal starts unlit, with no pulse", () => {
     expect(createFlight().signal).toEqual({ lift: 0, target: 0, at: Number.NEGATIVE_INFINITY });
