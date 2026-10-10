@@ -119,7 +119,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           foot,
           settle,
           intro,
-          trail: trailFrame(settle, up, reduced, work.height > 0),
+          trail: trailFrame(cam.zoom, settle, up, reduced, work.height > 0),
           span: [work.top, contact.height ? contact.top : work.top + work.height],
           text,
           copy: cam.copy,
