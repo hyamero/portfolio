@@ -80,7 +80,13 @@ export fn bodyLight(p: vec2f, b: Body, pl: f32, quiet: f32) -> BodyLight {
   }
   out.inside = (1.0 - smoothstep(-0.6, 0.6, d * b.dpr)) * b.vis;
   out.front *= (1.0 - out.inside) * b.vis;
-  out.night = mix(moon(q, R, rest), groundNight(max(-d, 0.0) / hsc), m);
+  // Only where the body covers the pixel: the moon's noise is too costly to spend on the open sky.
+  if (out.inside > 0.0) {
+    out.night = groundNight(max(-d, 0.0) / hsc);
+    if (m < 1.0) {
+      out.night = mix(moon(q, R, rest), out.night, m);
+    }
+  }
   let feature = (1.0 - smoothstep(0.0, 0.35, m)) * b.vis;
   if (feature > 0.001 && abs(d) < 40.0) {
     let flames = prom(q, R, rest, 65.0, 7.5, 9.5, 3u, b.time) + prom(q, R, rest, -167.0, 5.5, 7.0, 5u, b.time);
