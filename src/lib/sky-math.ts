@@ -66,7 +66,7 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
 export function trailFrame(fall: number, dep: number, up: number, reduced: boolean, hasWork: boolean) {
   if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
   return {
-    shed: ease(0.08, 0.6, fall),
+    shed: ease(0.05, 0.9, fall),
     carry: hasWork ? ease(0, 0.35, dep) * (1 - 0.4 * up) : 0,
     gather: up,
   };

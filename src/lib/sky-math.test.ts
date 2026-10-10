@@ -97,8 +97,12 @@ describe("armIntro", () => {
 describe("trailFrame", () => {
   test("the shed comes in early in the descent, while the planet still has its colour", () => {
     expect(trailFrame(0.05, 0, 0, false, true).shed).toBe(0);
-    expect(trailFrame(0.34, 0, 0, false, true).shed).toBeGreaterThan(0.45);
-    expect(trailFrame(0.7, 0, 0, false, true).shed).toBe(1);
+    expect(trailFrame(0.34, 0, 0, false, true).shed).toBeGreaterThan(0.2);
+    expect(trailFrame(0.9, 0, 0, false, true).shed).toBe(1);
+  });
+  test("the shed builds gradually over most of the descent", () => {
+    expect(trailFrame(0.5, 0, 0, false, true).shed).toBeLessThan(0.6);
+    expect(trailFrame(0.75, 0, 0, false, true).shed).toBeLessThan(0.95);
   });
   test("the whole trail has shed by the time the horizon settles", () => {
     expect(trailFrame(1, 0, 0, false, true).shed).toBe(1);
