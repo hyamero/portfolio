@@ -27,7 +27,7 @@ struct Params {
   let B = params.sun.xy;
   let m = params.sun.z;
   let b = Body(params.body.xy, params.body.z, params.body.w, B, m, params.beads, params.W, params.dpr, params.time,
-               0.0, vec2f(-1e5), 0.0, 0.0, -1.0, 1.0, 1.0);
+               0.0, vec2f(-1e5), 0.0, -1.0, 1.0, 1.0);
   let bl = bodyLight(p, b, 0.0, 0.0);
   var col = mix(BG + bl.front, bl.night, bl.inside) + bl.limb;
   let k = params.sun.w * sunPulse(params.time, m) * params.body.w;

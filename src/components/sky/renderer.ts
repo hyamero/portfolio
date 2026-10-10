@@ -9,7 +9,7 @@ import { getGpu } from "@/lib/gpu";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
-// The ambient drift (twinkle, the corona's filaments, the sun's pulse) needs no more than ~30fps.
+// The ambient drift (twinkle, the corona's breathing, the sun's pulse) needs no more than ~30fps.
 const AMBIENT_MS = 33;
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };

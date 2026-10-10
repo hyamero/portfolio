@@ -28,6 +28,11 @@ export fn decode(c: vec3f) -> vec3f {
   return select(pow((x + 0.055) / 1.055, vec3f(2.4)), x / 12.92, x <= vec3f(0.04045));
 }
 
+// Light the boards' CSS adds in display space over the page background, in linear light.
+export fn overBg(c: vec3f) -> vec3f {
+  return max(decode(vec3f(6.0, 7.0, 10.0) / 255.0 + c) - BG, vec3f(0.0));
+}
+
 // Film grain and an 8-bit dither, in display space, hashed from the integer screen pixel so both
 // canvases agree across the rim. The dither's seed moves with time, the grain's doesn't.
 export fn grain(pixel: vec2f, lum: f32, time: f32) -> f32 {
