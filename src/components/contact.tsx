@@ -26,7 +26,7 @@ export default function Contact() {
         aria-hidden="true"
         className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_100%] mask-[radial-gradient(ellipse_56%_78%_at_50%_100%,#000_0%,rgb(0_0_0/0.45)_45%,transparent_76%)]"
       />
-      <div className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-[1_0_auto] flex-col items-center pt-[150px] pb-40 text-center md:pt-[196px]">
+      <div data-sky-text="contact" className="px-gutter relative z-1 mx-auto flex w-full max-w-[1440px] flex-[1_0_auto] flex-col items-center pt-[150px] pb-40 text-center md:pt-[196px]">
         <h2
           id="contact-title"
           className="text-sm font-normal text-mute md:text-[15px]"
@@ -35,6 +35,7 @@ export default function Contact() {
         </h2>
         <a
           data-catch-light
+          data-sky-signal
           className="say mt-5 text-[clamp(2.75rem,6.4vw,5.75rem)] leading-[1.1] font-medium tracking-[-0.07em] md:mt-[26px]"
           href={siteConfig.links.email}
         >
@@ -47,6 +48,7 @@ export default function Contact() {
                 className="line-link"
                 data-catch-light
                 data-magnet
+                data-sky-signal
                 href={link.href}
                 {...(link.external && { target: "_blank", rel: "noopener noreferrer" })}
               >
