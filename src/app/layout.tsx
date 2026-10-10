@@ -7,7 +7,7 @@ import EdgeLight from "@/components/edge-light";
 import SiteHeader from "@/components/site-header";
 import SmoothScroll from "@/components/smooth-scroll";
 import Sky from "@/components/sky/sky";
-import { SkyGrain } from "@/components/sky/fallback";
+import { SkyGrain, SkyStars } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -55,6 +55,7 @@ export default function RootLayout({
         <noscript>
           <style>{"[data-rise],[data-head-word]{opacity:1!important}"}</style>
         </noscript>
+        <SkyStars />
         <SkyGrain />
         <Sky />
         <SmoothScroll />
