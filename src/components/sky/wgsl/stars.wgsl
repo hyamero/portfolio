@@ -59,7 +59,8 @@ fn bandFrame(s: vec2f, W: f32, H: f32) -> vec3f {
   let along = dot(s - c0, dir);
   // It swells and narrows along its length, and its centre line wanders.
   let w = 0.2 * H * (0.8 + 0.4 * fbm(vec2f(along / 600.0, 6.1), 3, 13u));
-  let across = dot(s - c0, nrm) - w * 0.9 * (fbm(vec2f(along / 700.0, 1.3), 3, 11u) - 0.5);
+  // Its edges wander on their own, so it never reads as a tube.
+  let across = dot(s - c0, nrm) - w * 0.9 * (fbm(vec2f(along / 700.0, 1.3), 3, 11u) - 0.5) - w * 0.8 * (fbm(s / 280.0, 4, 19u) - 0.5);
   return vec3f(along, across, w);
 }
 
@@ -79,18 +80,17 @@ export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   let q = s + (vec2f(fbm(s / 420.0, 3, 43u), fbm(s / 420.0 + vec2f(5.2, 1.3), 3, 47u)) - 0.5) * 140.0;
   let r = q + (vec2f(fbm(q / 150.0, 3, 71u), fbm(q / 150.0 + vec2f(3.7, 8.1), 3, 73u)) - 0.5) * 60.0;
   // Starlight: one continuous glow, brightest down the middle, lumpier where the star clouds bunch.
-  let clouds = smoothstep(0.32, 0.78, fbm(r / 130.0, 5, 23u));
+  let clouds = smoothstep(0.25, 0.85, fbm(r / 130.0, 5, 23u));
   let mottle = fbm(s / 14.0, 3, 29u);
   // Unresolved stars: a dust of specks a couple of px across, densest in the clouds.
   let specks = pow(vnoise(s / 1.6, 59u), 10.0) * 12.0;
-  let starlight = core * (0.45 + 0.65 * clouds) * (0.55 + 0.9 * mottle * mottle) * (1.0 + 0.3 * specks * (0.4 + clouds));
-  // Dust: patchy clouds with ragged filaments off them, lying along the middle in stretches. It dims
+  let starlight = core * (0.4 + 0.75 * clouds) * (0.7 + 0.6 * mottle * mottle) * (1.0 + 0.18 * specks * (0.4 + clouds));
+  // Dust: soft patches with ragged edges, lying along the middle in stretches. It dims
   // only the band's own light, never the sky behind it.
   let lies = exp(-pow((a + 0.12) / 0.45, 2.0)) * smoothstep(0.3, 0.6, fbm(vec2f(along / 360.0, 7.3), 3, 37u));
-  let patches = smoothstep(0.48, 0.76, fbm(r / 48.0, 5, 83u));
-  let filaments = smoothstep(0.8, 0.97, 1.0 - abs(2.0 * fbm(r / 40.0, 4, 89u) - 1.0));
-  let dust = clamp((patches + 0.6 * filaments) * lies, 0.0, 1.0);
-  let glow = (starlight * (1.0 - 0.75 * dust) + 0.035 * skirt * (0.5 + 0.5 * clouds)) * lengthwise * (0.75 + 0.7 * bulge);
+  let patches = smoothstep(0.4, 0.74, 0.7 * fbm(r / 90.0, 4, 83u) + 0.3 * fbm(r / 22.0, 3, 89u));
+  let dust = patches * lies;
+  let glow = (starlight * (1.0 - 0.7 * dust) + 0.035 * skirt * (0.5 + 0.5 * clouds)) * lengthwise * (0.75 + 0.7 * bulge);
   // Blue starlight, paler in the clouds and faintly warm at the core, with dust edges lit brown and
   // faint rose knots of glowing gas. The encode flattens dim colour, so the tints are far stronger
   // than they read.
@@ -100,7 +100,7 @@ export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   tint = mix(tint, vec3f(1.0, 0.72, 0.48), 0.35 * rim);
   let knots = smoothstep(0.66, 0.86, fbm(r / 70.0, 4, 41u)) * core * clouds;
   let light = tint * glow + vec3f(0.9, 0.3, 0.8) * knots * 0.3 * (1.0 - dust);
-  return vec4f(light, core * (1.0 - 0.75 * dust));
+  return vec4f(light, core * (1.0 - 0.7 * dust));
 }
 
 // One depth of stars at css (viewport px). off: the layer's scroll and parallax offset; trail: its
@@ -205,7 +205,7 @@ export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampl
   let mwOff = vec2f(0.0, f.drift) + f.par * 0.8;
   let band = textureSampleLevel(cache, samp, (css + mwOff - f.map.xy) / f.map.zw, 0.0).rgb;
   // The cursor's light lifts the band's dust like a lamp in fog; text dims both.
-  var col = (band * 0.016 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);
+  var col = (band * 0.012 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);
   let T = f.vel * EXPOSURE;
   col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 7.0, 101u),
                    T * 0.04, f.dpr, f.time, mwOff, cache, samp, f.map);
