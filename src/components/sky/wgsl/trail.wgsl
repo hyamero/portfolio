@@ -84,20 +84,21 @@ export fn ribbon(page: vec2f, css: vec2f, tr: Trail, quiet: f32) -> vec3f {
   return lift(vec3f(0.2, 0.34, 0.7) * smoothstep(0.3, 0.75, n) * body * ends * (1.0 - 0.45 * quiet) * tr.carry * 0.3);
 }
 
-// Shed: as the horizon settles, its atmosphere peels off the rim around the sun and streams up the
-// page, then fades as the ribbon takes over. Its root keeps the sunrise's amber. d: height above the limb.
+// Shed: on the way down the planet's atmosphere peels off the rim around the sun and drifts up the
+// page with the scroll, then fades as the horizon settles and the ribbon takes over. Its root keeps the sunrise's amber. d: height above the limb.
 export fn shed(page: vec2f, d: f32, tr: Trail) -> vec3f {
   let k = tr.shed * (1.0 - 0.5 * tr.vis) * smoothstep(0.0, 0.15, tr.vis) * (1.0 - smoothstep(0.5, 1.0, tr.settle));
   let Rs = 0.95 * tr.viewHeight;
-  let len = Rs * mix(0.15, 0.9, tr.shed);
+  let len = Rs * mix(0.12, 0.6, tr.shed);
   if (k <= 0.001 || d <= 0.0 || d >= len) {
     return vec3f(0.0);
   }
   let lat = (page.x - tr.B.x) / Rs;
   let along = d / len;
-  let q = vec2f(lat * 14.0, along * 1.6 - tr.shed * 2.5 - tr.time * 0.03);
+  // Its wisps rise slowly and steadily with the scroll, so it moves whenever the page does.
+  let q = vec2f(lat * 14.0, along * 1.6 - tr.scroll * 0.0007 - tr.time * 0.03);
   let n = fbm4(q + vec2f(fbm3(q * 0.8) * 1.2, 0.0));
-  let streak = smoothstep(0.42, 0.8, n) * exp(-along * 1.6) * (1.0 - smoothstep(0.7, 1.0, along));
+  let streak = smoothstep(0.42, 0.8, n) * exp(-along * 1.6) * (1.0 - smoothstep(0.3, 1.0, along));
   let crown = 1.0 - smoothstep(0.6, 1.1, abs(lat));
   let blue = mix(vec3f(0.47, 0.7, 0.96), vec3f(0.16, 0.24, 0.52), smoothstep(0.0, 0.8, along));
   let tint = mix(blue, vec3f(1.0, 0.6, 0.22), 0.25 * (1.0 - smoothstep(0.0, 0.33, along)));
