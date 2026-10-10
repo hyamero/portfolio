@@ -28,27 +28,29 @@ export fn decode(c: vec3f) -> vec3f {
   return select(pow((x + 0.055) / 1.055, vec3f(2.4)), x / 12.92, x <= vec3f(0.04045));
 }
 
-// Light the boards' CSS adds in display space over the page background, in linear light.
+// Light added in display space over the page background, in linear light. It clips at white per
+// channel, as main's display-space sky did, so a bright rim reads white rather than dimmed to its hue.
 export fn overBg(c: vec3f) -> vec3f {
-  return max(decode(vec3f(6.0, 7.0, 10.0) / 255.0 + c) - BG, vec3f(0.0));
+  return max(decode(min(vec3f(6.0, 7.0, 10.0) / 255.0 + c, vec3f(1.0))) - BG, vec3f(0.0));
 }
 
 // Film grain and an 8-bit dither, in display space, hashed from the integer screen pixel so both
 // canvases agree across the rim. The dither's seed moves with time, the grain's doesn't.
 export fn grain(pixel: vec2f, lum: f32, time: f32) -> f32 {
   let p = vec2i(floor(pixel));
-  let g = (u01(cellHash(p, 7u)) - 0.5) * (0.012 + 0.03 * lum);
+  // Main's grain, as strong as the noise the boards were drawn with.
+  let g = (u01(cellHash(p, 7u)) - 0.5) * (0.02 + 0.07 * lum);
   let dither = (u01(cellHash(p, 11u + u32(fract(time) * 4096.0))) - 0.5) / 255.0;
   return g + dither;
 }
 
-// How much a text rect (x, y, w, h; w 0 for none) covers p: 1 from 12 px inside, 0 by 80 px outside.
-export fn textMask(p: vec2f, rect: vec4f) -> f32 {
+// How much a text rect (x, y, w, h; w 0 for none) covers p: 1 from 12 px inside, 0 by `reach` px outside.
+export fn textMask(p: vec2f, rect: vec4f, reach: f32) -> f32 {
   if (rect.z <= 0.0) {
     return 0.0;
   }
   let half = rect.zw * 0.5;
   let d = abs(p - (rect.xy + half)) - half;
   let outside = length(max(d, vec2f(0.0))) + min(max(d.x, d.y), 0.0);
-  return 1.0 - smoothstep(-12.0, 80.0, outside);
+  return 1.0 - smoothstep(-12.0, reach, outside);
 }

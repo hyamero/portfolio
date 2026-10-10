@@ -36,11 +36,15 @@ fn lift(add: vec3f) -> vec3f {
   return decode(vec3f(0.0235, 0.0275, 0.0392) + add) - BG;
 }
 
-// Domain-warped fbm gathering along the page margins, drifting on its own and lagging the scroll.
-export fn nebula(page: vec2f, css: vec2f, tr: Trail) -> vec3f {
+// Domain-warped fbm gathering round the planet, along the page margins and above the horizon,
+// drifting on its own and lagging the scroll. d: p's height above the body's limb; R, m: its radius and
+// morph; quiet: the text mask, which keeps the horizon's clouds off the text.
+export fn nebula(page: vec2f, css: vec2f, tr: Trail, d: f32, R: f32, m: f32, quiet: f32) -> vec3f {
   var side = smoothstep(0.26, 0.5, abs(css.x - tr.W * 0.5) / tr.W);
   side *= 0.3 + 0.7 * vnoise(vec2f(page.y * 0.0012, step(tr.W * 0.5, css.x) * 5.0), 47u);
-  let env = side * 0.55;
+  let around = (1.0 - m) * exp(-max(d, 0.0) / (max(R, 1.0) * 0.5)) * step(-60.0, d);
+  let above = m * exp(-max(d, 0.0) / 300.0) * step(-40.0, d) * 0.9 * (1.0 - 0.85 * quiet);
+  let env = side * 0.55 + (around + above) * tr.vis;
   if (env <= 0.003) {
     return vec3f(0.0);
   }

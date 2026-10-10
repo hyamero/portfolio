@@ -13,7 +13,7 @@ export default function SiteHeader() {
           to="home"
           className="pointer-events-auto inline-flex min-h-11 items-center gap-2.5 text-base tracking-tighter md:gap-3 md:text-lg"
         >
-          <span aria-hidden="true" className="eclipse-mark size-[13px] rounded-full" />
+          <span aria-hidden="true" className="orb-dot size-[13px] rounded-full" />
           hyamero
         </ScrollLink>
         <nav

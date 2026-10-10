@@ -1,13 +1,15 @@
 /**
- * The sky's light (spec §3.2), mirrored from src/components/sky/wgsl/light.wgsl and air.wgsl for the
+ * The sky's light (spec §3.2), mirrored from src/components/sky/wgsl/light.wgsl, air.wgsl and planet.wgsl for the
  * CSS sky's star map and stills. Keep in step with those files.
  */
 export type Rgb = readonly [number, number, number];
 
 /** The page background, #06070a, in linear light. */
 export const BG: Rgb = [0.00182, 0.00212, 0.00304];
-/** The night ground's base colour in linear light (air.wgsl's GROUND). */
-export const GROUND: Rgb = [0.0013, 0.0016, 0.0024];
+/** The night ground's base colour in linear light, the page's at 80% (air.wgsl's GROUND). */
+export const GROUND: Rgb = [0.00149, 0.00167, 0.00241];
+/** The hero planet's darkest, under its band, in linear light (planet.wgsl's CORE). */
+export const CORE: Rgb = [0.000774, 0.000929, 0.00232];
 const KNEE = 0.62;
 
 /** Highlights roll off toward 1 above the knee, the colour scaled as one so its hue is kept. */

@@ -3,13 +3,13 @@ import { effect, frame, surface } from "vgpu";
 import { createMilkyCache } from "./milky-cache";
 import { bandExtent, diffKey, sameKey, skyParams, type BandMap, type SkyInput } from "./params";
 import skySource from "./sky.wgsl";
-import { bodyFrame, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/eclipse";
+import { bodyFrame, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
 import { anchorRect, EMPTY_RECT, flight, onTick, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
-// The ambient drift (twinkle, the corona's breathing, the sun's pulse) needs no more than ~30fps.
+// The ambient drift (twinkle, the planet's flowing band and sparkles) needs no more than ~30fps.
 const AMBIENT_MS = 33;
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
@@ -52,7 +52,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let cssHeight = 1;
       let frontTop = 0;
       let hero: Rect = EMPTY_RECT;
-      let eclipse: Rect = EMPTY_RECT;
+      let planet: Rect = EMPTY_RECT;
       let work: Rect = EMPTY_RECT;
       let contact: Rect = EMPTY_RECT;
       let text = { hero: EMPTY_RECT, work: EMPTY_RECT, contact: EMPTY_RECT };
@@ -70,25 +70,27 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
 
       const input = (now: number): SkyInput => {
         const { light, pointer, reduced } = flight;
-        const cam = flight.eclipse;
+        const cam = flight.camera;
         const scrollY = flight.scroll;
         const W = cssWidth;
         const H = cssHeight;
-        const hasEclipse = eclipse.width > 0;
+        const hasPlanet = planet.width > 0;
         // The tick only runs while the tab is visible.
-        introStart = armIntro(introStart, now + INTRO_DELAY_MS, hasEclipse, true);
+        introStart = armIntro(introStart, now + INTRO_DELAY_MS, hasPlanet, true);
         const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
         let body: Body | null = null;
         let morph = 0;
+        let foot: number | null = null;
         let settle = 0;
-        if (hasEclipse && reduced) {
-          const still = stillFrame(startFrame(eclipse, hero.top), { hero, work, contact }, W, H, scrollY);
+        if (hasPlanet && reduced) {
+          const still = stillFrame(startFrame(planet, hero.top), { hero, work, contact }, W, H, scrollY);
           body = still.body;
           morph = still.morph;
-          // The still horizon is at rest; the still eclipse isn't.
+          // The still horizon is at rest; the still planet isn't, and ends at the hero's foot as the CSS one does.
           settle = still.morph;
-        } else if (hasEclipse) {
-          const settled = settleFrame(bodyFrame(cam, startFrame(eclipse, hero.top), endFrame(W, H)), scrollY, cam.end, H);
+          if (!still.morph) foot = hero.top + hero.height;
+        } else if (hasPlanet) {
+          const settled = settleFrame(bodyFrame(cam, startFrame(planet, hero.top), endFrame(W, H)), scrollY, cam.end, H);
           body = settled.body;
           morph = cam.morph;
           settle = settled.s;
@@ -109,6 +111,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           time,
           body,
           morph,
+          foot,
           settle,
           intro,
           trail: trailFrame(settle, up, reduced, work.height > 0),
@@ -118,7 +121,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           signal: flight.signal,
           band,
           // The ground covers the content from the runway's end on (eclipse spec §5.6).
-          frontOn: !reduced && hasEclipse && scrollY >= cam.end,
+          frontOn: !reduced && hasPlanet && scrollY >= cam.end,
           frontTop,
         };
       };
@@ -138,7 +141,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       // Layout is read only here, never inside a tick.
       measure = () => {
         hero = anchorRect("hero");
-        eclipse = anchorRect("eclipse");
+        planet = anchorRect("planet");
         work = anchorRect("work");
         contact = anchorRect("contact");
         text = { hero: textRect("hero"), work: textRect("work"), contact: textRect("contact") };

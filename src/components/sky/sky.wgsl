@@ -1,8 +1,7 @@
 // The page's one sky, in page space and linear light (sky polish spec §3): the star field and the
-// Milky Way, the body the camera flies from board 09's eclipse to board 02's horizon, the sun, and
+// Milky Way, the body the camera flies from the hero's planet down to the resting horizon, and
 // the trail. Lengths are CSS px; y grows down the page.
 import { Body, bodyLight } from "./wgsl/body.wgsl";
-import { sunGlare, sunPulse } from "./wgsl/lens.wgsl";
 import { encode, grain, LUMA, shoulder, textMask } from "./wgsl/light.wgsl";
 import { skyField, StarFrame } from "./wgsl/stars.wgsl";
 import { gather, nebula, ribbon, shed, Trail } from "./wgsl/trail.wgsl";
@@ -25,10 +24,10 @@ struct Params {
   viewHeight: f32,
   // The body: centre x, y (page), radius, visibility.
   body: vec4f,
-  // The bead, which becomes the sun: x, y (page), morph (0 eclipse .. 1 horizon), the diamond's strength.
-  sun: vec4f,
-  // sunFrame: core radius, glare radius, horizontal and vertical streak decay (px).
-  glare: vec4f,
+  // The sun, just behind the limb where the rim is brightest: x, y (page); and the morph (0 planet .. 1 horizon).
+  sun: vec3f,
+  // Page y where the body ends, fading out over the 200 px above.
+  foot: f32,
   // How far the horizon has settled toward its rest line, 0..1.
   settle: f32,
   // Where the trail's ribbon runs, page y: the tops of Work and Contact.
@@ -37,9 +36,9 @@ struct Params {
   trail: vec4f,
   // The stars' scroll speed, px/s.
   velocity: f32,
-  // How far Baily's beads are open.
-  beads: f32,
-  // A hovered or focused Contact link's lift on the sun, 0..1.
+  // How far the intro has lit the planet.
+  dawn: f32,
+  // A hovered or focused Contact link's lift on the rim's light, 0..1.
   lift: f32,
   // The signal's pulse: age (s, < 0 for none), and travel (0 under reduced motion, which also stops
   // the cursor's light).
@@ -67,7 +66,7 @@ struct Params {
   let page = css + vec2f(0.0, params.scroll);
   let W = params.resolution.x / params.dpr;
   let t = params.time;
-  let vis = params.body.w;
+  let vis = params.body.w * (1.0 - smoothstep(params.foot - 200.0, params.foot, page.y));
   let B = params.sun.xy;
   let m = params.sun.z;
   let motion = params.pulse.y;
@@ -78,36 +77,30 @@ struct Params {
     return vec4f(0.0);
   }
 
-  let quiet = max(max(textMask(page, params.textA) * params.textK.x, textMask(page, params.textB) * params.textK.y),
-                  textMask(page, params.textC) * params.textK.z);
+  let quiet = max(max(textMask(page, params.textA, 80.0) * params.textK.x, textMask(page, params.textB, 80.0) * params.textK.y),
+                  textMask(page, params.textC, 80.0) * params.textK.z);
+  // The planet's halo spans the hero, so it eases off round the copy far more gently.
+  let hush = textMask(page, params.textA, 320.0) * params.textK.x;
   // The cursor's light (spec §5.5), dimmed behind text.
   let lp = page - params.light;
   let pl = params.hover * motion * exp(-dot(lp, lp) / 80000.0) * (1.0 - 0.92 * quiet);
 
   let gathered = params.trail.z;
-  let b = Body(params.body.xy, params.body.z, vis, B, m, params.beads, W, params.dpr, t, params.hover, params.light,
-               params.settle, params.pulse.x, params.pulse.y, 1.0 + 0.25 * gathered * smoothstep(0.6, 1.0, gathered));
-  let bl = bodyLight(page, b, pl, quiet);
-  // Where the corona or the air is bright, the stars wash out.
+  let b = Body(params.body.xy, params.body.z, vis, B, m, params.dawn, W, params.dpr, t, params.hover, params.light,
+               params.settle, params.pulse.x, params.pulse.y,
+               (1.0 + 0.25 * gathered * smoothstep(0.6, 1.0, gathered)) * (1.0 + 0.6 * params.lift));
+  let bl = bodyLight(page, b, hush, quiet);
+  // Where the halo or the air is bright, the stars wash out.
   let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
   let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
                      quiet, params.band, params.bandDrift);
   let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
                  params.viewHeight, B, vis, params.settle);
 
-  var col = skyField(css, sf, milky, milkySampler) + nebula(page, css, tr) + ribbon(page, css, tr, quiet) + bl.front;
-  // The moon and the ground are opaque.
+  var col = skyField(css, sf, milky, milkySampler) + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
+  // The planet and the ground are opaque.
   col = mix(col, bl.night, bl.inside);
-  col += bl.limb + shed(page, bl.d, tr) + gather(page, bl.d, tr);
-
-  // The sun brightens for a hovered link and flashes as a signal leaves.
-  var k = params.sun.w * sunPulse(t, m) * (1.0 + 0.6 * params.lift) * vis;
-  if (params.pulse.x >= 0.0) {
-    k *= 1.0 + 1.2 * exp(-5.0 * params.pulse.x);
-  }
-  if (k > 0.001 && length(page - B) < max(700.0, 4.0 * params.glare.z)) {
-    col += sunGlare(page - B, m, bl.d, params.glare) * k;
-  }
+  col += shed(page, bl.d, tr) + gather(page, bl.d, tr);
 
   let encoded = encode(shoulder(max(col, vec3f(0.0))));
   let rgb = max(encoded + grain(screen, dot(encoded, LUMA), t), vec3f(0.0));
