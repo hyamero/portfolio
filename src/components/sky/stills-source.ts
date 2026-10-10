@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { resolveShader } from "@vgpu/wgsl/runtime";
 
-import { endFrame, PHI0 } from "@/lib/eclipse";
+import { endFrame, PHI0, sunFrame } from "@/lib/eclipse";
 import { BG, encode, GROUND, shoulder, type Rgb } from "@/lib/light";
 import { NARROW, WIDE } from "@/lib/stills";
 
@@ -15,8 +15,9 @@ import { NARROW, WIDE } from "@/lib/stills";
 export const ROOT = path.resolve(import.meta.dir, "../../..");
 export const STILLS_ENTRY = path.join(ROOT, "src/components/sky/wgsl/stills.wgsl");
 export const STAR_CHECK_ENTRY = path.join(ROOT, "src/components/sky/wgsl/star-check.wgsl");
-// The script's own encode and shoulder mirror it, so a change there must re-render the stills too.
-const LIGHT = path.join(ROOT, "src/components/sky/wgsl/light.wgsl");
+// The script inverts with light.ts's encode, shoulder and GROUND, which mirror light.wgsl and
+// air.wgsl: a change to either side must re-render the stills.
+const LIGHT = [path.join(ROOT, "src/components/sky/wgsl/light.wgsl"), path.join(ROOT, "src/lib/light.ts")];
 
 export type Still = {
   file: string;
@@ -29,12 +30,14 @@ export type Still = {
   /** C.x, C.y, R, then B.x, B.y, morph and the diamond's strength, in the still's CSS px. */
   body: readonly [number, number, number];
   sun: readonly [number, number, number, number];
+  /** sunFrame's core, glare and streak decays: part of the hash, so retuning them re-renders. */
+  glare: readonly [number, number, number, number];
   beads: number;
   /** What the CSS puts under the still where the body covers it: the black moon disc, or the ground. */
   interior: "moon" | "ground";
 };
 
-function eclipse(): Still {
+function eclipse(): Omit<Still, "glare"> {
   const C = 1024;
   const R = 256;
   return {
@@ -52,7 +55,7 @@ function eclipse(): Still {
   };
 }
 
-function horizon(still: typeof WIDE | typeof NARROW): Still {
+function horizon(still: typeof WIDE | typeof NARROW): Omit<Still, "glare"> {
   // The hold frame with its apex `above` px from the top.
   const e = endFrame(still.W, still.above / 0.64);
   return {
@@ -69,14 +72,23 @@ function horizon(still: typeof WIDE | typeof NARROW): Still {
   };
 }
 
-export const STILLS: readonly Still[] = [eclipse(), horizon(WIDE), horizon(NARROW)];
+const withGlare = (still: Omit<Still, "glare">): Still => {
+  const g = sunFrame(still.sun[2], still.W);
+  return { ...still, glare: [g.core, g.glare, g.streakH, g.streakV] };
+};
 
-/** A SHA-256 of the stills' parameters and of every shader file they're rendered from. */
-export async function stillsHash() {
+export const STILLS: readonly Still[] = [eclipse(), horizon(WIDE), horizon(NARROW)].map(withGlare);
+
+/** Every file the stills are rendered from, relative to the repo. */
+export async function stillsFiles() {
   const { deps } = await resolveShader({ entry: STILLS_ENTRY });
-  const files = [...new Set([...deps, LIGHT])].map((file) => path.relative(ROOT, file)).sort();
+  return [...new Set([...deps, ...LIGHT])].map((file) => path.relative(ROOT, file)).sort();
+}
+
+/** A SHA-256 of the stills' parameters and of every file they're rendered from. */
+export async function stillsHash() {
   const hash = createHash("sha256").update(JSON.stringify(STILLS));
-  for (const file of files) hash.update(file).update("\0").update(await readFile(path.join(ROOT, file)));
+  for (const file of await stillsFiles()) hash.update(file).update("\0").update(await readFile(path.join(ROOT, file)));
   return hash.digest("hex");
 }
 

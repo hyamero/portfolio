@@ -1,15 +1,28 @@
 import { describe, expect, test } from "bun:test";
 
+import { sunFrame } from "@/lib/eclipse";
 import { encode, GROUND, type Rgb } from "@/lib/light";
 
 import manifest from "./stills.json";
-import { screenInverse, stillsHash } from "./stills-source";
+import { screenInverse, STILLS, stillsFiles, stillsHash } from "./stills-source";
 
 const screen = (u: number, s: number) => 1 - (1 - u) * (1 - s);
 
 describe("the CSS sky's stills", () => {
   test("are rendered from the current shaders and parameters", async () => {
     if ((await stillsHash()) !== manifest.hash) throw new Error("The sky's stills are stale: run `bun run sky:stills`.");
+  });
+});
+
+describe("what the stills' hash covers", () => {
+  test("each still carries the glare sizes it renders with", () => {
+    for (const still of STILLS) {
+      const g = sunFrame(still.sun[2], still.W);
+      expect(still.glare).toEqual([g.core, g.glare, g.streakH, g.streakV]);
+    }
+  });
+  test("the TS light the script inverts with is hashed too", async () => {
+    expect(await stillsFiles()).toContain("src/lib/light.ts");
   });
 });
 
