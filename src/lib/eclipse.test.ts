@@ -8,7 +8,6 @@ import {
   bodyFrame,
   CAMERA_KEYS,
   endFrame,
-  haloFrame,
   PHI0,
   REST,
   settleFrame,
@@ -186,35 +185,6 @@ describe("stillFrame", () => {
       expect(before.body.C[1] + 3.4 * before.body.R).toBeLessThan(0);
       expect(after.body.C[1] - after.body.R - 170).toBeGreaterThan(h);
     }
-  });
-});
-
-describe("haloFrame", () => {
-  test("starts at board 09's reaches and ends at board 02's", () => {
-    const a = haloFrame(0, 200);
-    expect(a.ring).toBeCloseTo(36);
-    expect(a.glow).toBeCloseTo(240);
-    expect(a.haze).toBeCloseTo(480);
-    expect(a.rays).toBe(1);
-    const b = haloFrame(1, 6000);
-    expect(b.ring).toBeCloseTo(22);
-    expect(b.glow).toBeCloseTo(100);
-    expect(b.haze).toBeCloseTo(100);
-    expect(b.rays).toBe(0);
-  });
-  test("moves one way between the two", () => {
-    let last = haloFrame(0, 1000);
-    for (let i = 1; i <= 20; i++) {
-      const h = haloFrame(i / 20, 1000);
-      expect(h.ring).toBeLessThanOrEqual(last.ring);
-      expect(h.glow).toBeLessThanOrEqual(last.glow);
-      expect(h.haze).toBeLessThanOrEqual(last.haze);
-      expect(h.rays).toBeLessThanOrEqual(last.rays);
-      last = h;
-    }
-  });
-  test("loses the rays by halfway", () => {
-    expect(haloFrame(0.5, 1000).rays).toBe(0);
   });
 });
 

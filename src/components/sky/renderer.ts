@@ -1,33 +1,23 @@
 import { effect, frame, surface } from "vgpu";
 
+import { createMilkyCache } from "./milky-cache";
+import { bandExtent, diffKey, sameKey, skyParams, type BandMap, type SkyInput } from "./params";
 import skySource from "./sky.wgsl";
-import {
-  beadFlash,
-  bodyFrame,
-  endFrame,
-  haloFrame,
-  settleFrame,
-  startFrame,
-  stillFrame,
-  sunFrame,
-  type Body,
-} from "@/lib/eclipse";
-import { anchorRect, EMPTY_RECT, flight, onTick, startFlight } from "@/lib/flight";
+import { bodyFrame, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/eclipse";
+import { anchorRect, EMPTY_RECT, flight, onTick, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
-// The ambient drift (nebula, twinkle, the bead's pulse) needs no more than ~30fps.
+// The ambient drift (twinkle, the corona's filaments, the sun's pulse) needs no more than ~30fps.
 const AMBIENT_MS = 33;
-// Far above the page and invisible: the body on a page without an eclipse box.
-const NO_BODY: Body = { C: [0, -1e5], R: 1, B: [0, -1e5] };
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 
 /**
  * Draws the page's sky into the fixed `canvas` on flight's tick, and the resting horizon's ground
- * into `front`, over the content (spec §5.6). Frames are drawn on demand: when anything the sky
- * reads has changed, while the intro eases, and at ~30fps while the body is still moving.
+ * into `front`, over the content (eclipse spec §5.6). Frames are drawn on demand (sky polish spec
+ * §3.6): when any uniform has changed, while the intro eases, and at ~30fps while the body moves.
  */
 export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
   let disposed = false;
@@ -56,30 +46,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       // The ground over the content writes premultiplied alpha: clear above the rim.
       const frontOutput = surface(gpu, front, { autoResize: false, alphaMode: "premultiplied" });
       teardown.push(() => frontOutput.dispose());
-
-      const initial = {
-        resolution: output.size,
-        light: [0, 0],
-        pointer: [0.5, 0.5],
-        dpr: 1,
-        scroll: 0,
-        hover: 0,
-        time: flight.reduced ? 8 : 0,
-        layer: 0,
-        origin: 0,
-        viewHeight: 1,
-        body: [0, 0, 1, 0],
-        sun: [0, 0, 0, 0],
-        halo: [1, 1, 1, 0],
-        glare: [1, 1, 1, 1],
-        settle: 0,
-        span: [0, 0],
-        trail: [0, 0, 0, 0],
-      };
-      const sky = effect(gpu, skySource, { set: { params: initial } });
-      const ground = effect(gpu, skySource, { set: { params: { ...initial, layer: 1 } } });
-      await Promise.all([sky.compile({ colors: [output.format] }), ground.compile({ colors: [frontOutput.format] })]);
-      if (disposed) return;
+      const milky = createMilkyCache(gpu);
 
       let cssWidth = 1;
       let cssHeight = 1;
@@ -88,6 +55,8 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let eclipse: Rect = EMPTY_RECT;
       let work: Rect = EMPTY_RECT;
       let contact: Rect = EMPTY_RECT;
+      let text = { hero: EMPTY_RECT, work: EMPTY_RECT, contact: EMPTY_RECT };
+      let band: BandMap = bandExtent(1, 1, 0);
       let time = flight.reduced ? 8 : 0;
       let lastDraw = 0;
       let dirty = true;
@@ -95,46 +64,21 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let frontShown = false;
       let introStart: number | null = null;
       // What the last frame was drawn from; a tick that matches it draws nothing.
-      const last = new Float64Array(13).fill(Number.NaN);
-      // What the ground was last drawn from. It doesn't move with the scroll, so it redraws only when these change.
-      const lastGround = new Float64Array(16).fill(Number.NaN);
+      let lastKey: number[] = [];
+      // What the ground was last drawn from. It holds still on screen, so it ignores the scroll.
+      let lastFront: number[] = [];
 
-      // Layout is read only here, never inside a tick.
-      measure = () => {
-        hero = anchorRect("hero");
-        eclipse = anchorRect("eclipse");
-        work = anchorRect("work");
-        contact = anchorRect("contact");
-        flight.hero = hero;
-        dirty = true;
-      };
-
-      const resize = () => {
-        cssWidth = Math.max(canvas.clientWidth, 1);
-        cssHeight = Math.max(canvas.clientHeight, 1);
-        const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
-        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
-        const box = front.getBoundingClientRect();
-        frontTop = box.top;
-        frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
-        dirty = true;
-        // Resizing clears the canvas.
-        lastGround.fill(Number.NaN);
-      };
-
-      const tick = (now: number) => {
-        if (document.hidden) return;
+      const input = (now: number): SkyInput => {
         const { light, pointer, reduced } = flight;
         const cam = flight.eclipse;
         const scrollY = flight.scroll;
         const W = cssWidth;
         const H = cssHeight;
         const hasEclipse = eclipse.width > 0;
-
         // The tick only runs while the tab is visible.
         introStart = armIntro(introStart, now + INTRO_DELAY_MS, hasEclipse, true);
         const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
-        let body = NO_BODY;
+        let body: Body | null = null;
         let morph = 0;
         let settle = 0;
         if (hasEclipse && reduced) {
@@ -149,79 +93,109 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           morph = cam.morph;
           settle = settled.s;
         }
-        const vis = hasEclipse ? intro : 0;
         const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, H, contact);
-        const trail = trailFrame(settle, up, reduced, work.height > 0);
-        const starScroll = scrollY + flight.coast.offset;
-        const bead = beadFlash(intro);
-        // The ground covers the content from the runway's end on (spec §5.6).
-        const frontOn = !reduced && hasEclipse && scrollY >= cam.end;
+        return {
+          resolution: output.size,
+          W,
+          H,
+          scroll: scrollY,
+          starScroll: scrollY + flight.coast.offset,
+          velocity: flight.velocity,
+          coast: flight.coast.v,
+          light,
+          pointer,
+          reduced,
+          now,
+          time,
+          body,
+          morph,
+          settle,
+          intro,
+          trail: trailFrame(settle, up, reduced, work.height > 0),
+          span: [work.top, contact.height ? contact.top : work.top + work.height],
+          text,
+          copy: cam.copy,
+          signal: flight.signal,
+          band,
+          // The ground covers the content from the runway's end on (eclipse spec §5.6).
+          frontOn: !reduced && hasEclipse && scrollY >= cam.end,
+          frontTop,
+        };
+      };
 
-        const inputs = [
-          scrollY, starScroll, light.x, light.y, light.hover, pointer.nx, pointer.ny, reduced ? 1 : 0,
-          cam.zoom, cam.pan, cam.level, cam.morph, cam.end,
-        ];
-        let changed = dirty;
-        inputs.forEach((value, i) => {
-          if (value !== last[i]) {
-            last[i] = value;
-            changed = true;
-          }
-        });
-        const easing = !reduced && introStart !== null && intro < 1;
-        // At rest the body holds still, so reading Work costs no frames (spec §5.8).
-        const ambient = !reduced && vis > 0.001 && settle < 1;
+      const initial = skyParams(input(0)).params;
+      const sky = effect(gpu, skySource, { set: { params: initial, milky: milky.target, milkySampler: milky.sampler } });
+      const ground = effect(gpu, skySource, {
+        set: { params: { ...initial, layer: 1 }, milky: milky.target, milkySampler: milky.sampler },
+      });
+      await Promise.all([
+        sky.compile({ colors: [output.format] }),
+        ground.compile({ colors: [frontOutput.format] }),
+        milky.compile(),
+      ]);
+      if (disposed) return;
+
+      // Layout is read only here, never inside a tick.
+      measure = () => {
+        hero = anchorRect("hero");
+        eclipse = anchorRect("eclipse");
+        work = anchorRect("work");
+        contact = anchorRect("contact");
+        text = { hero: textRect("hero"), work: textRect("work"), contact: textRect("contact") };
+        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        flight.hero = hero;
+        dirty = true;
+      };
+
+      const resize = () => {
+        cssWidth = Math.max(canvas.clientWidth, 1);
+        cssHeight = Math.max(canvas.clientHeight, 1);
+        const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
+        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
+        const box = front.getBoundingClientRect();
+        frontTop = box.top;
+        frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
+        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        dirty = true;
+        // Resizing clears the canvas.
+        lastFront = [];
+      };
+
+      const tick = (now: number) => {
+        if (document.hidden) return;
+        const next = input(now);
+        const key = diffKey(skyParams(next).params);
+        const changed = dirty || !sameKey(key, lastKey);
+        const easing = !next.reduced && introStart !== null && next.intro < 1;
+        // At rest the body holds still, so reading Work costs no frames (eclipse spec §5.8).
+        const ambient = !next.reduced && next.body !== null && next.settle < 1;
         if (!changed && !easing && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
 
         // Time only runs while something ambient is in view; elsewhere frames are static.
         if (ambient && lastDraw) time += Math.min((now - lastDraw) / 1000, 0.1);
         lastDraw = now;
         dirty = false;
-        const halo = haloFrame(morph, body.R);
-        const glare = sunFrame(morph, W);
-        const params = {
-          resolution: output.size,
-          dpr: output.size[0] / cssWidth,
-          scroll: scrollY,
-          light: [light.x, light.y],
-          pointer: [pointer.nx, pointer.ny],
-          hover: light.hover,
-          time,
-          layer: 0,
-          origin: 0,
-          viewHeight: H,
-          body: [body.C[0], body.C[1] + scrollY, body.R, vis],
-          sun: [body.B[0], body.B[1] + scrollY, morph, bead],
-          halo: [halo.ring, halo.glow, halo.haze, halo.rays],
-          glare: [glare.core, glare.glare, glare.streakH, glare.streakV],
-          settle,
-          span: [work.top, contact.height ? contact.top : work.top + work.height],
-          trail: [trail.shed, trail.carry, trail.gather, starScroll],
-        };
+        lastKey = key;
+        const { params, frontKey } = skyParams({ ...next, time });
         sky.set({ params });
+        const drawCache = milky.update(next.W, next.H, params.dpr, band);
 
-        if (frontOn !== frontShown) {
-          frontShown = frontOn;
-          front.style.visibility = frontOn ? "visible" : "hidden";
+        if (next.frontOn !== frontShown) {
+          frontShown = next.frontOn;
+          front.style.visibility = next.frontOn ? "visible" : "hidden";
         }
-        const groundInputs = [
-          frontOn ? 1 : 0, body.C[0], body.C[1], body.R, body.B[0], body.B[1], morph, vis, bead, settle,
-          light.hover > 0 ? light.x : 0, light.hover, time, W, H, frontTop,
-        ];
-        let groundChanged = false;
-        groundInputs.forEach((value, i) => {
-          if (value !== lastGround[i]) {
-            lastGround[i] = value;
-            groundChanged = true;
-          }
-        });
-        const drawGround = frontOn && groundChanged;
+        const drawGround = next.frontOn && !sameKey(frontKey, lastFront);
         if (drawGround) {
+          lastFront = frontKey;
           ground.set({ params: { ...params, resolution: frontOutput.size, layer: 1, origin: frontTop } });
-          // Hit-testing follows the planet: the ground takes the clicks, the clear sky above it doesn't.
-          front.style.clipPath = `circle(${(body.R + 3).toFixed(1)}px at ${body.C[0].toFixed(1)}px ${(body.C[1] - frontTop).toFixed(1)}px)`;
+          const body = next.body;
+          if (body) {
+            // Hit-testing follows the planet: the ground takes the clicks, the clear sky above it doesn't.
+            front.style.clipPath = `circle(${(body.R + 3).toFixed(1)}px at ${body.C[0].toFixed(1)}px ${(body.C[1] - frontTop).toFixed(1)}px)`;
+          }
         }
         const done = frame(gpu, (f) => {
+          if (drawCache) f.pass(milky.target, milky.effect);
           f.pass(output, sky);
           if (drawGround) f.pass(frontOutput, ground);
         }).done;
