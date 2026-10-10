@@ -44,6 +44,19 @@ export function HeroStars() {
   );
 }
 
+/**
+ * The CSS sky's stars (sky polish spec §7.2): the live sky's near and bright stars at scroll 0, from
+ * the build's star map, anchored at the viewport's top left as the live field is.
+ */
+export function SkyStars() {
+  return (
+    <div
+      aria-hidden="true"
+      className="sky-fallback pointer-events-none fixed inset-0 -z-2 bg-[url(/sky/stars.svg)] bg-no-repeat"
+    />
+  );
+}
+
 const RAYS =
   "conic-gradient(from 0deg, rgba(201,220,255,0) 0deg, rgba(201,220,255,0.16) 8deg, rgba(201,220,255,0) 18deg, " +
   "rgba(201,220,255,0) 52deg, rgba(201,220,255,0.1) 61deg, rgba(201,220,255,0) 70deg, " +
