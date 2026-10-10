@@ -63,7 +63,7 @@ fn bandFrame(s: vec2f, W: f32, H: f32) -> vec3f {
 }
 
 // The Milky Way at band-space s (viewport W × H): rgb its light before gain, a its core profile
-// exp(−a²), which raises the faint layers' odds in the band. The sky caches it (spec §3.5).
+// exp(−a²) less its dust, which raises the faint layers' odds in the band. The sky caches it (spec §3.5).
 export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   let f = bandFrame(s, W, H);
   let along = f.x;
@@ -71,23 +71,33 @@ export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   let w = f.z;
   let a = across / w;
   let core = exp(-a * a);
-  let wing = exp(-abs(a) / 1.6);
+  // A wide, faint glow the band sits in, so it fades into the sky rather than stop at an edge.
+  let veil = exp(-a * a / 6.0);
   let lengthwise = 0.55 + 0.7 * fbm(vec2f(along / 520.0, 4.7), 3, 17u);
   let bx = (along - 0.12 * W) / (0.5 * W);
   let bulge = exp(-bx * bx);
-  let cloud = fbm(s / 140.0, 5, 23u);
-  let grain = fbm(s / 22.0, 3, 29u);
-  let glow = (core * (0.22 + 1.1 * smoothstep(0.35, 0.85, cloud)) * (0.7 + 0.6 * grain) + 0.22 * wing * cloud)
+  // Domain-warped clouds stretch into wisps along the band.
+  let warp = vec2f(fbm(s / 320.0, 3, 43u), fbm(s / 320.0 + vec2f(5.2, 1.3), 3, 47u)) - 0.5;
+  let cloud = fbm(s / 150.0 + warp * 1.8, 5, 23u);
+  let clumps = smoothstep(0.3, 0.78, cloud);
+  // Unresolved stars: a fine mottle over the clouds.
+  let grain = fbm(s / 16.0, 3, 29u);
+  let glow = (core * (0.14 + 1.6 * clumps * clumps) * (0.5 + 1.1 * grain * grain) + 0.16 * veil * (0.4 + 0.6 * cloud))
            * lengthwise * (0.75 + 0.7 * bulge);
-  let ridge = 1.0 - abs(2.0 * fbm(vec2f(along / 300.0, across / 80.0), 5, 31u) - 1.0);
-  let lanes = smoothstep(0.62, 0.93, ridge) * exp(-2.0 * a * a);
-  let rx = (across + 0.12 * w) / (0.16 * w);
-  let rift = exp(-rx * rx) * smoothstep(0.35, 0.75, fbm(vec2f(along / 450.0, 9.1), 3, 37u));
-  let clear = (1.0 - 0.85 * lanes) * (1.0 - 0.7 * rift);
-  let warm = clamp(core * (0.35 + 0.65 * bulge), 0.0, 1.0);
-  var tint = mix(vec3f(0.6, 0.72, 1.0), vec3f(1.0, 0.85, 0.7), warm);
-  tint = mix(vec3f(dot(tint, LUMA)), tint, 0.55);
-  return vec4f(tint * glow * clear, core);
+  // Dust: filaments along the band and a rift that wanders down its middle.
+  let ridge = 1.0 - abs(2.0 * fbm(vec2f(along / 300.0, across / 70.0) + warp, 5, 31u) - 1.0);
+  let lanes = smoothstep(0.6, 0.94, ridge) * exp(-1.6 * a * a);
+  let rx = (across + 0.22 * w + 0.12 * w * (fbm(vec2f(along / 260.0, 2.9), 3, 53u) - 0.5)) / (0.1 * w);
+  let rift = exp(-rx * rx) * smoothstep(0.3, 0.7, fbm(vec2f(along / 450.0, 9.1), 3, 37u));
+  let clear = (1.0 - 0.65 * lanes) * (1.0 - 0.7 * rift);
+  // Blue starlight, paler in the bulge's clouds, and faint rose knots of glowing gas along them. The
+  // encode flattens dim colour, so the tints are far bluer than they read.
+  let warm = clamp(core * bulge, 0.0, 1.0);
+  var tint = mix(vec3f(0.2, 0.28, 1.0), vec3f(0.42, 0.56, 1.0), smoothstep(0.1, 0.8, core));
+  tint = mix(tint, vec3f(0.9, 0.86, 1.0), 0.45 * warm * clumps);
+  let knots = smoothstep(0.66, 0.86, fbm(s / 70.0 + warp * 2.0, 4, 41u)) * core * clumps;
+  let light = tint * glow * clear + vec3f(0.9, 0.3, 0.8) * knots * 0.5 * clear;
+  return vec4f(light, core * clear);
 }
 
 // One depth of stars at css (viewport px). off: the layer's scroll and parallax offset; trail: its
@@ -179,8 +189,10 @@ export struct StarFrame {
   pl: f32,
   // How much of the sky shows through the light in front of it.
   ext: f32,
-  // The text mask here.
+  // The text mask here, and a wider, softer one for the Milky Way, whose glow would show the
+  // narrow mask's edge.
   quiet: f32,
+  hush: f32,
   // The band-space rect the Milky Way cache covers: origin, size.
   map: vec4f,
   // The band's drift down band space (2.5% of the virtual scroll, held inside the cache).
@@ -192,13 +204,57 @@ export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampl
   let mwOff = vec2f(0.0, f.drift) + f.par * 0.3;
   let band = textureSampleLevel(cache, samp, (css + mwOff - f.map.xy) / f.map.zw, 0.0).rgb;
   // The cursor's light lifts the band's dust like a lamp in fog; text dims both.
-  var col = (band * 0.004 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);
+  var col = (band * 0.024 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * max(f.quiet, f.hush));
   let T = f.vel * EXPOSURE;
-  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 2.4, 101u),
+  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 4.0, 101u),
                    T * 0.04, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += starLayer(css, vec2f(0.0, f.scroll * 0.08) + f.par * 1.2, Layer(24.0, 0.03, 0.09, 14.0, 0.0, 1.2, 202u),
                    T * 0.08, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += starLayer(css, vec2f(0.0, f.scroll * 0.17) + f.par * 2.0, nearLayer(), T * 0.17, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += brightLayer(css, vec2f(0.0, f.scroll * 0.12) + f.par * 1.6, T * 0.12, f.dpr, f.time);
   return BG + col * f.ext;
+}
+
+// Occasional shooting stars, in viewport px: at most one in each 5 s slot, a white head drawing out a
+// blue trail. They run on the sky's time, which holds still at rest, so callers gate them off under
+// reduced motion, where a frozen one would hang in the sky.
+export fn meteors(css: vec2f, W: f32, H: f32, time: f32, dpr: f32) -> vec3f {
+  let P = 5.0;
+  let slot = floor(time / P);
+  let h0 = cellHash(vec2i(i32(slot), 0), 505u);
+  if (slot < 1.0 || u01(h0) > 0.5) {
+    return vec3f(0.0);
+  }
+  let h1 = pcg(h0);
+  let h2 = pcg(h1);
+  let h3 = pcg(h2);
+  let h4 = pcg(h3);
+  let h5 = pcg(h4);
+  let h6 = pcg(h5);
+  let h7 = pcg(h6);
+  let dur = 0.6 + 0.5 * u01(h1);
+  let u = (time - slot * P - 0.4 - (P - dur - 0.8) * u01(h2)) / dur;
+  if (u <= 0.0 || u >= 1.0) {
+    return vec3f(0.0);
+  }
+  // Down and across, 15–40° below level, from the side it heads away from.
+  let side = select(1.0, -1.0, u01(h3) < 0.5);
+  let ang = radians(15.0 + 25.0 * u01(h4));
+  let dir = vec2f(side * cos(ang), sin(ang));
+  let p0 = vec2f(W * (0.5 - side * (0.05 + 0.35 * u01(h5))), H * (0.04 + 0.36 * u01(h6)));
+  let span = (0.3 + 0.25 * u01(h7)) * max(W, 700.0);
+  let q = css - (p0 + dir * span * u);
+  let behind = -dot(q, dir);
+  let across = dot(q, vec2f(-dir.y, dir.x));
+  // The trail draws out behind the head, then shortens as it burns out.
+  let len = span * 0.45 * min(u * 3.0, 1.0) * (1.0 - 0.5 * u);
+  let k = clamp(behind / len, 0.0, 1.0);
+  let sig = max(0.5, 0.75 / dpr);
+  let body = exp(-0.5 * across * across / (sig * sig)) + 0.12 * exp(-0.5 * across * across / (16.0 * sig * sig));
+  let tail = select(0.0, (1.0 - k) * (1.0 - k), behind > 0.0 && behind < len);
+  let trail = mix(vec3f(0.8, 0.9, 1.0), vec3f(0.22, 0.45, 1.0), smoothstep(0.0, 0.35, k)) * body * tail * 0.5;
+  let head = vec3f(0.95, 0.97, 1.0) * exp(-0.5 * dot(q, q) / (1.4 * sig * sig)) * 1.6;
+  // In, flaring, and out.
+  let life = smoothstep(0.0, 0.15, u) * (1.0 - smoothstep(0.6, 1.0, u));
+  return (trail + head) * life;
 }

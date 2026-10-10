@@ -3,7 +3,7 @@
 // the trail. Lengths are CSS px; y grows down the page.
 import { Body, bodyLight } from "./wgsl/body.wgsl";
 import { encode, grain, LUMA, shoulder, textMask } from "./wgsl/light.wgsl";
-import { skyField, StarFrame } from "./wgsl/stars.wgsl";
+import { meteors, skyField, StarFrame } from "./wgsl/stars.wgsl";
 import { gather, nebula, ribbon, shed, Trail } from "./wgsl/trail.wgsl";
 
 struct Params {
@@ -93,11 +93,12 @@ struct Params {
   // Where the halo or the air is bright, the stars wash out.
   let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
   let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
-                     quiet, params.band, params.bandDrift);
+                     quiet, textMask(page, params.textA, 260.0) * params.textK.x, params.band, params.bandDrift);
   let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
                  params.viewHeight, B, vis, params.settle);
 
-  var col = skyField(css, sf, milky, milkySampler) + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
+  var col = skyField(css, sf, milky, milkySampler) + meteors(css, W, params.viewHeight, t, params.dpr) * motion * ext * (1.0 - 0.9 * quiet)
+          + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
   // The planet and the ground are opaque.
   col = mix(col, bl.night, bl.inside);
   col += shed(page, bl.d, tr) + gather(page, bl.d, tr);
