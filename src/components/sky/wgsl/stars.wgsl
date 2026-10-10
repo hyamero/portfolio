@@ -1,7 +1,7 @@
 // The star field and the Milky Way (spec §4.1, Appendix A.1–A.2), in linear light. src/lib/star-field.ts
 // ports the near and bright layers' placement for the CSS sky's star map: keep them in step.
 import { BG, LUMA } from "./light.wgsl";
-import { cellHash, erf, fbm, pcg, u01 } from "./noise.wgsl";
+import { cellHash, erf, fbm, pcg, u01, vnoise } from "./noise.wgsl";
 
 // The streaks' exposure, s: a star smears over velocity × parallax × this.
 const EXPOSURE = 0.05;
@@ -71,32 +71,35 @@ export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   let w = f.z;
   let a = across / w;
   let core = exp(-a * a);
-  // A wide, faint glow the band sits in, so it fades into the sky rather than stop at an edge.
-  let veil = exp(-a * a / 6.0);
+  // A faint skirt, so the band fades into the sky rather than stop at an edge.
+  let skirt = exp(-a * a / 3.0);
   let lengthwise = 0.55 + 0.7 * fbm(vec2f(along / 520.0, 4.7), 3, 17u);
   let bx = (along - 0.12 * W) / (0.5 * W);
   let bulge = exp(-bx * bx);
-  // Domain-warped clouds stretch into wisps along the band.
+  // Domain-warped clouds stretch into wisps along the band; the brightest of them stand out as star clouds.
   let warp = vec2f(fbm(s / 320.0, 3, 43u), fbm(s / 320.0 + vec2f(5.2, 1.3), 3, 47u)) - 0.5;
   let cloud = fbm(s / 150.0 + warp * 1.8, 5, 23u);
-  let clumps = smoothstep(0.3, 0.78, cloud);
-  // Unresolved stars: a fine mottle over the clouds.
-  let grain = fbm(s / 16.0, 3, 29u);
-  let glow = (core * (0.14 + 1.6 * clumps * clumps) * (0.5 + 1.1 * grain * grain) + 0.16 * veil * (0.4 + 0.6 * cloud))
-           * lengthwise * (0.75 + 0.7 * bulge);
-  // Dust: filaments along the band and a rift that wanders down its middle.
+  let clumps = smoothstep(0.32, 0.8, cloud);
+  let knotty = fbm(s / 45.0 + warp * 3.0, 4, 61u);
+  // Unresolved stars: a mottle, and a dust of specks a couple of px across, densest in the clouds.
+  let mottle = fbm(s / 14.0, 3, 29u);
+  let specks = pow(vnoise(s / 1.6, 59u), 10.0) * 12.0;
+  let starlight = core * (0.2 + 1.1 * pow(clumps, 1.6) * (0.6 + 0.8 * knotty)) * (0.55 + 0.9 * mottle * mottle) * (1.0 + 0.3 * specks * (0.4 + clumps));
+  // Dust dims only the band's own light, never the sky behind it: filaments along the band and a
+  // rift that wanders down one side of its middle.
   let ridge = 1.0 - abs(2.0 * fbm(vec2f(along / 300.0, across / 70.0) + warp, 5, 31u) - 1.0);
   let lanes = smoothstep(0.6, 0.94, ridge) * exp(-1.6 * a * a);
   let rx = (across + 0.22 * w + 0.12 * w * (fbm(vec2f(along / 260.0, 2.9), 3, 53u) - 0.5)) / (0.1 * w);
   let rift = exp(-rx * rx) * smoothstep(0.3, 0.7, fbm(vec2f(along / 450.0, 9.1), 3, 37u));
-  let clear = (1.0 - 0.65 * lanes) * (1.0 - 0.7 * rift);
+  let clear = (1.0 - 0.7 * lanes) * (1.0 - 0.75 * rift);
+  let glow = (starlight * clear + 0.035 * skirt * (0.5 + 0.5 * cloud)) * lengthwise * (0.75 + 0.7 * bulge);
   // Blue starlight, paler in the bulge's clouds, and faint rose knots of glowing gas along them. The
   // encode flattens dim colour, so the tints are far bluer than they read.
   let warm = clamp(core * bulge, 0.0, 1.0);
-  var tint = mix(vec3f(0.2, 0.28, 1.0), vec3f(0.42, 0.56, 1.0), smoothstep(0.1, 0.8, core));
+  var tint = mix(vec3f(0.2, 0.28, 1.0), vec3f(0.45, 0.58, 1.0), smoothstep(0.1, 0.8, core) * clumps);
   tint = mix(tint, vec3f(0.9, 0.86, 1.0), 0.45 * warm * clumps);
   let knots = smoothstep(0.66, 0.86, fbm(s / 70.0 + warp * 2.0, 4, 41u)) * core * clumps;
-  let light = tint * glow * clear + vec3f(0.9, 0.3, 0.8) * knots * 0.5 * clear;
+  let light = tint * glow + vec3f(0.9, 0.3, 0.8) * knots * 0.35 * clear;
   return vec4f(light, core * clear);
 }
 
@@ -189,26 +192,24 @@ export struct StarFrame {
   pl: f32,
   // How much of the sky shows through the light in front of it.
   ext: f32,
-  // The text mask here, and a wider, softer one for the Milky Way, whose glow would show the
-  // narrow mask's edge.
+  // The text mask here.
   quiet: f32,
-  hush: f32,
   // The band-space rect the Milky Way cache covers: origin, size.
   map: vec4f,
-  // The band's drift down band space (2.5% of the virtual scroll, held inside the cache).
+  // The band's drift down band space (6% of the virtual scroll, held inside the cache).
   drift: f32,
 }
 
 // The sky behind everything, in linear light: the background, the cached Milky Way and four depths of stars.
 export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampler) -> vec3f {
-  let mwOff = vec2f(0.0, f.drift) + f.par * 0.3;
+  let mwOff = vec2f(0.0, f.drift) + f.par * 0.8;
   let band = textureSampleLevel(cache, samp, (css + mwOff - f.map.xy) / f.map.zw, 0.0).rgb;
   // The cursor's light lifts the band's dust like a lamp in fog; text dims both.
-  var col = (band * 0.024 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * max(f.quiet, f.hush));
+  var col = (band * 0.016 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);
   let T = f.vel * EXPOSURE;
-  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 4.0, 101u),
+  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 7.0, 101u),
                    T * 0.04, f.dpr, f.time, mwOff, cache, samp, f.map);
-  col += starLayer(css, vec2f(0.0, f.scroll * 0.08) + f.par * 1.2, Layer(24.0, 0.03, 0.09, 14.0, 0.0, 1.2, 202u),
+  col += starLayer(css, vec2f(0.0, f.scroll * 0.08) + f.par * 1.2, Layer(24.0, 0.03, 0.09, 14.0, 0.0, 2.0, 202u),
                    T * 0.08, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += starLayer(css, vec2f(0.0, f.scroll * 0.17) + f.par * 2.0, nearLayer(), T * 0.17, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += brightLayer(css, vec2f(0.0, f.scroll * 0.12) + f.par * 1.6, T * 0.12, f.dpr, f.time);
@@ -216,8 +217,9 @@ export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampl
 }
 
 // Occasional shooting stars, in viewport px: at most one in each 5 s slot, a white head drawing out a
-// blue trail. They run on the sky's time, which holds still at rest, so callers gate them off under
-// reduced motion, where a frozen one would hang in the sky.
+// blue trail. src/lib/meteors.ts ports the schedule, so the sky draws frames while one is in flight:
+// keep them in step. Reduced motion stops the clock, so callers gate them off there, where a frozen
+// one would hang in the sky.
 export fn meteors(css: vec2f, W: f32, H: f32, time: f32, dpr: f32) -> vec3f {
   let P = 5.0;
   let slot = floor(time / P);
