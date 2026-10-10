@@ -194,9 +194,9 @@ export fn skyField(css: vec2f, f: StarFrame, cache: texture_2d<f32>, samp: sampl
   // The cursor's light lifts the band's dust like a lamp in fog; text dims both.
   var col = (band * 0.004 * (1.0 + 2.5 * f.pl) + vec3f(0.5, 0.65, 1.0) * 0.0016 * f.pl) * (1.0 - 0.92 * f.quiet);
   let T = f.vel * EXPOSURE;
-  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.1, 0.035, 10.0, 0.0, 2.4, 101u),
+  col += starLayer(css, vec2f(0.0, f.scroll * 0.04) + f.par * 0.6, Layer(8.0, 0.006, 0.035, 10.0, 0.0, 2.4, 101u),
                    T * 0.04, f.dpr, f.time, mwOff, cache, samp, f.map);
-  col += starLayer(css, vec2f(0.0, f.scroll * 0.08) + f.par * 1.2, Layer(24.0, 0.13, 0.09, 14.0, 0.0, 1.2, 202u),
+  col += starLayer(css, vec2f(0.0, f.scroll * 0.08) + f.par * 1.2, Layer(24.0, 0.03, 0.09, 14.0, 0.0, 1.2, 202u),
                    T * 0.08, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += starLayer(css, vec2f(0.0, f.scroll * 0.17) + f.par * 2.0, nearLayer(), T * 0.17, f.dpr, f.time, mwOff, cache, samp, f.map);
   col += brightLayer(css, vec2f(0.0, f.scroll * 0.12) + f.par * 1.6, T * 0.12, f.dpr, f.time);
