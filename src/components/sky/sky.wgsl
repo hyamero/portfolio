@@ -51,6 +51,8 @@ struct Params {
   textK: vec4f,
   // The band-space rect the Milky Way cache covers: origin, size.
   band: vec4f,
+  // The Milky Way's drift down band space, held inside its cache.
+  bandDrift: f32,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -89,7 +91,7 @@ struct Params {
   // Where the corona or the air is bright, the stars wash out.
   let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
   let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
-                     quiet, params.band);
+                     quiet, params.band, params.bandDrift);
   let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
                  params.viewHeight, B, vis, params.settle);
 
