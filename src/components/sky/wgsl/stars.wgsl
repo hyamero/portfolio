@@ -57,7 +57,8 @@ fn bandFrame(s: vec2f, W: f32, H: f32) -> vec3f {
   let dir = vec2f(cos(ang), -sin(ang));
   let nrm = vec2f(-dir.y, dir.x);
   let along = dot(s - c0, dir);
-  let w = 0.2 * H;
+  // It swells and narrows along its length, and its centre line wanders.
+  let w = 0.2 * H * (0.8 + 0.4 * fbm(vec2f(along / 600.0, 6.1), 3, 13u));
   let across = dot(s - c0, nrm) - w * 0.9 * (fbm(vec2f(along / 700.0, 1.3), 3, 11u) - 0.5);
   return vec3f(along, across, w);
 }
@@ -67,40 +68,39 @@ fn bandFrame(s: vec2f, W: f32, H: f32) -> vec3f {
 export fn milky(s: vec2f, W: f32, H: f32) -> vec4f {
   let f = bandFrame(s, W, H);
   let along = f.x;
-  let across = f.y;
-  let w = f.z;
-  let a = across / w;
+  let a = f.y / f.z;
   let core = exp(-a * a);
   // A faint skirt, so the band fades into the sky rather than stop at an edge.
   let skirt = exp(-a * a / 3.0);
-  let lengthwise = 0.55 + 0.7 * fbm(vec2f(along / 520.0, 4.7), 3, 17u);
+  let lengthwise = 0.6 + 0.6 * fbm(vec2f(along / 520.0, 4.7), 3, 17u);
   let bx = (along - 0.12 * W) / (0.5 * W);
   let bulge = exp(-bx * bx);
-  // Domain-warped clouds stretch into wisps along the band; the brightest of them stand out as star clouds.
-  let warp = vec2f(fbm(s / 320.0, 3, 43u), fbm(s / 320.0 + vec2f(5.2, 1.3), 3, 47u)) - 0.5;
-  let cloud = fbm(s / 150.0 + warp * 1.8, 5, 23u);
-  let clumps = smoothstep(0.32, 0.8, cloud);
-  let knotty = fbm(s / 45.0 + warp * 3.0, 4, 61u);
-  // Unresolved stars: a mottle, and a dust of specks a couple of px across, densest in the clouds.
+  // Two rounds of domain warp, with no preferred direction, so nothing in it runs straight.
+  let q = s + (vec2f(fbm(s / 420.0, 3, 43u), fbm(s / 420.0 + vec2f(5.2, 1.3), 3, 47u)) - 0.5) * 140.0;
+  let r = q + (vec2f(fbm(q / 150.0, 3, 71u), fbm(q / 150.0 + vec2f(3.7, 8.1), 3, 73u)) - 0.5) * 60.0;
+  // Starlight: one continuous glow, brightest down the middle, lumpier where the star clouds bunch.
+  let clouds = smoothstep(0.32, 0.78, fbm(r / 130.0, 5, 23u));
   let mottle = fbm(s / 14.0, 3, 29u);
+  // Unresolved stars: a dust of specks a couple of px across, densest in the clouds.
   let specks = pow(vnoise(s / 1.6, 59u), 10.0) * 12.0;
-  let starlight = core * (0.2 + 1.1 * pow(clumps, 1.6) * (0.6 + 0.8 * knotty)) * (0.55 + 0.9 * mottle * mottle) * (1.0 + 0.3 * specks * (0.4 + clumps));
-  // Dust dims only the band's own light, never the sky behind it: filaments along the band and a
-  // rift that wanders down one side of its middle.
-  let ridge = 1.0 - abs(2.0 * fbm(vec2f(along / 300.0, across / 70.0) + warp, 5, 31u) - 1.0);
-  let lanes = smoothstep(0.6, 0.94, ridge) * exp(-1.6 * a * a);
-  let rx = (across + 0.22 * w + 0.12 * w * (fbm(vec2f(along / 260.0, 2.9), 3, 53u) - 0.5)) / (0.1 * w);
-  let rift = exp(-rx * rx) * smoothstep(0.3, 0.7, fbm(vec2f(along / 450.0, 9.1), 3, 37u));
-  let clear = (1.0 - 0.7 * lanes) * (1.0 - 0.75 * rift);
-  let glow = (starlight * clear + 0.035 * skirt * (0.5 + 0.5 * cloud)) * lengthwise * (0.75 + 0.7 * bulge);
-  // Blue starlight, paler in the bulge's clouds, and faint rose knots of glowing gas along them. The
-  // encode flattens dim colour, so the tints are far bluer than they read.
-  let warm = clamp(core * bulge, 0.0, 1.0);
-  var tint = mix(vec3f(0.2, 0.28, 1.0), vec3f(0.45, 0.58, 1.0), smoothstep(0.1, 0.8, core) * clumps);
-  tint = mix(tint, vec3f(0.9, 0.86, 1.0), 0.45 * warm * clumps);
-  let knots = smoothstep(0.66, 0.86, fbm(s / 70.0 + warp * 2.0, 4, 41u)) * core * clumps;
-  let light = tint * glow + vec3f(0.9, 0.3, 0.8) * knots * 0.35 * clear;
-  return vec4f(light, core * clear);
+  let starlight = core * (0.45 + 0.65 * clouds) * (0.55 + 0.9 * mottle * mottle) * (1.0 + 0.3 * specks * (0.4 + clouds));
+  // Dust: patchy clouds with ragged filaments off them, lying along the middle in stretches. It dims
+  // only the band's own light, never the sky behind it.
+  let lies = exp(-pow((a + 0.12) / 0.45, 2.0)) * smoothstep(0.3, 0.6, fbm(vec2f(along / 360.0, 7.3), 3, 37u));
+  let patches = smoothstep(0.48, 0.76, fbm(r / 48.0, 5, 83u));
+  let filaments = smoothstep(0.8, 0.97, 1.0 - abs(2.0 * fbm(r / 40.0, 4, 89u) - 1.0));
+  let dust = clamp((patches + 0.6 * filaments) * lies, 0.0, 1.0);
+  let glow = (starlight * (1.0 - 0.75 * dust) + 0.035 * skirt * (0.5 + 0.5 * clouds)) * lengthwise * (0.75 + 0.7 * bulge);
+  // Blue starlight, paler in the clouds and faintly warm at the core, with dust edges lit brown and
+  // faint rose knots of glowing gas. The encode flattens dim colour, so the tints are far stronger
+  // than they read.
+  var tint = mix(vec3f(0.2, 0.28, 1.0), vec3f(0.45, 0.58, 1.0), smoothstep(0.1, 0.8, core) * clouds);
+  tint = mix(tint, vec3f(1.0, 0.82, 0.66), 0.4 * core * bulge * clouds);
+  let rim = smoothstep(0.08, 0.4, dust) * (1.0 - smoothstep(0.4, 0.85, dust));
+  tint = mix(tint, vec3f(1.0, 0.72, 0.48), 0.35 * rim);
+  let knots = smoothstep(0.66, 0.86, fbm(r / 70.0, 4, 41u)) * core * clouds;
+  let light = tint * glow + vec3f(0.9, 0.3, 0.8) * knots * 0.3 * (1.0 - dust);
+  return vec4f(light, core * (1.0 - 0.75 * dust));
 }
 
 // One depth of stars at css (viewport px). off: the layer's scroll and parallax offset; trail: its
