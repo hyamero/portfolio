@@ -6,11 +6,8 @@ import {
   clamp,
   COAST,
   coastStep,
-  departure,
   ease,
-  horizonFrame,
   introProgress,
-  orbFrame,
   restingLight,
   rise,
   skyDpr,
@@ -51,12 +48,7 @@ describe("skyDpr", () => {
   });
 });
 
-describe("departure and rise", () => {
-  test("departure runs 0..1 across the hero", () => {
-    expect(departure(0, hero)).toBe(0);
-    expect(departure(480, hero)).toBe(0.5);
-    expect(departure(5000, hero)).toBe(1);
-  });
+describe("rise", () => {
   test("rise starts when Contact's top meets the viewport bottom", () => {
     expect(rise(3000 - 900, 900, contact)).toBe(0);
     expect(rise(3000 - 900 + 410, 900, contact)).toBeCloseTo(0.5);
@@ -64,54 +56,15 @@ describe("departure and rise", () => {
   });
   test("a missing anchor never divides by zero", () => {
     const none: Rect = { left: 0, top: 0, width: 0, height: 0 };
-    expect(Number.isFinite(departure(100, none))).toBe(true);
     expect(Number.isFinite(rise(100, 900, none))).toBe(true);
   });
 });
 
 describe("introProgress", () => {
-  test("eases out over 2.4 s", () => {
+  test("eases out over 3.6 s", () => {
     expect(introProgress(-100)).toBe(0);
-    expect(introProgress(1200)).toBeCloseTo(0.875);
-    expect(introProgress(2400)).toBe(1);
-  });
-});
-
-describe("orbFrame", () => {
-  test("rests at 68% of the hero once the intro is done", () => {
-    const orb = orbFrame(hero, 1, 0);
-    expect(orb.cx).toBe(720);
-    expect(orb.apex).toBeCloseTo(960 * 0.68);
-    expect(orb.radius).toBeCloseTo(Math.max(0.62 * 1440, 0.95 * 960));
-    expect(orb.vis).toBe(1);
-  });
-  test("starts 10% lower and 3% smaller during the intro", () => {
-    const orb = orbFrame(hero, 0, 0);
-    expect(orb.apex).toBeCloseTo(960 * 0.78);
-    expect(orb.radius).toBeCloseTo(0.97 * 912);
-    expect(orb.vis).toBe(0);
-  });
-  test("sinks twice as fast as the page scrolls and is gone by 80% departure", () => {
-    const half = orbFrame(hero, 1, 0.5);
-    expect(half.apex).toBeCloseTo(960 * 0.68 + 960);
-    expect(half.vis).toBeCloseTo(0.5);
-    expect(orbFrame(hero, 1, 0.8).vis).toBe(0);
-  });
-  test("is invisible without a hero", () => {
-    expect(orbFrame({ left: 0, top: 0, width: 0, height: 0 }, 1, 0).vis).toBe(0);
-  });
-});
-
-describe("horizonFrame", () => {
-  test("sits 2% above Contact's bottom at rest and 15% when risen", () => {
-    expect(horizonFrame(contact, 0).top).toBeCloseTo(3820 - 0.02 * 820);
-    expect(horizonFrame(contact, 1).top).toBeCloseTo(3820 - 0.15 * 820);
-  });
-  test("is a wide arc centered on Contact", () => {
-    const h = horizonFrame(contact, 1);
-    expect(h.cx).toBe(720);
-    expect(h.radius).toBe(Math.max(1440 * 2.2, 2600));
-    expect(h.halfWidth).toBeCloseTo(1440 * 0.37);
+    expect(introProgress(1800)).toBeCloseTo(0.875);
+    expect(introProgress(3600)).toBe(1);
   });
 });
 
@@ -142,36 +95,40 @@ describe("armIntro", () => {
 });
 
 describe("trailFrame", () => {
-  test("nothing sheds at the top, and the whole trail has shed as the orb finishes fading", () => {
-    expect(trailFrame(0, 0, false, true).shed).toBe(0);
-    expect(trailFrame(0.85, 0, false, true).shed).toBe(1);
-    expect(trailFrame(1, 0, false, true).shed).toBe(1);
+  test("the shed comes in early in the descent, while the planet still has its colour", () => {
+    expect(trailFrame(0.05, 0, 0, false, true).shed).toBe(0);
+    expect(trailFrame(0.34, 0, 0, false, true).shed).toBeGreaterThan(0.2);
+    expect(trailFrame(0.9, 0, 0, false, true).shed).toBe(1);
   });
-  test("most of the shed happens while the setting limb is still in view", () => {
-    // The orb sinks at twice the page speed, so its limb leaves the viewport near dep 0.26.
-    expect(trailFrame(0.26, 0, false, true).shed).toBeGreaterThan(0.5);
+  test("the shed builds gradually over most of the descent", () => {
+    expect(trailFrame(0.5, 0, 0, false, true).shed).toBeLessThan(0.6);
+    expect(trailFrame(0.75, 0, 0, false, true).shed).toBeLessThan(0.95);
   });
-  test("shed grows monotonically with departure", () => {
+  test("the whole trail has shed by the time the horizon settles", () => {
+    expect(trailFrame(1, 0, 0, false, true).shed).toBe(1);
+    expect(trailFrame(1, 1, 0, false, true).shed).toBe(1);
+  });
+  test("shed grows monotonically with the descent", () => {
     let last = -1;
-    for (let d = 0; d <= 1; d += 0.05) {
-      const { shed } = trailFrame(d, 0, false, true);
+    for (let m = 0; m <= 1; m += 0.05) {
+      const { shed } = trailFrame(m, 0, 0, false, true);
       expect(shed).toBeGreaterThanOrEqual(last);
       last = shed;
     }
   });
-  test("the ribbon appears as the orb leaves and dims as the horizon takes over", () => {
-    expect(trailFrame(0, 0, false, true).carry).toBe(0);
-    expect(trailFrame(0.35, 0, false, true).carry).toBe(1);
-    expect(trailFrame(1, 1, false, true).carry).toBeCloseTo(0.6);
+  test("the ribbon appears as the horizon settles and dims as Contact rises", () => {
+    expect(trailFrame(1, 0, 0, false, true).carry).toBe(0);
+    expect(trailFrame(1, 0.35, 0, false, true).carry).toBe(1);
+    expect(trailFrame(1, 1, 1, false, true).carry).toBeCloseTo(0.6);
   });
   test("there is no ribbon without a Work section", () => {
-    expect(trailFrame(1, 0, false, false).carry).toBe(0);
+    expect(trailFrame(1, 1, 0, false, false).carry).toBe(0);
   });
   test("gather follows the horizon's rise", () => {
-    expect(trailFrame(1, 0.4, false, true).gather).toBe(0.4);
+    expect(trailFrame(1, 1, 0.4, false, true).gather).toBe(0.4);
   });
   test("reduced motion sheds nothing and holds the ribbon as still nebula", () => {
-    expect(trailFrame(0.6, 1, true, true)).toEqual({ shed: 0, carry: 1, gather: 1 });
+    expect(trailFrame(1, 0.6, 1, true, true)).toEqual({ shed: 0, carry: 1, gather: 1 });
   });
 });
 

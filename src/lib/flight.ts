@@ -1,6 +1,7 @@
 import gsap from "gsap";
 import type Lenis from "lenis";
 
+import { liftStep } from "./signal";
 import { approach, clamp, coastStep, restingLight, type Rect } from "./sky-math";
 
 export const EMPTY_RECT: Rect = { left: 0, top: 0, width: 0, height: 0 };
@@ -22,6 +23,17 @@ export function createFlight() {
     /** The stars' coast: a velocity and the virtual scroll it has added. */
     coast: { v: 0, offset: 0 },
     hero: EMPTY_RECT,
+    /**
+     * The hero's camera (spec §4.1): motion.tsx scrubs the channels and the sky reads them. `end` is
+     * the scroll position where the runway ends, written on refresh; until then nothing settles.
+     * `copy` is how much of the hero copy still shows, 1 → 0 as it lifts away; the sky's text mask follows it.
+     */
+    camera: { zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 },
+    /**
+     * Contact's signal (sky polish spec §5.6): a hovered or focused link's lift on the sun, easing
+     * toward `target`, and the last click's time in ms on the tick's clock.
+     */
+    signal: { lift: 0, target: 0, at: Number.NEGATIVE_INFINITY },
     reduced: false,
     lenis: null as Lenis | null,
   };
@@ -65,6 +77,7 @@ export function advance(s: Flight, scroll: number, scrollX: number, dt: number) 
 
   s.coast.v = s.reduced ? 0 : coastStep(s.coast.v, s.velocity, dt);
   s.coast.offset += s.coast.v * dt;
+  s.signal.lift = liftStep(s.signal.lift, s.signal.target, dt, s.reduced);
 }
 
 /** True while the light, its hover or the coast is still easing. */
@@ -118,6 +131,33 @@ function listen() {
   const onLeave = () => {
     flight.pointer.active = false;
   };
+  // Contact's links send a signal (sky polish spec §5.6). Delegated, so it holds across routes.
+  const signals = (target: EventTarget | null) => target instanceof Element && !!target.closest("[data-sky-signal]");
+  let hovered = false;
+  let focused = false;
+  const aim = () => {
+    flight.signal.target = hovered || focused ? 1 : 0;
+  };
+  const onOver = (event: PointerEvent) => {
+    hovered = signals(event.target);
+    aim();
+  };
+  const onOut = (event: PointerEvent) => {
+    hovered = signals(event.relatedTarget);
+    aim();
+  };
+  const onFocusIn = (event: FocusEvent) => {
+    focused = signals(event.target);
+    aim();
+  };
+  const onFocusOut = (event: FocusEvent) => {
+    focused = signals(event.relatedTarget);
+    aim();
+  };
+  // Enter on a focused link clicks it too. The link still follows its href.
+  const onClick = (event: MouseEvent) => {
+    if (signals(event.target)) flight.signal.at = gsap.ticker.time * 1000;
+  };
   // One callback so the order is fixed: Lenis scrolls, the state reads it, subscribers draw.
   const tick = (time: number, deltaMs: number) => {
     const now = time * 1000;
@@ -130,11 +170,21 @@ function listen() {
   gsap.ticker.add(tick);
   window.addEventListener("pointermove", onPointer, { passive: true });
   document.documentElement.addEventListener("pointerleave", onLeave);
+  document.addEventListener("pointerover", onOver);
+  document.addEventListener("pointerout", onOut);
+  document.addEventListener("focusin", onFocusIn);
+  document.addEventListener("focusout", onFocusOut);
+  document.addEventListener("click", onClick);
   motion.addEventListener("change", onMotion);
   return () => {
     gsap.ticker.remove(tick);
     window.removeEventListener("pointermove", onPointer);
     document.documentElement.removeEventListener("pointerleave", onLeave);
+    document.removeEventListener("pointerover", onOver);
+    document.removeEventListener("pointerout", onOut);
+    document.removeEventListener("focusin", onFocusIn);
+    document.removeEventListener("focusout", onFocusOut);
+    document.removeEventListener("click", onClick);
     motion.removeEventListener("change", onMotion);
     flight.primed = false;
   };
@@ -148,5 +198,11 @@ export function pageRect(el: Element): Rect {
 
 export function anchorRect(name: string): Rect {
   const el = document.querySelector(`[data-sky-anchor="${name}"]`);
+  return el ? pageRect(el) : EMPTY_RECT;
+}
+
+/** A `data-sky-text` block's rect in page space: text the sky keeps quiet behind. Layout too. */
+export function textRect(name: string): Rect {
+  const el = document.querySelector(`[data-sky-text="${name}"]`);
   return el ? pageRect(el) : EMPTY_RECT;
 }

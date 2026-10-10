@@ -13,7 +13,7 @@ export function ease(a: number, b: number, x: number) {
 // A pixel budget, not a fixed ratio: the sky covers the whole viewport on every frame.
 const PIXEL_BUDGET = 2.2e6;
 const MAX_DPR = 1.25;
-const INTRO_MS = 2400;
+const INTRO_MS = 3600;
 
 export function skyDpr(deviceDpr: number, width: number, height: number) {
   return Math.min(
@@ -21,11 +21,6 @@ export function skyDpr(deviceDpr: number, width: number, height: number) {
     MAX_DPR,
     Math.sqrt(PIXEL_BUDGET / Math.max(width * height, 1)),
   );
-}
-
-/** How far the page has scrolled through the hero, 0..1. */
-export function departure(scrollY: number, hero: Rect) {
-  return clamp((scrollY - hero.top) / Math.max(hero.height, 1));
 }
 
 /** How far Contact has come up into the viewport, 0..1. */
@@ -44,33 +39,9 @@ export function armIntro(start: number | null, now: number, hasHero: boolean, vi
   return start ?? (visible ? now : null);
 }
 
-/** The orb's page-in, eased out (cubic) over 2.4 s. */
+/** The orb's page-in, eased out (cubic) over 3.6 s. */
 export function introProgress(elapsedMs: number) {
   return 1 - (1 - clamp(elapsedMs / INTRO_MS)) ** 3;
-}
-
-/**
- * The hero orb: `apex` is the top of its limb. It rises into place with the intro, then sinks
- * twice as fast as the page scrolls, so the departing copy never sits on the bright limb.
- */
-export function orbFrame(hero: Rect, intro: number, dep: number) {
-  const { width: W, height: H } = hero;
-  return {
-    cx: hero.left + W / 2,
-    apex: hero.top + H * (0.68 + 0.1 * (1 - intro)) + dep * H * 2,
-    radius: Math.max(0.62 * W, 0.95 * H) * (0.97 + 0.03 * intro),
-    vis: H > 0 ? intro * (1 - ease(0.2, 0.8, dep)) : 0,
-  };
-}
-
-/** The closing horizon behind Contact: a wide arc whose top climbs with `rise`. */
-export function horizonFrame(contact: Rect, rise: number) {
-  return {
-    cx: contact.left + contact.width / 2,
-    top: contact.top + contact.height - (0.02 + 0.13 * rise) * contact.height,
-    radius: Math.max(contact.width * 2.2, 2600),
-    halfWidth: contact.width * 0.37,
-  };
 }
 
 /** Where the light rests without a pointer: above the hero, a little left of center. */
@@ -87,13 +58,15 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
 }
 
 /**
- * The orb's trail (spec §4.1): its atmosphere sheds off the limb as it sets, carries on as a
- * ribbon of nebula through Work, and gathers back into the horizon as Contact rises.
+ * The horizon's trail (motion spec §4.1, eclipse spec §5.4): the planet's atmosphere sheds off the
+ * rim from early in the camera's descent (`fall`, its zoom), just ahead of the planet losing its
+ * colour, carries on as a ribbon of nebula through Work as the horizon settles (`dep` is how far it
+ * has), and gathers back into it as Contact rises.
  */
-export function trailFrame(dep: number, up: number, reduced: boolean, hasWork: boolean) {
+export function trailFrame(fall: number, dep: number, up: number, reduced: boolean, hasWork: boolean) {
   if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
   return {
-    shed: ease(0.04, 0.4, dep),
+    shed: ease(0.05, 0.9, fall),
     carry: hasWork ? ease(0, 0.35, dep) * (1 - 0.4 * up) : 0,
     gather: up,
   };

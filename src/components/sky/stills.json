@@ -1,0 +1,26 @@
+{
+  "hash": "f21eaf81dcce70fc01325652f5624123a5be41a5b37f4133daa5510a01b71516",
+  "stills": {
+    "planet.avif": {
+      "size": [
+        2560,
+        1536
+      ],
+      "bytes": 16074
+    },
+    "horizon-1440.avif": {
+      "size": [
+        2880,
+        768
+      ],
+      "bytes": 5066
+    },
+    "horizon-390.avif": {
+      "size": [
+        780,
+        464
+      ],
+      "bytes": 1901
+    }
+  }
+}

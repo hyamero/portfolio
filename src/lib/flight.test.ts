@@ -12,6 +12,32 @@ const fresh = () => {
 };
 
 describe("flight", () => {
+  test("the hero's camera starts on the planet, with no runway end yet", () => {
+    expect(createFlight().camera).toEqual({ zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 });
+  });
+  test("the signal starts unlit, with no pulse", () => {
+    expect(createFlight().signal).toEqual({ lift: 0, target: 0, at: Number.NEGATIVE_INFINITY });
+  });
+  test("a hovered link's lift eases in and lets go", () => {
+    const s = fresh();
+    advance(s, 0, 0, DT);
+    s.signal.target = 1;
+    advance(s, 0, 0, DT);
+    expect(s.signal.lift).toBeGreaterThan(0);
+    expect(s.signal.lift).toBeLessThan(1);
+    for (let i = 0; i < 120; i++) advance(s, 0, 0, DT);
+    expect(s.signal.lift).toBe(1);
+    s.signal.target = 0;
+    for (let i = 0; i < 120; i++) advance(s, 0, 0, DT);
+    expect(s.signal.lift).toBe(0);
+  });
+  test("under reduced motion the lift applies at once", () => {
+    const s = fresh();
+    s.reduced = true;
+    s.signal.target = 1;
+    advance(s, 0, 0, DT);
+    expect(s.signal.lift).toBe(1);
+  });
   test("the first tick primes the scroll without a velocity kick", () => {
     const s = fresh();
     advance(s, 2400, 0, DT);

@@ -19,7 +19,7 @@ export default function Work() {
         >
           Selected work
         </h2>
-        <ol>
+        <ol data-sky-text="work">
           {projects.map((project) => (
             <li
               key={project.id}

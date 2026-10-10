@@ -7,7 +7,7 @@ import EdgeLight from "@/components/edge-light";
 import SiteHeader from "@/components/site-header";
 import SmoothScroll from "@/components/smooth-scroll";
 import Sky from "@/components/sky/sky";
-import { SkyGrain } from "@/components/sky/fallback";
+import { SkyGrain, SkyStars } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -49,12 +49,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-sky="css" className={GeistSans.variable}>
+    // The script below changes data-sky before hydration.
+    <html lang="en" data-sky="css" className={GeistSans.variable} suppressHydrationWarning>
+      <head>
+        {/* Before first paint, so a slow hydration can't let the CSS planet's dawn start while the live
+            sky may still take over (sky polish spec §6). */}
+        <script dangerouslySetInnerHTML={{ __html: 'if("gpu"in navigator)document.documentElement.dataset.sky="pending"' }} />
+      </head>
       <body className="flex min-h-svh flex-col overflow-x-clip font-sans">
         {/* Without scripts nothing would fade the page-in up. */}
         <noscript>
           <style>{"[data-rise],[data-head-word]{opacity:1!important}"}</style>
         </noscript>
+        <SkyStars />
         <SkyGrain />
         <Sky />
         <SmoothScroll />

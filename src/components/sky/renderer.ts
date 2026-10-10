@@ -1,35 +1,38 @@
 import { effect, frame, surface } from "vgpu";
 
+import { createMilkyCache } from "./milky-cache";
+import { bandExtent, diffKey, sameKey, skyParams, type BandMap, type SkyInput } from "./params";
 import skySource from "./sky.wgsl";
-import { anchorRect, EMPTY_RECT, flight, onTick, startFlight } from "@/lib/flight";
+import { bodyFrame, discIn, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
+import { anchorRect, EMPTY_RECT, flight, onTick, pageRect, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
-import {
-  armIntro,
-  departure,
-  horizonFrame,
-  introProgress,
-  orbFrame,
-  rise,
-  skyDpr,
-  trailFrame,
-  type Rect,
-} from "@/lib/sky-math";
+import { meteorInFlight } from "@/lib/meteors";
+import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
-// The ambient drift (nebula, flow, twinkle) needs no more than ~30fps.
+// The ambient drift (twinkle, the planet's flowing band and sparkles) needs no more than ~30fps.
 const AMBIENT_MS = 33;
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 
 /**
- * Draws the page's sky into the fixed `canvas` on flight's tick. Frames are drawn on demand: when
- * anything the sky reads has changed, while the orb's intro eases, and at ~30fps while the orb,
- * the horizon or the shedding trail is in view.
+ * Draws the page's sky into the fixed `canvas` on flight's tick, and the resting horizon's ground
+ * into `front`, over the content (eclipse spec §5.6). Frames are drawn on demand (sky polish spec
+ * §3.6): when any uniform has changed, while the intro eases, at ~30fps while the body moves, and
+ * while a shooting star is in flight.
  */
-export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
+export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
   let disposed = false;
   let measure = () => {};
-  const teardown: (() => void)[] = [startFlight()];
+  const hideFront = () => {
+    front.style.visibility = "hidden";
+    front.style.clipPath = "";
+  };
+  let grid: HTMLElement | null = null;
+  const uncutGrid = () => {
+    for (const k of ["--disc-x", "--disc-y", "--disc-r"]) grid?.style.removeProperty(k);
+  };
+  const teardown: (() => void)[] = [startFlight(), hideFront, uncutGrid];
 
   void (async () => {
     const maybeGpu = await getGpu();
@@ -46,107 +49,192 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
         alphaMode: "opaque",
       });
       teardown.push(() => output.dispose());
-
-      const sky = effect(gpu, skySource, {
-        set: {
-          params: {
-            resolution: output.size,
-            light: [0, 0],
-            pointer: [0.5, 0.5],
-            dpr: 1,
-            scroll: 0,
-            hover: 0,
-            time: flight.reduced ? 8 : 0,
-            orb: [0, 0, 1, 0],
-            foot: [0, 0, 1, 0],
-            footWidth: 1,
-            heroHeight: 1,
-            span: [0, 0],
-            trail: [0, 0, 0, 0],
-          },
-        },
-      });
-      await sky.compile({ colors: [output.format] });
-      if (disposed) return;
+      // The ground over the content writes premultiplied alpha: clear above the rim.
+      const frontOutput = surface(gpu, front, { autoResize: false, alphaMode: "premultiplied" });
+      teardown.push(() => frontOutput.dispose());
+      const milky = createMilkyCache(gpu);
 
       let cssWidth = 1;
+      let cssHeight = 1;
+      let frontTop = 0;
       let hero: Rect = EMPTY_RECT;
+      let planet: Rect = EMPTY_RECT;
+      let gridBox: Rect = EMPTY_RECT;
+      let lastCut = "";
       let work: Rect = EMPTY_RECT;
       let contact: Rect = EMPTY_RECT;
+      let text = { hero: EMPTY_RECT, work: EMPTY_RECT, contact: EMPTY_RECT };
+      let band: BandMap = bandExtent(1, 1, 0);
       let time = flight.reduced ? 8 : 0;
       let lastDraw = 0;
+      let clock = 0;
+      let lastTick = 0;
       let dirty = true;
       let shown = false;
+      let frontShown = false;
       let introStart: number | null = null;
       // What the last frame was drawn from; a tick that matches it draws nothing.
-      const last = new Float64Array(8).fill(Number.NaN);
+      let lastKey: number[] = [];
+      // What the ground was last drawn from. It holds still on screen, so it ignores the scroll.
+      let lastFront: number[] = [];
+
+      const input = (now: number): SkyInput => {
+        const { light, pointer, reduced } = flight;
+        const cam = flight.camera;
+        const scrollY = flight.scroll;
+        const W = cssWidth;
+        const H = cssHeight;
+        const hasPlanet = planet.width > 0;
+        // The tick only runs while the tab is visible.
+        introStart = armIntro(introStart, now + INTRO_DELAY_MS, hasPlanet, true);
+        const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
+        let body: Body | null = null;
+        let morph = 0;
+        let foot: number | null = null;
+        let settle = 0;
+        if (hasPlanet && reduced) {
+          const still = stillFrame(startFrame(planet, hero.top), { hero, work, contact }, W, H, scrollY);
+          body = still.body;
+          morph = still.morph;
+          // The still horizon is at rest; the still planet isn't, and ends at the hero's foot as the CSS one does.
+          settle = still.morph;
+          if (!still.morph) foot = hero.top + hero.height;
+        } else if (hasPlanet) {
+          const settled = settleFrame(bodyFrame(cam, startFrame(planet, hero.top), endFrame(W, H)), scrollY, cam.end, H);
+          body = settled.body;
+          morph = cam.morph;
+          settle = settled.s;
+        }
+        const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, H, contact);
+        return {
+          resolution: output.size,
+          W,
+          H,
+          scroll: scrollY,
+          starScroll: scrollY + flight.coast.offset,
+          velocity: flight.velocity,
+          coast: flight.coast.v,
+          light,
+          pointer,
+          reduced,
+          now,
+          time,
+          clock,
+          body,
+          morph,
+          foot,
+          settle,
+          intro,
+          trail: trailFrame(cam.zoom, settle, up, reduced, work.height > 0),
+          span: [work.top, contact.height ? contact.top : work.top + work.height],
+          text,
+          copy: cam.copy,
+          signal: flight.signal,
+          band,
+          // The ground covers the content from the runway's end on (eclipse spec §5.6).
+          frontOn: !reduced && hasPlanet && scrollY >= cam.end,
+          frontTop,
+        };
+      };
+
+      const initial = skyParams(input(0)).params;
+      const sky = effect(gpu, skySource, { set: { params: initial, milky: milky.target, milkySampler: milky.sampler } });
+      const ground = effect(gpu, skySource, {
+        set: { params: { ...initial, layer: 1 }, milky: milky.target, milkySampler: milky.sampler },
+      });
+      await Promise.all([
+        sky.compile({ colors: [output.format] }),
+        ground.compile({ colors: [frontOutput.format] }),
+        milky.compile(),
+      ]);
+      if (disposed) return;
 
       // Layout is read only here, never inside a tick.
       measure = () => {
         hero = anchorRect("hero");
+        planet = anchorRect("planet");
+        grid = document.querySelector<HTMLElement>("[data-planet-grid]");
+        gridBox = grid ? pageRect(grid) : EMPTY_RECT;
         work = anchorRect("work");
         contact = anchorRect("contact");
+        text = { hero: textRect("hero"), work: textRect("work"), contact: textRect("contact") };
+        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
         flight.hero = hero;
         dirty = true;
       };
 
       const resize = () => {
         cssWidth = Math.max(canvas.clientWidth, 1);
-        const height = Math.max(canvas.clientHeight, 1);
-        const dpr = skyDpr(window.devicePixelRatio, cssWidth, height);
-        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(height * dpr))]);
+        cssHeight = Math.max(canvas.clientHeight, 1);
+        const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
+        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
+        const box = front.getBoundingClientRect();
+        frontTop = box.top;
+        frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
+        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
         dirty = true;
+        // Resizing clears the canvas.
+        lastFront = [];
       };
 
       const tick = (now: number) => {
         if (document.hidden) return;
-        const { light, pointer, reduced } = flight;
-        const scrollY = flight.scroll;
-
-        // The tick only runs while the tab is visible.
-        introStart = armIntro(introStart, now + INTRO_DELAY_MS, hero.height > 0, true);
-        const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
-        const dep = reduced ? 0 : departure(scrollY, hero);
-        const orb = orbFrame(hero, intro, dep);
-        const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, window.innerHeight, contact);
-        const horizon = horizonFrame(contact, up);
-        const trail = trailFrame(dep, up, reduced, work.height > 0);
-        const starScroll = scrollY + flight.coast.offset;
-
-        const inputs = [scrollY, starScroll, light.x, light.y, light.hover, pointer.nx, pointer.ny, reduced ? 1 : 0];
-        let changed = dirty;
-        inputs.forEach((value, i) => {
-          if (value !== last[i]) {
-            last[i] = value;
-            changed = true;
-          }
-        });
-        const easing = !reduced && introStart !== null && intro < 1;
-        const ambient = !reduced && (orb.vis > 0.001 || up > 0 || (trail.shed > 0 && trail.shed < 1));
-        if (!changed && !easing && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
+        const next = input(now);
+        // The shooting stars' clock runs whenever the tab shows, so they keep their schedule at rest.
+        // A hidden tab's gap counts as one frame.
+        if (!next.reduced && lastTick) clock += Math.min((now - lastTick) / 1000, 0.1);
+        lastTick = now;
+        const key = diffKey(skyParams(next).params);
+        const changed = dirty || !sameKey(key, lastKey);
+        const easing = !next.reduced && introStart !== null && next.intro < 1;
+        // At rest the body holds still, so reading Work costs no frames (eclipse spec §5.8).
+        const ambient = !next.reduced && next.body !== null && next.settle < 1;
+        // At rest frames are drawn only while a shooting star crosses, every frame so it streaks smoothly.
+        const meteor = !next.reduced && meteorInFlight(clock);
+        if (!changed && !easing && !meteor && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
 
         // Time only runs while something ambient is in view; elsewhere frames are static.
         if (ambient && lastDraw) time += Math.min((now - lastDraw) / 1000, 0.1);
         lastDraw = now;
         dirty = false;
-        sky.set({
-          params: {
-            resolution: output.size,
-            dpr: output.size[0] / cssWidth,
-            scroll: scrollY,
-            light: [light.x, light.y],
-            pointer: [pointer.nx, pointer.ny],
-            hover: light.hover,
-            time,
-            orb: [orb.cx, orb.apex, orb.radius, orb.vis],
-            foot: [horizon.cx, horizon.top, horizon.radius, up],
-            footWidth: horizon.halfWidth,
-            heroHeight: hero.height,
-            span: [work.top, contact.height ? contact.top : work.top + work.height],
-            trail: [trail.shed, trail.carry, trail.gather, starScroll],
-          },
-        });
-        const done = frame(gpu, (f) => f.pass(output, sky)).done;
+        lastKey = key;
+        const { params, frontKey } = skyParams({ ...next, time, clock });
+        sky.set({ params });
+        const drawCache = milky.update(next.W, next.H, params.dpr, band);
+
+        if (next.frontOn !== frontShown) {
+          frontShown = next.frontOn;
+          front.style.visibility = next.frontOn ? "visible" : "hidden";
+        }
+        const drawGround = next.frontOn && !sameKey(frontKey, lastFront);
+        if (drawGround) {
+          lastFront = frontKey;
+          ground.set({ params: { ...params, resolution: frontOutput.size, layer: 1, origin: frontTop } });
+          const body = next.body;
+          if (body) {
+            // Hit-testing follows the planet: the ground takes the clicks, the clear sky above it doesn't.
+            front.style.clipPath = `circle(${(body.R + 3).toFixed(1)}px at ${body.C[0].toFixed(1)}px ${(body.C[1] - frontTop).toFixed(1)}px)`;
+          }
+        }
+        // Cut the hero's grid round the disc while the grid is on screen.
+        if (grid && next.scroll < gridBox.top + gridBox.height) {
+          const d = discIn(next.body, gridBox, next.scroll);
+          const cut = d.r > 0 ? `${d.x.toFixed(1)} ${d.y.toFixed(1)} ${d.r.toFixed(1)}` : "";
+          if (cut !== lastCut) {
+            lastCut = cut;
+            if (!cut) uncutGrid();
+            else {
+              grid.style.setProperty("--disc-x", `${d.x.toFixed(1)}px`);
+              grid.style.setProperty("--disc-y", `${d.y.toFixed(1)}px`);
+              grid.style.setProperty("--disc-r", `${d.r.toFixed(1)}px`);
+            }
+          }
+        }
+        const done = frame(gpu, (f) => {
+          if (drawCache) f.pass(milky.target, milky.effect);
+          f.pass(output, sky);
+          if (drawGround) f.pass(frontOutput, ground);
+        }).done;
         if (!shown) {
           shown = true;
           // A device lost before the first submit rejects here; the lost handler falls back.
@@ -161,6 +249,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       document.addEventListener("visibilitychange", onVisibility);
       const canvasObserver = new ResizeObserver(resize);
       canvasObserver.observe(canvas);
+      canvasObserver.observe(front);
       const pageObserver = new ResizeObserver(measure);
       pageObserver.observe(document.body);
       void document.fonts.ready.then(() => !disposed && measure());
@@ -176,6 +265,8 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       void gpu.gpu.lost.then(() => {
         if (disposed) return;
         offTick();
+        hideFront();
+        uncutGrid();
         onFallback();
       });
 
@@ -183,6 +274,7 @@ export function mountSky(canvas: HTMLCanvasElement, { onFirstFrame, onFallback }
       measure();
     } catch (error) {
       console.error(error);
+      hideFront();
       if (!disposed) onFallback();
     }
   })();

@@ -42,6 +42,18 @@
     background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
     box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
   }
+  /* The statement's full stop: a small bead that breathes. */
+  .full-stop {
+    display: inline-block;
+    width: 0.15em;
+    height: 0.15em;
+    margin-left: 0.07em;
+    border-radius: 50%;
+    vertical-align: baseline;
+    background: #f4f8ff;
+    box-shadow: 0 0 0.05em 0.01em rgb(244 248 255 / 0.9), 0 0 0.3em 0.06em rgb(201 220 255 / 0.32);
+    animation: breathe 5.2s ease-in-out infinite;
+  }
   .hairline {
     --line: linear-gradient(90deg, rgb(201 220 255 / 0.42), rgb(201 220 255 / 0.1) 32%, rgb(255 255 255 / 0.07) 62%);
     background-image: var(--line);
@@ -57,6 +69,14 @@
       linear-gradient(rgb(168 184 214 / 0.065) 1px, transparent 1px),
       linear-gradient(90deg, rgb(168 184 214 / 0.065) 1px, transparent 1px);
     background-size: 64px 64px;
+  }
+  /* The live planet draws behind the page, so the renderer cuts the hero's grid round its disc
+     (--disc-*, in the grid's px); the CSS sky's planet sits in front of it on its own. */
+  .grid-hero {
+    mask-image:
+      radial-gradient(circle at var(--disc-x, 0) var(--disc-y, 0), transparent calc(var(--disc-r, -40px) + 1px), #000 calc(var(--disc-r, -40px) + 20px)),
+      radial-gradient(ellipse 58% 60% at 50% 72%, #000 0%, rgb(0 0 0 / 0.5) 46%, transparent 78%);
+    mask-composite: intersect;
   }
 
   /* Underlined text link: the rule brightens and the arrow nudges toward where it goes. */
@@ -151,19 +171,10 @@
   [data-rise], [data-head-word] { opacity: 0; }
 }
 
-@keyframes twinkle {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.95; }
-}
-@keyframes flare {
-  0%, 100% { opacity: 0.55; transform: scale(0.8); }
-  50% { opacity: 1; transform: scale(1); }
-}
-@utility animate-twinkle {
-  animation: twinkle 3.6s ease-in-out infinite;
-}
-@utility animate-flare {
-  animation: flare 4.8s ease-in-out infinite;
+/* The statement's full stop breathes. */
+@keyframes breathe {
+  0%, 100% { opacity: 0.86; }
+  50% { opacity: 1; }
 }
 
 /* The vgpu sky paints over all of this once it's live (see sky.tsx). */
@@ -171,9 +182,59 @@
   visibility: hidden;
 }
 
+/* The CSS planet's dawn (fallback.tsx) plays only on the CSS sky, as the live sky's intro does. While
+   the live sky is pending it waits, unseen, inside its delay. */
+@keyframes dawn-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.css-dawn {
+  animation: dawn-in 2s ease-out 0.6s both;
+}
+html:not([data-sky="css"]) .css-dawn {
+  animation-play-state: paused;
+}
 @media (prefers-reduced-motion: reduce) {
-  .animate-twinkle,
-  .animate-flare {
+  .css-dawn { animation: none; }
+  html:not([data-sky="css"]) .css-dawn { visibility: hidden; }
+}
+
+/* The CSS horizon (fallback.tsx), sized from src/lib/stills.ts: keep them in step. Below 864 px the
+   390 still stretches across with its heights pinned; from 864 px the 1440 still scales with the
+   width. The ground is an ellipse of radii 2.2 × the still's modelled width, matching its limb. Each
+   media query loads only its own still. */
+.horizon-ground {
+  width: 440%;
+  height: 1716px;
+}
+.horizon-still {
+  height: 232px;
+  translate: 0 -192px;
+  background: url("/sky/horizon-390.avif") 0 0 / 100% 100% no-repeat;
+}
+@media (min-width: 864px) {
+  .horizon-ground {
+    height: auto;
+    aspect-ratio: 1;
+  }
+  .horizon-still {
+    height: auto;
+    aspect-ratio: 2880 / 768;
+    translate: 0 -83.3333%;
+    background-image: url("/sky/horizon-1440.avif");
+  }
+}
+
+/* The resting horizon's ground covers the bottom of the screen (spec §3.4), so focus and anchor
+   scrolling stop above it. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-sky="live"] {
+    scroll-padding-bottom: calc(14lvh + 24px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .full-stop {
     animation: none;
   }
 }
