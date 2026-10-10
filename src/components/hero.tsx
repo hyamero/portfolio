@@ -18,7 +18,8 @@ export default function Hero() {
       <div className="relative flex min-h-[880px] flex-col overflow-hidden pt-[clamp(120px,calc(31svh-20px),280px)] md:min-h-[960px]">
         <div
           aria-hidden="true"
-          className="grid-lines absolute inset-0 z-0 bg-position-[calc(50%+32px)_0] mask-[radial-gradient(ellipse_58%_60%_at_50%_72%,#000_0%,rgb(0_0_0/0.5)_46%,transparent_78%)]"
+          data-planet-grid
+          className="grid-lines grid-hero absolute inset-0 z-0 bg-position-[calc(50%+32px)_0]"
         />
         <div className="px-gutter mx-auto w-full max-w-[1440px]">
           <div data-hero-copy data-sky-text="hero" className="relative z-1 max-w-[540px]">

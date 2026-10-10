@@ -75,6 +75,12 @@ export function stillFrame(
   return { body: withSun([cx, apex + R], R), morph: 1 };
 }
 
+/** The body's disc (viewport px) in a page box's own px, for a mask over that box; r 0 without a body. */
+export function discIn(body: Body | null, box: Rect, scroll: number) {
+  if (!body) return { x: 0, y: 0, r: 0 };
+  return { x: body.C[0] - box.left, y: body.C[1] + scroll - box.top, r: body.R };
+}
+
 /** The body's opacity over the intro: it fades in from nothing, rather than pop in, before it's fully lit. */
 export function planetAppear(intro: number) {
   return ease(0, 0.85, intro);
