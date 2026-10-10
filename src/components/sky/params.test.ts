@@ -23,6 +23,7 @@ const input = (over: Partial<SkyInput> = {}): SkyInput => ({
   reduced: false,
   now: 10_000,
   time: 0,
+  clock: 0,
   body: endFrame(1440, 900),
   morph: 1,
   foot: null,
@@ -94,8 +95,8 @@ describe("skyParams", () => {
 });
 
 describe("bandDrift", () => {
-  test("follows 2.5% of the stars' virtual scroll", () => {
-    expect(skyParams(input({ starScroll: 3000 })).params.bandDrift).toBeCloseTo(75, 9);
+  test("follows 6% of the stars' virtual scroll, between the far stars and the near", () => {
+    expect(skyParams(input({ starScroll: 3000 })).params.bandDrift).toBeCloseTo(180, 9);
   });
   test("keeps the band inside its cache however far the coast wanders", () => {
     const band = bandExtent(1440, 900, 6000);
@@ -121,6 +122,11 @@ describe("frontKey", () => {
 });
 
 describe("diffKey", () => {
+  test("ignores the shooting stars' clock, which runs on at rest", () => {
+    const a = skyParams(input()).params;
+    expect(skyParams(input({ clock: 12.5 })).params.clock).toBe(12.5);
+    expect(sameKey(diffKey(a), diffKey(skyParams(input({ clock: 12.5 })).params))).toBe(true);
+  });
   test("ignores time and nothing else", () => {
     const a = skyParams(input()).params;
     expect(sameKey(diffKey(a), diffKey(skyParams(input({ time: 5 })).params))).toBe(true);
@@ -134,11 +140,11 @@ describe("bandExtent", () => {
     expect(origin[0]).toBeLessThanOrEqual(-8);
     expect(origin[1]).toBeLessThanOrEqual(-8);
     expect(origin[0] + size[0]).toBeGreaterThanOrEqual(1448);
-    expect(origin[1] + size[1]).toBeGreaterThanOrEqual(900 + 0.025 * 6000 + 8);
+    expect(origin[1] + size[1]).toBeGreaterThanOrEqual(900 + 0.06 * 6000 + 8);
   });
   test("leaves room for the coast to wander 2000 px past either end", () => {
     const { origin, size } = bandExtent(1440, 900, 6000);
-    expect(origin[1]).toBeLessThanOrEqual(-0.025 * 2000);
-    expect(origin[1] + size[1]).toBeGreaterThanOrEqual(900 + 0.025 * 8000);
+    expect(origin[1]).toBeLessThanOrEqual(-0.06 * 2000);
+    expect(origin[1] + size[1]).toBeGreaterThanOrEqual(900 + 0.06 * 8000);
   });
 });

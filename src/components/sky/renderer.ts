@@ -6,6 +6,7 @@ import skySource from "./sky.wgsl";
 import { bodyFrame, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
 import { anchorRect, EMPTY_RECT, flight, onTick, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
+import { meteorInFlight } from "@/lib/meteors";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
@@ -17,7 +18,8 @@ type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 /**
  * Draws the page's sky into the fixed `canvas` on flight's tick, and the resting horizon's ground
  * into `front`, over the content (eclipse spec §5.6). Frames are drawn on demand (sky polish spec
- * §3.6): when any uniform has changed, while the intro eases, and at ~30fps while the body moves.
+ * §3.6): when any uniform has changed, while the intro eases, at ~30fps while the body moves, and
+ * while a shooting star is in flight.
  */
 export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { onFirstFrame, onFallback }: Callbacks) {
   let disposed = false;
@@ -59,6 +61,8 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let band: BandMap = bandExtent(1, 1, 0);
       let time = flight.reduced ? 8 : 0;
       let lastDraw = 0;
+      let clock = 0;
+      let lastTick = 0;
       let dirty = true;
       let shown = false;
       let frontShown = false;
@@ -109,6 +113,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           reduced,
           now,
           time,
+          clock,
           body,
           morph,
           foot,
@@ -167,19 +172,25 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       const tick = (now: number) => {
         if (document.hidden) return;
         const next = input(now);
+        // The shooting stars' clock runs whenever the tab shows, so they keep their schedule at rest.
+        // A hidden tab's gap counts as one frame.
+        if (!next.reduced && lastTick) clock += Math.min((now - lastTick) / 1000, 0.1);
+        lastTick = now;
         const key = diffKey(skyParams(next).params);
         const changed = dirty || !sameKey(key, lastKey);
         const easing = !next.reduced && introStart !== null && next.intro < 1;
         // At rest the body holds still, so reading Work costs no frames (eclipse spec §5.8).
         const ambient = !next.reduced && next.body !== null && next.settle < 1;
-        if (!changed && !easing && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
+        // At rest frames are drawn only while a shooting star crosses, every frame so it streaks smoothly.
+        const meteor = !next.reduced && meteorInFlight(clock);
+        if (!changed && !easing && !meteor && !(ambient && now - lastDraw >= AMBIENT_MS)) return;
 
         // Time only runs while something ambient is in view; elsewhere frames are static.
         if (ambient && lastDraw) time += Math.min((now - lastDraw) / 1000, 0.1);
         lastDraw = now;
         dirty = false;
         lastKey = key;
-        const { params, frontKey } = skyParams({ ...next, time });
+        const { params, frontKey } = skyParams({ ...next, time, clock });
         sky.set({ params });
         const drawCache = milky.update(next.W, next.H, params.dpr, band);
 

@@ -52,6 +52,8 @@ struct Params {
   band: vec4f,
   // The Milky Way's drift down band space, held inside its cache.
   bandDrift: f32,
+  // s; the shooting stars' clock, which unlike time runs on at rest.
+  clock: f32,
 }
 
 @group(0) @binding(0) var<uniform> params: Params;
@@ -77,13 +79,17 @@ struct Params {
     return vec4f(0.0);
   }
 
-  let quiet = max(max(textMask(page, params.textA, 80.0) * params.textK.x, textMask(page, params.textB, 80.0) * params.textK.y),
-                  textMask(page, params.textC, 80.0) * params.textK.z);
+  // The text mask fades out far wider than the text, so the broad glows it dims show no edge round it.
+  let quiet = max(max(textMask(page, params.textA, 240.0) * params.textK.x, textMask(page, params.textB, 240.0) * params.textK.y),
+                  textMask(page, params.textC, 240.0) * params.textK.z);
   // The planet's halo spans the hero, so it eases off round the copy far more gently.
   let hush = textMask(page, params.textA, 320.0) * params.textK.x;
-  // The cursor's light (spec §5.5), dimmed behind text.
+  // The cursor's light (spec §5.5), dimmed behind text. It moves, so it draws no edge, and the tight
+  // mask keeps it lighting the margins round the copy.
+  let near = max(max(textMask(page, params.textA, 80.0) * params.textK.x, textMask(page, params.textB, 80.0) * params.textK.y),
+                 textMask(page, params.textC, 80.0) * params.textK.z);
   let lp = page - params.light;
-  let pl = params.hover * motion * exp(-dot(lp, lp) / 80000.0) * (1.0 - 0.92 * quiet);
+  let pl = params.hover * motion * exp(-dot(lp, lp) / 80000.0) * (1.0 - 0.92 * near);
 
   let gathered = params.trail.z;
   let b = Body(params.body.xy, params.body.z, vis, B, m, params.dawn, W, params.dpr, t, params.hover, params.light,
@@ -93,11 +99,11 @@ struct Params {
   // Where the halo or the air is bright, the stars wash out.
   let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
   let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
-                     quiet, textMask(page, params.textA, 260.0) * params.textK.x, params.band, params.bandDrift);
+                     quiet, params.band, params.bandDrift);
   let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
                  params.viewHeight, B, vis, params.settle);
 
-  var col = skyField(css, sf, milky, milkySampler) + meteors(css, W, params.viewHeight, t, params.dpr) * motion * ext * (1.0 - 0.9 * quiet)
+  var col = skyField(css, sf, milky, milkySampler) + meteors(css, W, params.viewHeight, params.clock, params.dpr) * motion * ext * (1.0 - 0.9 * quiet)
           + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
   // The planet and the ground are opaque.
   col = mix(col, bl.night, bl.inside);

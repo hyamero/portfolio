@@ -26,6 +26,8 @@ export type SkyInput = {
   now: number;
   /** s; it advances only while something ambient runs. */
   time: number;
+  /** s; the shooting stars' clock, which runs whenever the tab shows. */
+  clock: number;
   /** The body, or null on a page without a planet box. */
   body: Body | null;
   morph: number;
@@ -51,8 +53,8 @@ export type SkyInput = {
 const NO_BODY: Body = { C: [0, -1e5], R: 1, B: [0, -1e5] };
 // A foot no page reaches; WGSL has no infinity to pass.
 const NO_FOOT = 1e9;
-// The Milky Way drifts at 2.5% of the virtual scroll; the coast's offset can wander ~2000 px past the page's ends.
-const DRIFT = 0.025;
+// The Milky Way drifts at 6% of the virtual scroll, a parallax between the far stars (4%) and the near (8–17%); the coast's offset can wander ~2000 px past the page's ends.
+const DRIFT = 0.06;
 const COAST_MARGIN = DRIFT * 2000;
 
 /** The cache's extent: the viewport and the band's whole drift down the page, plus the pointer's parallax. */
@@ -79,6 +81,7 @@ export function skyParams(s: SkyInput) {
     scroll: s.scroll,
     hover: s.light.hover,
     time: s.time,
+    clock: s.clock,
     layer: 0,
     origin: 0,
     viewHeight: s.H,
@@ -98,7 +101,7 @@ export function skyParams(s: SkyInput) {
     textK: [s.copy, 1, 1, 0],
     band: [...s.band.origin, ...s.band.size],
     // The coast's offset grows with every scroll, so the band stops drifting at its cache's edge
-    // rather than smear the edge across the sky. At 2.5% of the scroll the stop can't be seen.
+    // rather than smear the edge across the sky. The cache spans the coast's usual reach, so it rarely stops.
     bandDrift: clamp(DRIFT * s.starScroll, s.band.origin[1] + 8, s.band.origin[1] + s.band.size[1] - s.H - 8),
   };
   // The front canvas holds still on screen, so it reads the body in viewport px and ignores the scroll.
@@ -112,11 +115,11 @@ export function skyParams(s: SkyInput) {
 
 export type SkyParams = ReturnType<typeof skyParams>["params"];
 
-/** Every uniform but `time`, flat: a frame whose key matches the last one's draws nothing new (spec §3.6). */
+/** Every uniform but the clocks, flat: a frame whose key matches the last one's draws nothing new (spec §3.6). */
 export function diffKey(params: SkyParams) {
   const key: number[] = [];
   for (const [name, value] of Object.entries(params)) {
-    if (name === "time") continue;
+    if (name === "time" || name === "clock") continue;
     if (typeof value === "number") key.push(value);
     else key.push(...value);
   }

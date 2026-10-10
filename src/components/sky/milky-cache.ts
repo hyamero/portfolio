@@ -4,8 +4,9 @@ import type { BandMap } from "./params";
 import cacheSource from "./wgsl/milky-cache.wgsl";
 
 /**
- * The Milky Way cache (spec §3.5): ~22 octaves of noise per pixel that only drift at 2.5% of the
- * scroll, so the band renders once at half the sky's resolution and the sky samples it each frame.
+ * The Milky Way cache (spec §3.5): ~22 octaves of noise per pixel that only drift at 6% of the
+ * scroll, so the band renders once at the sky's resolution and the sky samples it each frame. Full
+ * resolution keeps its finest grain, the unresolved stars, from blurring into haze.
  * Its texture belongs to the shared device, which gpu.ts keeps for the tab's lifetime.
  */
 export function createMilkyCache(gpu: Gpu) {
@@ -22,7 +23,7 @@ export function createMilkyCache(gpu: Gpu) {
       const next = [W, H, dpr, ...map.origin, ...map.size].join();
       if (next === key) return false;
       key = next;
-      cache.resize([Math.max(1, Math.ceil((map.size[0] * dpr) / 2)), Math.max(1, Math.ceil((map.size[1] * dpr) / 2))]);
+      cache.resize([Math.max(1, Math.ceil(map.size[0] * dpr)), Math.max(1, Math.ceil(map.size[1] * dpr))]);
       band.set({ params: { size: [W, H], map: [...map.origin, ...map.size] } });
       return true;
     },
