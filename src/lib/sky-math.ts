@@ -58,14 +58,15 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
 }
 
 /**
- * The horizon's trail (motion spec §4.1, eclipse spec §5.4): its atmosphere sheds off the rim as it
- * settles (`dep` is how far it has settled), carries on as a ribbon of nebula through Work, and
- * gathers back into the resting horizon as Contact rises.
+ * The horizon's trail (motion spec §4.1, eclipse spec §5.4): the planet's atmosphere sheds off the
+ * rim from early in the camera's descent (`fall`, its zoom), just ahead of the planet losing its
+ * colour, carries on as a ribbon of nebula through Work as the horizon settles (`dep` is how far it
+ * has), and gathers back into it as Contact rises.
  */
-export function trailFrame(dep: number, up: number, reduced: boolean, hasWork: boolean) {
+export function trailFrame(fall: number, dep: number, up: number, reduced: boolean, hasWork: boolean) {
   if (reduced) return { shed: 0, carry: hasWork ? 1 : 0, gather: up };
   return {
-    shed: ease(0.04, 0.4, dep),
+    shed: ease(0.08, 0.6, fall),
     carry: hasWork ? ease(0, 0.35, dep) * (1 - 0.4 * up) : 0,
     gather: up,
   };

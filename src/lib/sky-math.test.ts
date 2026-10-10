@@ -95,35 +95,36 @@ describe("armIntro", () => {
 });
 
 describe("trailFrame", () => {
-  test("nothing sheds before the settle, and the whole trail has shed well before it ends", () => {
-    expect(trailFrame(0, 0, false, true).shed).toBe(0);
-    expect(trailFrame(0.85, 0, false, true).shed).toBe(1);
-    expect(trailFrame(1, 0, false, true).shed).toBe(1);
+  test("the shed comes in early in the descent, while the planet still has its colour", () => {
+    expect(trailFrame(0.05, 0, 0, false, true).shed).toBe(0);
+    expect(trailFrame(0.34, 0, 0, false, true).shed).toBeGreaterThan(0.45);
+    expect(trailFrame(0.7, 0, 0, false, true).shed).toBe(1);
   });
-  test("most of the shed happens in the first quarter of the settle, while the horizon still moves", () => {
-    expect(trailFrame(0.26, 0, false, true).shed).toBeGreaterThan(0.5);
+  test("the whole trail has shed by the time the horizon settles", () => {
+    expect(trailFrame(1, 0, 0, false, true).shed).toBe(1);
+    expect(trailFrame(1, 1, 0, false, true).shed).toBe(1);
   });
-  test("shed grows monotonically with the settle", () => {
+  test("shed grows monotonically with the descent", () => {
     let last = -1;
-    for (let d = 0; d <= 1; d += 0.05) {
-      const { shed } = trailFrame(d, 0, false, true);
+    for (let m = 0; m <= 1; m += 0.05) {
+      const { shed } = trailFrame(m, 0, 0, false, true);
       expect(shed).toBeGreaterThanOrEqual(last);
       last = shed;
     }
   });
   test("the ribbon appears as the horizon settles and dims as Contact rises", () => {
-    expect(trailFrame(0, 0, false, true).carry).toBe(0);
-    expect(trailFrame(0.35, 0, false, true).carry).toBe(1);
-    expect(trailFrame(1, 1, false, true).carry).toBeCloseTo(0.6);
+    expect(trailFrame(1, 0, 0, false, true).carry).toBe(0);
+    expect(trailFrame(1, 0.35, 0, false, true).carry).toBe(1);
+    expect(trailFrame(1, 1, 1, false, true).carry).toBeCloseTo(0.6);
   });
   test("there is no ribbon without a Work section", () => {
-    expect(trailFrame(1, 0, false, false).carry).toBe(0);
+    expect(trailFrame(1, 1, 0, false, false).carry).toBe(0);
   });
   test("gather follows the horizon's rise", () => {
-    expect(trailFrame(1, 0.4, false, true).gather).toBe(0.4);
+    expect(trailFrame(1, 1, 0.4, false, true).gather).toBe(0.4);
   });
   test("reduced motion sheds nothing and holds the ribbon as still nebula", () => {
-    expect(trailFrame(0.6, 1, true, true)).toEqual({ shed: 0, carry: 1, gather: 1 });
+    expect(trailFrame(1, 0.6, 1, true, true)).toEqual({ shed: 0, carry: 1, gather: 1 });
   });
 });
 
