@@ -55,16 +55,18 @@ export default function Sky() {
   const fade = `transition-opacity duration-1200 ${shown ? "opacity-100" : "opacity-0"}`;
   return (
     <>
+      {/* Both run SKY_OVERSCAN px past the viewport: iOS Safari scrolls the page under its floating
+          toolbar, below where 100lvh ends. */}
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className={`pointer-events-none fixed inset-x-0 top-0 -z-1 h-lvh w-full ${fade}`}
+        className={`pointer-events-none fixed inset-x-0 top-0 -z-1 h-[calc(100lvh+160px)] w-full ${fade}`}
       />
       {/* The renderer shows it from the runway's end and clips its hit area to the planet. */}
       <canvas
         ref={frontRef}
         aria-hidden="true"
-        className={`invisible fixed inset-x-0 top-[62lvh] z-30 h-[38lvh] w-full ${fade}`}
+        className={`invisible fixed inset-x-0 top-[62lvh] z-30 h-[calc(38lvh+160px)] w-full ${fade}`}
       />
     </>
   );

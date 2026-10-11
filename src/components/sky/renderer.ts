@@ -10,6 +10,8 @@ import { meteorInFlight } from "@/lib/meteors";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
+/** How far both canvases run past the viewport's bottom; matches their heights in sky.tsx. */
+export const SKY_OVERSCAN = 160;
 // The ambient drift (twinkle, the planet's flowing band and sparkles) needs no more than ~30fps.
 const AMBIENT_MS = 33;
 
@@ -150,20 +152,21 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
         work = anchorRect("work");
         contact = anchorRect("contact");
         text = { hero: textRect("hero"), work: textRect("work"), contact: textRect("contact") };
-        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        band = bandExtent(cssWidth, cssHeight + SKY_OVERSCAN, document.documentElement.scrollHeight - window.innerHeight);
         flight.hero = hero;
         dirty = true;
       };
 
       const resize = () => {
         cssWidth = Math.max(canvas.clientWidth, 1);
-        cssHeight = Math.max(canvas.clientHeight, 1);
+        // The sky's geometry keys off the viewport; the overscan only draws more of it below.
+        cssHeight = Math.max(canvas.clientHeight - SKY_OVERSCAN, 1);
         const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
-        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
+        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(canvas.clientHeight * dpr))]);
         const box = front.getBoundingClientRect();
         frontTop = box.top;
         frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
-        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        band = bandExtent(cssWidth, cssHeight + SKY_OVERSCAN, document.documentElement.scrollHeight - window.innerHeight);
         dirty = true;
         // Resizing clears the canvas.
         lastFront = [];
