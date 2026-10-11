@@ -38,11 +38,15 @@ export default function Motion({ children }: { children: React.ReactNode }) {
         // a rendering fault, so this one reveal isn't scrubbed.
         const sayWords = gsap.utils.toArray<HTMLElement>(".say [data-head-word]");
         if (sayWords.length) {
+          // Its hover fill is a sharp copy over the words, so it waits for them to resolve.
+          const say = sayWords[0].closest<HTMLElement>(".say");
+          say?.setAttribute("data-revealing", "");
           gsap.fromTo(sayWords, { ...blur, y: 16, filter: "blur(12px)" }, {
             ...clear,
             duration: 2,
             stagger: 0.14,
             scrollTrigger: { trigger: sayWords[0], start: "top 80%", once: true },
+            onComplete: () => say?.removeAttribute("data-revealing"),
           });
         }
 
@@ -103,6 +107,7 @@ export default function Motion({ children }: { children: React.ReactNode }) {
           // Reduced motion has no runway, so nothing may settle.
           flight.camera.end = Number.POSITIVE_INFINITY;
           flight.camera.copy = 1;
+          document.querySelector(".say")?.removeAttribute("data-revealing");
           words.forEach((word) => {
             word.style.removeProperty("opacity");
             word.style.removeProperty("filter");
