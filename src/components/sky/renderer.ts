@@ -3,13 +3,15 @@ import { effect, frame, surface } from "vgpu";
 import { createMilkyCache } from "./milky-cache";
 import { bandExtent, diffKey, sameKey, skyParams, type BandMap, type SkyInput } from "./params";
 import skySource from "./sky.wgsl";
-import { bodyFrame, discIn, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
-import { anchorRect, EMPTY_RECT, flight, onTick, pageRect, startFlight, textRect } from "@/lib/flight";
+import { bodyFrame, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
+import { anchorRect, EMPTY_RECT, flight, onTick, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
 import { meteorInFlight } from "@/lib/meteors";
 import { armIntro, introProgress, rise, skyDpr, trailFrame, type Rect } from "@/lib/sky-math";
 
 const INTRO_DELAY_MS = 250;
+/** How far both canvases run past the viewport's bottom; matches their heights in sky.tsx. */
+export const SKY_OVERSCAN = 160;
 // The ambient drift (twinkle, the planet's flowing band and sparkles) needs no more than ~30fps.
 const AMBIENT_MS = 33;
 
@@ -28,11 +30,7 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
     front.style.visibility = "hidden";
     front.style.clipPath = "";
   };
-  let grid: HTMLElement | null = null;
-  const uncutGrid = () => {
-    for (const k of ["--disc-x", "--disc-y", "--disc-r"]) grid?.style.removeProperty(k);
-  };
-  const teardown: (() => void)[] = [startFlight(), hideFront, uncutGrid];
+  const teardown: (() => void)[] = [startFlight(), hideFront];
 
   void (async () => {
     const maybeGpu = await getGpu();
@@ -59,8 +57,6 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let frontTop = 0;
       let hero: Rect = EMPTY_RECT;
       let planet: Rect = EMPTY_RECT;
-      let gridBox: Rect = EMPTY_RECT;
-      let lastCut = "";
       let work: Rect = EMPTY_RECT;
       let contact: Rect = EMPTY_RECT;
       let text = { hero: EMPTY_RECT, work: EMPTY_RECT, contact: EMPTY_RECT };
@@ -153,25 +149,24 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       measure = () => {
         hero = anchorRect("hero");
         planet = anchorRect("planet");
-        grid = document.querySelector<HTMLElement>("[data-planet-grid]");
-        gridBox = grid ? pageRect(grid) : EMPTY_RECT;
         work = anchorRect("work");
         contact = anchorRect("contact");
         text = { hero: textRect("hero"), work: textRect("work"), contact: textRect("contact") };
-        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        band = bandExtent(cssWidth, cssHeight + SKY_OVERSCAN, document.documentElement.scrollHeight - window.innerHeight);
         flight.hero = hero;
         dirty = true;
       };
 
       const resize = () => {
         cssWidth = Math.max(canvas.clientWidth, 1);
-        cssHeight = Math.max(canvas.clientHeight, 1);
+        // The sky's geometry keys off the viewport; the overscan only draws more of it below.
+        cssHeight = Math.max(canvas.clientHeight - SKY_OVERSCAN, 1);
         const dpr = skyDpr(window.devicePixelRatio, cssWidth, cssHeight);
-        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(cssHeight * dpr))]);
+        output.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(canvas.clientHeight * dpr))]);
         const box = front.getBoundingClientRect();
         frontTop = box.top;
         frontOutput.resize([Math.max(1, Math.round(cssWidth * dpr)), Math.max(1, Math.round(box.height * dpr))]);
-        band = bandExtent(cssWidth, cssHeight, document.documentElement.scrollHeight - window.innerHeight);
+        band = bandExtent(cssWidth, cssHeight + SKY_OVERSCAN, document.documentElement.scrollHeight - window.innerHeight);
         dirty = true;
         // Resizing clears the canvas.
         lastFront = [];
@@ -216,20 +211,6 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
             front.style.clipPath = `circle(${(body.R + 3).toFixed(1)}px at ${body.C[0].toFixed(1)}px ${(body.C[1] - frontTop).toFixed(1)}px)`;
           }
         }
-        // Cut the hero's grid round the disc while the grid is on screen.
-        if (grid && next.scroll < gridBox.top + gridBox.height) {
-          const d = discIn(next.body, gridBox, next.scroll);
-          const cut = d.r > 0 ? `${d.x.toFixed(1)} ${d.y.toFixed(1)} ${d.r.toFixed(1)}` : "";
-          if (cut !== lastCut) {
-            lastCut = cut;
-            if (!cut) uncutGrid();
-            else {
-              grid.style.setProperty("--disc-x", `${d.x.toFixed(1)}px`);
-              grid.style.setProperty("--disc-y", `${d.y.toFixed(1)}px`);
-              grid.style.setProperty("--disc-r", `${d.r.toFixed(1)}px`);
-            }
-          }
-        }
         const done = frame(gpu, (f) => {
           if (drawCache) f.pass(milky.target, milky.effect);
           f.pass(output, sky);
@@ -266,7 +247,6 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
         if (disposed) return;
         offTick();
         hideFront();
-        uncutGrid();
         onFallback();
       });
 
