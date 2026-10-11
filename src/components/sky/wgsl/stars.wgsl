@@ -117,6 +117,11 @@ export fn starLayer(css: vec2f, off: vec2f, L: Layer, trail: f32, dpr: f32, time
   for (var j = -reach; j <= reach; j++) {
     let c = base + vec2i(0, j);
     let h0 = cellHash(c, L.seed);
+    // The odds below never exceed this (fbm and the core are both ≤ 1), so most empty cells skip the
+    // noise and the cache read: the same stars, at a fraction of the cost.
+    if (u01(h0) > L.odds * 1.55 * (1.0 + L.boost)) {
+      continue;
+    }
     let mid = (vec2f(c) + 0.5) * L.cell;
     // Clusters and voids.
     var odds = L.odds * (0.45 + 1.1 * fbm(mid / 380.0, 3, L.seed + 7u));
