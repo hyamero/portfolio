@@ -42,6 +42,10 @@ export default function Contact() {
             href={siteConfig.links.email}
           >
             <Words text="Send a signal." />
+            <span aria-hidden="true" className="say-fill">
+              Send a signal.
+            </span>
+            <span aria-hidden="true" className="say-ping" />
           </a>
           <ul className="mt-[30px] flex flex-wrap justify-center gap-x-6 text-sm tracking-tight text-mute md:mt-11 md:gap-x-9 md:gap-y-1 md:text-[15px]">
             {LINKS.map((link) => (
