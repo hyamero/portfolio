@@ -5,7 +5,6 @@ import {
   addCameraTweens,
   bodyFrame,
   CAMERA_KEYS,
-  discIn,
   endFrame,
   planetAppear,
   planetDawn,
@@ -118,17 +117,18 @@ describe("settleFrame", () => {
     expect(settleFrame(hold, end - 100, end, H).s).toBe(0);
   });
   test("reaches the rest line one screen past the end, and stays", () => {
+    expect(REST).toBe(0.8);
     expect(apex(end + H)).toBeCloseTo(REST * H);
     expect(apex(end + 5 * H)).toBeCloseTo(REST * H);
     expect(settleFrame(hold, end + H, end, H).s).toBe(1);
   });
-  test("starts at 0.44× the scroll's speed, slows to a stop and never moves up", () => {
-    expect(apex(end + 1) - apex(end)).toBeCloseTo(0.44, 2);
+  test("starts at 0.32× the scroll's speed, slows to a stop and never moves up", () => {
+    expect(apex(end + 1) - apex(end)).toBeCloseTo(0.32, 2);
     let last = apex(end);
     for (let y = end + 5; y <= end + 1.2 * H; y += 5) {
       const a = apex(y);
       expect(a - last).toBeGreaterThanOrEqual(0);
-      expect((a - last) / 5).toBeLessThanOrEqual(0.441);
+      expect((a - last) / 5).toBeLessThanOrEqual(0.321);
       last = a;
     }
   });
@@ -160,7 +160,7 @@ describe("stillFrame", () => {
     const bottom = 3180 - H;
     const f = stillFrame(start, rects, W, H, bottom);
     expect(f.morph).toBe(1);
-    expect(f.body.C[1] - f.body.R).toBeCloseTo(2360 + 0.85 * 820 - bottom);
+    expect(f.body.C[1] - f.body.R).toBeCloseTo(2360 + 0.8 * 820 - bottom);
     expect(f.body.B[0]).toBeCloseTo(W / 2);
   });
   test("switches while neither is in view", () => {
@@ -246,15 +246,3 @@ describe("CAMERA_KEYS", () => {
   });
 });
 
-describe("discIn", () => {
-  const body = { C: [700, 1400] as Vec, R: 920, B: [700, 480] as Vec };
-  test("places the viewport's disc in a page box's own px", () => {
-    expect(discIn(body, { left: 0, top: 0, width: 1440, height: 960 }, 0)).toEqual({ x: 700, y: 1400, r: 920 });
-  });
-  test("follows the scroll, since the box scrolls with the page and the disc doesn't", () => {
-    expect(discIn(body, { left: 20, top: 100, width: 1440, height: 960 }, 300)).toEqual({ x: 680, y: 1600, r: 920 });
-  });
-  test("has no disc without a body", () => {
-    expect(discIn(null, { left: 0, top: 0, width: 1440, height: 960 }, 0).r).toBe(0);
-  });
-});

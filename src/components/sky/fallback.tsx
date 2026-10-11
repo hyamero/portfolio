@@ -61,11 +61,11 @@ export function HorizonSky() {
   );
 }
 
-/** Contact's horizon, where the reduced-motion sky rests it: 0.15 × Contact's height above its bottom. */
+/** Contact's horizon, where the reduced-motion sky rests it: 0.2 × Contact's height above its bottom. */
 export function ContactSky() {
   return (
     <div aria-hidden="true" className="sky-fallback pointer-events-none absolute inset-0">
-      <Horizon apex="85%" />
+      <Horizon apex="80%" />
     </div>
   );
 }
