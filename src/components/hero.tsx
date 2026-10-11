@@ -35,7 +35,7 @@ export default function Hero() {
                 </Fragment>
               ))}
             </h1>
-            <nav data-rise aria-label="Start here" className="mt-7 flex flex-wrap gap-x-9 gap-y-1 text-base tracking-tight">
+            <nav data-rise aria-label="Start here" className="mt-7 flex flex-wrap gap-x-5 gap-y-1 text-base tracking-tight sm:gap-x-9">
               <ScrollLink to="work" className="line-link" data-catch-light data-magnet>
                 Selected work <Arrow dir="s" size={16} />
               </ScrollLink>
