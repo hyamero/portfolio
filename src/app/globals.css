@@ -116,11 +116,30 @@
     transition: translate 0.5s var(--ease-out-quint);
   }
 
-  /* "Send a signal.": an underline draws out from the left. */
+  /* "Send a signal.": the ink crossfades to a cool fill (lit where the pointer is), an underline draws
+     out from the left, and the full stop pings. Nothing moves, so the hover never loses its pointer. */
   .say {
     position: relative;
     display: inline-block;
-    transition: color 0.3s ease;
+    transition: color 0.7s ease;
+  }
+  /* The fill is a copy of the words laid over them, not a clip on the link itself: a text clip over the
+     words would repaint through their blur-in every frame. Its box runs past the full stop and the
+     descenders, which overhang the link's box, so the clip never cuts them. */
+  .say-fill {
+    position: absolute;
+    inset: 0 -0.25em -0.2em 0;
+    padding: 0 0.25em 0.2em 0;
+    color: transparent;
+    background:
+      radial-gradient(5em circle at var(--lx, 50%) var(--ly, 50%), rgb(255 255 255 / 0.75), transparent 70%),
+      linear-gradient(100deg, #eef2ff 0%, #bfcdff 34%, #cbbcf3 62%, #e6edff 100%);
+    background-size: 100% 100%, 220% 100%;
+    background-clip: text;
+    opacity: 0;
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.7s ease;
   }
   .say::after {
     content: "";
@@ -128,7 +147,7 @@
     inset-inline: 0;
     bottom: 0.06em;
     height: 1px;
-    background: currentColor;
+    background: linear-gradient(90deg, #bfcdff, #cbbcf3 60%, rgb(230 237 255 / 0.4));
     opacity: 0;
     transform: scaleX(0.4);
     transform-origin: left center;
@@ -146,8 +165,9 @@
   .line-link:hover svg[data-dir="n"] { translate: 0 -3px; }
   .visit:hover { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
   .visit:hover svg { translate: 2px -2px; }
-  .say:hover { color: var(--color-glow); }
-  .say:hover::after { opacity: 0.5; transform: scaleX(1); }
+  .say:not([data-revealing]):hover { color: transparent; }
+  .say:not([data-revealing]):hover .say-fill { opacity: 1; }
+  .say:hover::after { opacity: 0.75; transform: scaleX(1); }
 }
 .line-link:focus-visible::after { opacity: 0.85; }
 .line-link:focus-visible svg[data-dir="ne"] { translate: 2px -2px; }
@@ -155,8 +175,61 @@
 .line-link:focus-visible svg[data-dir="n"] { translate: 0 -3px; }
 .visit:focus-visible { color: #fff; border-color: rgb(201 220 255 / 0.55); background-color: rgb(201 220 255 / 0.07); }
 .visit:focus-visible svg { translate: 2px -2px; }
-.say:focus-visible { color: var(--color-glow); }
-.say:focus-visible::after { opacity: 0.5; transform: scaleX(1); }
+.say:not([data-revealing]):focus-visible { color: transparent; }
+.say:not([data-revealing]):focus-visible .say-fill { opacity: 1; }
+.say:focus-visible::after { opacity: 0.75; transform: scaleX(1); }
+
+/* The full stop's ping: two hairline rings, half a beat apart. */
+.say-ping {
+  position: absolute;
+  right: 0.065em;
+  bottom: 0.265em;
+  pointer-events: none;
+}
+.say-ping::before,
+.say-ping::after {
+  content: "";
+  position: absolute;
+  width: 0.12em;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 1px solid #cbbcf3;
+  border-radius: 50%;
+  opacity: 0;
+}
+@keyframes say-drift {
+  to { background-position: 0 0, 100% 0; }
+}
+/* A gleam crosses the rule, then rests before the next. */
+@keyframes say-gleam {
+  0% { background-position: -30% 0, 0 0; }
+  55%, 100% { background-position: 130% 0, 0 0; }
+}
+/* Grown by size, not scale, so each ring stays a 1 px hairline. */
+@keyframes say-ping {
+  0% { width: 0.12em; opacity: 0; }
+  12% { opacity: 0.55; }
+  100% { width: 1.15em; opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .say::after {
+    background:
+      linear-gradient(90deg, transparent, rgb(255 255 255 / 0.95), transparent) no-repeat,
+      linear-gradient(90deg, #bfcdff, #cbbcf3 60%, rgb(230 237 255 / 0.4));
+    background-size: 24% 100%, 100% 100%;
+    background-position: -30% 0, 0 0;
+  }
+  @media (hover: hover) {
+    .say:hover .say-fill { animation: say-drift 9s ease-in-out infinite alternate; }
+    .say:hover::after { animation: say-gleam 4.8s cubic-bezier(0.45, 0, 0.3, 1) 0.6s infinite; }
+    .say:hover .say-ping::before { animation: say-ping 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) 0.5s infinite; }
+    .say:hover .say-ping::after { animation: say-ping 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) 2.3s infinite; }
+  }
+  .say:focus-visible .say-fill { animation: say-drift 9s ease-in-out infinite alternate; }
+  .say:focus-visible::after { animation: say-gleam 4.8s cubic-bezier(0.45, 0, 0.3, 1) 0.6s infinite; }
+  .say:focus-visible .say-ping::before { animation: say-ping 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) 0.5s infinite; }
+  .say:focus-visible .say-ping::after { animation: say-ping 3.6s cubic-bezier(0.2, 0.6, 0.3, 1) 2.3s infinite; }
+}
 
 /* The page-in fades these up (motion.tsx); hidden first so they never flash in. */
 @media (prefers-reduced-motion: no-preference) {
