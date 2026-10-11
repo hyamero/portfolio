@@ -10,7 +10,7 @@ export type Camera = { zoom: number; pan: number; morph: number };
 export type Body = { C: Vec; R: number; B: Vec };
 
 /** The horizon's rest line, as a share of the viewport's height (spec §5.2). */
-export const REST = 0.86;
+export const REST = 0.8;
 const HOLD = 0.64;
 /** The horizon's radius per px of viewport width: main's closing horizon, 2.2 × the width. */
 export const RADIUS_PER_WIDTH = 2.2;
@@ -45,7 +45,7 @@ export function bodyFrame(cam: Camera, start: Body, end: Body): Body {
 
 /**
  * Past the runway's end the horizon eases from the hold line down to REST over one screen of
- * scroll, starting at 0.44× the scroll's speed, then stays (spec §5.2). `s` runs 0..1 over that screen.
+ * scroll, starting at 0.32× the scroll's speed, then stays (spec §5.2). `s` runs 0..1 over that screen.
  */
 export function settleFrame(body: Body, scroll: number, end: number, H: number): { body: Body; s: number } {
   const s = clamp((scroll - end) / Math.max(H, 1));
@@ -70,15 +70,9 @@ export function stillFrame(
     return { body: { C: [start.C[0], start.C[1] + dy], R: start.R, B: [start.B[0], start.B[1] + dy] }, morph: 0 };
   }
   const R = RADIUS_PER_WIDTH * W;
-  const apex = contact.top + contact.height * 0.85 - scroll;
+  const apex = contact.top + contact.height * 0.8 - scroll;
   const cx = contact.left + contact.width / 2;
   return { body: withSun([cx, apex + R], R), morph: 1 };
-}
-
-/** The body's disc (viewport px) in a page box's own px, for a mask over that box; r 0 without a body. */
-export function discIn(body: Body | null, box: Rect, scroll: number) {
-  if (!body) return { x: 0, y: 0, r: 0 };
-  return { x: body.C[0] - box.left, y: body.C[1] + scroll - box.top, r: body.R };
 }
 
 /** The body's opacity over the intro: it fades in from nothing, rather than pop in, before it's fully lit. */
