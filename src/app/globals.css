@@ -35,8 +35,18 @@
 }
 
 @layer components {
-  .header-fade {
-    background: linear-gradient(#06070a 0%, rgb(6 7 10 / 0.72) 52%, rgb(6 7 10 / 0) 100%);
+  /* Near-solid through the nav row and fading out below the header, so text scrolling up is gone
+     before it reaches the links. */
+  .header-fade::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 -32px;
+    z-index: -1;
+    background: linear-gradient(#06070a 0%, rgb(6 7 10 / 0.96) 52%, rgb(6 7 10 / 0.7) 74%, rgb(6 7 10 / 0) 100%);
+    /* From md the header's own padding leaves room to fade, and the hero's sky shows through it. */
+    @media (width >= 48rem) {
+      bottom: 0;
+    }
   }
   .orb-dot {
     background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
