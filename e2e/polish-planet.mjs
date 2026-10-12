@@ -201,6 +201,42 @@ tests.test_lift = async () => {
   await p.context().close();
 };
 
+// The planet's edge lights up where the cursor nears it, and only there; off under reduced motion, with
+// the cursor's light. Along one ray from the centre the planet's own light faces the same way, so the air
+// just inside the limb is brighter with the cursor near the limb than far out, and the limb far along is
+// as it was. Two pages, shot together, so the band's flow matches.
+tests.test_edge_glow = async () => {
+  for (const reduced of [false, true]) {
+    const opts = reduced ? { reducedMotion: "reduce" } : {};
+    const [away, near] = await Promise.all([open(opts), open(opts)]);
+    const g = await geometry(near);
+    // The point at angle a from straight up, h px out from the limb (in, for h < 0).
+    const ray = (a, h) => [g.C[0] + Math.sin(a) * (g.R + h), g.C[1] - Math.cos(a) * (g.R + h)];
+    const air = (img, a) => {
+      let s = 0;
+      let n = 0;
+      for (let t = -40; t <= 40; t += 10) {
+        for (let d = 8; d <= 40; d += 8) {
+          s += at(img, ...ray(a + t / g.R, -d));
+          n++;
+        }
+      }
+      return s / n;
+    };
+    const a = Math.asin((0.8 * g.W - g.C[0]) / g.R);
+    const far = Math.asin((0.3 * g.W - g.C[0]) / g.R);
+    await Promise.all([away.mouse.move(...ray(a, 400), { steps: 10 }), near.mouse.move(...ray(a, 30), { steps: 10 })]);
+    await near.waitForTimeout(2500);
+    const [dim, lit] = await Promise.all([shot(away), shot(near)]);
+    const glow = air(lit, a) / air(dim, a);
+    const elsewhere = air(lit, far) / air(dim, far);
+    const ok = (reduced ? Math.abs(glow - 1) < 0.02 : glow > 1.15) && Math.abs(elsewhere - 1) < 0.05;
+    report(`test_edge_glow${reduced ? " reduced" : ""}`, ok, { glow: +glow.toFixed(3), elsewhere: +elsewhere.toFixed(3) });
+    await away.context().close();
+    await near.context().close();
+  }
+};
+
 // §2.4: the CSS sky and the live sky agree on the first frame: the planet's rim, the horizon's limb at the sun, and the stars.
 tests.test_css_live = async () => {
   for (const [w, h] of [[1440, 900], [390, 844]]) {
