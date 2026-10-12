@@ -1,6 +1,6 @@
-// The hero's planet: main's orb, its lit limb, flowing atmosphere band, dark body, orbital paths and
-// their two flares. Its colours were tuned in display space over the page, so they're mixed there and
-// converted to linear light.
+// The hero's planet: main's orb, its lit limb and the glow the cursor lights on it, flowing atmosphere
+// band, dark body, orbital paths and their two flares. Its colours were tuned in display space over the
+// page, so they're mixed there and converted to linear light.
 import { decode, overBg } from "./light.wgsl";
 import { fbm } from "./noise.wgsl";
 
@@ -23,8 +23,9 @@ export struct PlanetLight {
 }
 
 // p, C, light: page px; R: the radius; W: the viewport's width; lw: a hairline's width; lit: the rim's
-// and the air's share of their light over the intro; quiet: the text mask.
-export fn planetLight(p: vec2f, C: vec2f, R: f32, light: vec2f, t: f32, W: f32, lw: f32, lit: vec2f, quiet: f32) -> PlanetLight {
+// and the air's share of their light over the intro; quiet: the text mask; hover: how much the pointer
+// holds the light, 0 at rest.
+export fn planetLight(p: vec2f, C: vec2f, R: f32, light: vec2f, t: f32, W: f32, lw: f32, lit: vec2f, quiet: f32, hover: f32) -> PlanetLight {
   let rel = p - C;
   let dist = max(length(rel), 1e-4);
   let dOrb = dist - R;
@@ -56,6 +57,24 @@ export fn planetLight(p: vec2f, C: vec2f, R: f32, light: vec2f, t: f32, W: f32, 
   let bandFade = 1.0 - 0.92 * smoothstep(0.18, 0.6, depth);
   let atmos = band * bandFade * (0.45 + 0.55 * facing) * (0.8 + 0.4 * flow) * 0.85;
   let face = mix(CORE, max(atmos, CORE), lit.y) + rim;
+  if (hover > 0.0) {
+    // Where the pointer nears the limb, the limb lights up round it, fading with the pointer's height off
+    // the limb and with p's distance along the limb from the pointer's spot on it.
+    let toLight = light - C;
+    let lightDist = max(length(toLight), 1e-4);
+    let off = (lightDist - R) / 160.0;
+    let along = length(outward - toLight / lightDist) * R / 200.0;
+    let glow = hover * exp(-off * off - along * along) * (0.75 + 0.5 * flow);
+    let glowRim = vec3f(0.78, 0.87, 1.0) * exp(-abs(dOrb) / 8.0) * glow * 0.35 * lit.x;
+    let glowHalo = vec3f(0.42, 0.52, 0.62) * exp(-max(dOrb, 0.0) / 32.0) * glow * 0.4;
+    // The air lightens toward white: its blue is already near clipping, so added light would only lift
+    // its green and turn it aqua.
+    let air = mix(atmos, vec3f(0.82, 0.9, 1.0), min(glow, 1.0) * 0.45 * exp(-max(-dOrb, 0.0) / 80.0));
+    let glowFace = mix(CORE, max(air, CORE), lit.y) + rim + glowRim;
+    // A return of its own leaves the resting planet's arithmetic, and so its pixels, exactly as they were.
+    return PlanetLight(overBg((halo + glowHalo + paths) * lit.y * (1.0 - 0.85 * quiet) + rim + glowRim),
+                       decode(min(glowFace, vec3f(1.0))));
+  }
 
   return PlanetLight(overBg((halo + paths) * lit.y * (1.0 - 0.85 * quiet) + rim), decode(min(face, vec3f(1.0))));
 }

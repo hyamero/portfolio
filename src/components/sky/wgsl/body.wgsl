@@ -57,7 +57,8 @@ export fn bodyLight(p: vec2f, b: Body, hush: f32, quiet: f32) -> BodyLight {
   var face = vec3f(0.0);
   if (m < 1.0 && d < 1.4 * R + 330.0) {
     let lit = vec2f(smoothstep(0.0, 0.6, b.dawn), smoothstep(0.25, 1.0, b.dawn));
-    let pl = planetLight(p, b.C, R, b.light, b.time, b.W, max(0.7, 0.8 / b.dpr), lit, hush);
+    // The cursor's glow on the limb stops under reduced motion with the cursor's light; travel is 0 there.
+    let pl = planetLight(p, b.C, R, b.light, b.time, b.W, max(0.7, 0.8 / b.dpr), lit, hush, b.hover * b.travel);
     out.front += pl.halo * planetK;
     face = pl.face;
   }
