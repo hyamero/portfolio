@@ -1,6 +1,27 @@
-Copyright © 2024–2026 Joseph Dale Bañares. All rights reserved.
+Copyright © 2024–2026 Joseph Dale Bañares
 
-This repository is public for viewing only. No license is granted: you may not copy,
-modify, distribute, sublicense, or deploy any part of it, including its code, shaders,
-design, text, images, and résumé, in whole or in part, without the copyright holder's
-prior written permission.
+This repository is public so you can learn from it. Read it, run it, take it apart, and
+use what you learn to make something of your own. Please don't copy the portfolio itself.
+
+You may:
+
+1. Read, run and study the source.
+2. Reuse techniques and pieces of the code, such as a function, a shader routine or a
+   component, in projects with their own design and content. Where you do, keep a link
+   to https://github.com/hyamero/portfolio in your source.
+3. Make your own variations on its ideas: your own sky, layout, type and identity.
+
+You may not:
+
+1. Publish this site, or a version substantially the same in look and content, as your
+   portfolio or anyone else's.
+2. Use my name, likeness, writing, résumé or images, or the hyamero name and mark.
+3. Reuse the site's design as a whole: its sky, layout, type and colours together.
+
+If this site inspired yours, a mention is welcome but not required. For anything not
+covered here, ask me at daleban.dev@gmail.com. Everything not granted above is reserved.
+
+Third-party code and fonts, such as Geist, keep their own licenses.
+
+The source is provided "as is", without warranty of any kind. I am not liable for any
+claim, damages or other liability arising from its use.
