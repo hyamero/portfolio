@@ -1,6 +1,8 @@
 export const siteConfig = {
   url: "https://dale.omsimos.com",
   name: "Dale Bañares",
+  handle: "hyamero",
+  role: "Software engineer and designer",
   description:
     "Software engineer and designer based in the Philippines, working mostly with teams across the EU.",
   links: {
