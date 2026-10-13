@@ -1,7 +1,7 @@
 // Runs the browser suites in turn against URL (default http://localhost:3000/) and exits non-zero if any fails.
 import { spawnSync } from "node:child_process";
 
-const SUITES = ["polish-planet", "eclipse", "voyage"];
+const SUITES = ["polish-planet", "eclipse", "voyage", "lost"];
 const only = process.argv.slice(2);
 let failed = 0;
 for (const suite of SUITES.filter((s) => !only.length || only.includes(s))) {

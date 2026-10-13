@@ -16,6 +16,7 @@ node e2e/voyage.mjs test_frames test_link_rows    # single tests
 | `voyage.mjs` | Lenis, navigation, the cursor light, frame times, mobile layout. `BROWSER=webkit` for WebKit. |
 | `eclipse.mjs` | The planet-to-horizon camera, the resting horizon, the ground layer, reduced motion. |
 | `polish-planet.mjs` | The sky polish round: signal, CSS sky handover, contrast, dawn. |
+| `lost.mjs` | The 404's lost orb: the empty wordmark, the drift, the dodge, the flight home, reduced motion, phones. |
 
 Tools for sky work:
 
