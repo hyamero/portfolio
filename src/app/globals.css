@@ -52,6 +52,38 @@
     background: radial-gradient(circle at 50% 130%, #0c1838 35%, #4b80d4 72%, #c9dcff 100%);
     box-shadow: 0 -1px 7px rgb(201 220 255 / 0.4);
   }
+  /* The 404's orb (lost-orb.tsx): the header's orb at 48px, 72 from md, its glow scaled with it. The
+     CSS sets it in the open sky; once its script is live, the drift moves it from there. */
+  .lost-orb {
+    position: absolute;
+    left: 64%;
+    top: 29%;
+    width: 48px;
+    height: 48px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    -webkit-tap-highlight-color: transparent;
+    @media (width >= 48rem) {
+      left: 75%;
+      top: 42%;
+      width: 72px;
+      height: 72px;
+    }
+  }
+  [data-live] > .lost-orb {
+    left: 0;
+    top: 0;
+    translate: none;
+    will-change: transform;
+  }
+  .lost-orb-body {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    box-shadow: 0 -3px 20px rgb(201 220 255 / 0.34), 0 0 48px rgb(75 128 212 / 0.14);
+    transition: box-shadow 0.4s ease;
+  }
   /* The statement's full stop: a small bead that breathes. */
   .full-stop {
     display: inline-block;
@@ -178,7 +210,9 @@
   .say:not([data-revealing]):hover { color: transparent; }
   .say:not([data-revealing]):hover .say-fill { opacity: 1; }
   .say:hover::after { opacity: 0.75; transform: scaleX(1); }
+  .lost-orb:hover .lost-orb-body { box-shadow: 0 -4px 28px rgb(201 220 255 / 0.5), 0 0 64px rgb(75 128 212 / 0.22); }
 }
+.lost-orb:focus-visible .lost-orb-body { box-shadow: 0 -4px 28px rgb(201 220 255 / 0.5), 0 0 64px rgb(75 128 212 / 0.22); }
 .line-link:focus-visible::after { opacity: 0.85; }
 .line-link:focus-visible svg[data-dir="ne"] { translate: 2px -2px; }
 .line-link:focus-visible svg[data-dir="s"] { translate: 0 3px; }
@@ -365,3 +399,25 @@ html:not([data-sky="css"]) .css-dawn {
   [data-project]:hover h3 { translate: 4px 0; }
 }
 [data-project]:focus-within [data-statement] { color: var(--color-mute); }
+
+/* The 404 (lost-orb.tsx): the wordmark's orb is out in the sky, so its place shows empty until it's
+   caught; then the wordmark glows once as it takes the orb back. */
+body:has([data-lost-orb]:not([data-home])) [data-wordmark-orb] {
+  background: none;
+  box-shadow: inset 0 0 0 1px rgb(201 220 255 / 0.32);
+}
+@media (prefers-reduced-motion: no-preference) {
+  body:has([data-lost-orb]:not([data-home])) [data-wordmark-orb] { animation: orb-missing 3.2s ease-in-out infinite; }
+  body:has([data-lost-orb][data-home]) [data-wordmark-orb] { animation: orb-home 1.6s ease-out; }
+  body:has([data-lost-orb][data-home]) a:has(> [data-wordmark-orb]) { animation: wordmark-home 1.6s ease-out; }
+}
+@keyframes orb-missing {
+  0%, 100% { box-shadow: inset 0 0 0 1px rgb(201 220 255 / 0.18); }
+  50% { box-shadow: inset 0 0 0 1px rgb(201 220 255 / 0.46); }
+}
+@keyframes orb-home {
+  from { box-shadow: 0 -1px 22px 7px rgb(201 220 255 / 0.85); }
+}
+@keyframes wordmark-home {
+  from { color: #fff; text-shadow: 0 0 18px rgb(201 220 255 / 0.6); }
+}
