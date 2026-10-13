@@ -1,6 +1,6 @@
 import "lenis/dist/lenis.css";
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { GeistSans } from "geist/font/sans";
 
 import EdgeLight from "@/components/edge-light";
@@ -10,15 +10,18 @@ import Sky from "@/components/sky/sky";
 import { SkyGrain, SkyStars } from "@/components/sky/fallback";
 import { siteConfig } from "@/lib/site";
 
+const title = `${siteConfig.name} — ${siteConfig.role}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: {
-    default: siteConfig.name,
+    default: title,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  authors: [{ name: siteConfig.name, url: siteConfig.url }],
   openGraph: {
-    title: siteConfig.name,
+    title,
     description: siteConfig.description,
     url: siteConfig.url,
     siteName: siteConfig.name,
@@ -37,10 +40,16 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: siteConfig.name,
+    title,
     card: "summary_large_image",
     description: siteConfig.description,
   },
+};
+
+export const viewport: Viewport = {
+  // --color-sky, so the browser's own bars match the page
+  themeColor: "#06070a",
+  colorScheme: "dark",
 };
 
 export default function RootLayout({
