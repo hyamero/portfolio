@@ -96,18 +96,20 @@ struct Params {
                params.settle, params.pulse.x, params.pulse.y,
                (1.0 + 0.25 * gathered * smoothstep(0.6, 1.0, gathered)) * (1.0 + 0.6 * params.lift));
   let bl = bodyLight(page, b, hush, quiet);
-  // Where the halo or the air is bright, the stars wash out.
-  let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
-  let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
-                     quiet, params.band, params.bandDrift);
-  let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
-                 params.viewHeight, B, vis, params.settle);
-
-  var col = skyField(css, sf, milky, milkySampler) + meteors(css, W, params.viewHeight, params.clock, params.dpr) * motion * ext * (1.0 - 0.9 * quiet)
-          + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
-  // The planet and the ground are opaque.
-  col = mix(col, bl.night, bl.inside);
-  col += shed(page, bl.d, tr) + gather(page, bl.d, tr);
+  // The planet and the ground are opaque. Where the body covers p whole, the sky and the trail behind
+  // it would only be mixed away, so they go undrawn: on a phone the ground fills a third of both canvases.
+  var col = bl.night;
+  if (bl.inside < 1.0) {
+    // Where the halo or the air is bright, the stars wash out.
+    let ext = 1.0 - 0.9 * smoothstep(0.003, 0.06, dot(bl.front, LUMA));
+    let sf = StarFrame(params.trail.w, params.velocity, params.dpr, t, (params.pointer - 0.5) * 8.0 * params.hover, pl, ext,
+                       quiet, params.band, params.bandDrift);
+    let tr = Trail(W, params.scroll, t, params.trail.x, params.trail.y, gathered, params.span.x, params.span.y,
+                   params.viewHeight, B, vis, params.settle);
+    let sky = skyField(css, sf, milky, milkySampler) + meteors(css, W, params.viewHeight, params.clock, params.dpr) * motion * ext * (1.0 - 0.9 * quiet)
+            + nebula(page, css, tr, bl.d, params.body.z, m, quiet) + ribbon(page, css, tr, quiet) + bl.front;
+    col = mix(sky, bl.night, bl.inside) + shed(page, bl.d, tr) + gather(page, bl.d, tr);
+  }
 
   let encoded = encode(shoulder(max(col, vec3f(0.0))));
   let rgb = max(encoded + grain(screen, dot(encoded, LUMA), t), vec3f(0.0));
