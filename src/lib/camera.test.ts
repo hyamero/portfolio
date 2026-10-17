@@ -6,6 +6,7 @@ import {
   bodyFrame,
   CAMERA_KEYS,
   endFrame,
+  followPose,
   planetAppear,
   planetDawn,
   REST,
@@ -13,6 +14,7 @@ import {
   startFrame,
   stillFrame,
   type Camera,
+  type Pose,
   type Vec,
 } from "./camera";
 import type { Rect } from "./sky-math";
@@ -138,6 +140,40 @@ describe("settleFrame", () => {
   test("moves the sun with the body", () => {
     const f = settleFrame(hold, end + H, end, H).body;
     expect(f.B[1] - hold.B[1]).toBeCloseTo((REST - 0.64) * H);
+  });
+});
+
+describe("followPose", () => {
+  const rest: Pose = { zoom: 0.2, pan: 0.1, morph: 0, scroll: 300 };
+  const ahead: Pose = { zoom: 0.6, pan: 0.5, morph: 0.4, scroll: 700 };
+
+  test("lands at once with nothing to follow from", () => {
+    expect(followPose(null, ahead, 1 / 60)).toEqual(ahead);
+  });
+
+  test("eases every value part of the way in a tick", () => {
+    const next = followPose(rest, ahead, 1 / 60);
+    for (const k of ["zoom", "pan", "morph", "scroll"] as const) {
+      expect(next[k]).toBeGreaterThan(rest[k]);
+      expect(next[k]).toBeLessThan(ahead[k]);
+    }
+  });
+
+  test("evens out uneven scroll steps", () => {
+    // One tick with no new scroll, then one carrying two ticks' worth: the follow moves both times.
+    const target = (scroll: number): Pose => ({ ...rest, scroll });
+    const a = followPose(target(300), target(300), 1 / 60);
+    const b = followPose(a, target(300 + 80), 1 / 60);
+    const c = followPose(b, target(300 + 80), 1 / 60);
+    expect(b.scroll - a.scroll).toBeGreaterThan(0);
+    expect(c.scroll - b.scroll).toBeGreaterThan(0);
+    expect(c.scroll - b.scroll).toBeLessThan(b.scroll - a.scroll);
+  });
+
+  test("lands exactly once close, so a still horizon stops redrawing", () => {
+    let pose = rest;
+    for (let i = 0; i < 120; i++) pose = followPose(pose, ahead, 1 / 60);
+    expect(pose).toEqual(ahead);
   });
 });
 
