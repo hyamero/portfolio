@@ -1,4 +1,4 @@
-import { clamp, ease, type Rect } from "./sky-math";
+import { approach, clamp, ease, type Rect } from "./sky-math";
 
 /** A point in viewport CSS pixels, y down. */
 export type Vec = readonly [number, number];
@@ -51,6 +51,33 @@ export function settleFrame(body: Body, scroll: number, end: number, H: number):
   const s = clamp((scroll - end) / Math.max(H, 1));
   const shift = (REST - HOLD) * H * (1 - (1 - s) ** 2);
   return { body: { C: [body.C[0], body.C[1] + shift], R: body.R, B: [body.B[0], body.B[1] + shift] }, s };
+}
+
+/** What the horizon is drawn from: the camera's channels and the scroll the settle reads. */
+export type Pose = Camera & { scroll: number };
+
+// Most of the way to its pose in ~80 ms: unseen in the empty runway, and the settle already trails the content.
+const FOLLOW_RATE = 12;
+const CHANNEL_EPSILON = 1e-3;
+const SCROLL_EPSILON = 0.5;
+
+/**
+ * One tick of the horizon following its pose on touch. iOS hands the page its native scroll in
+ * uneven steps, and a horizon drawn straight from them stutters; wheel scrolls get this from Lenis.
+ * Each value lands once close, so a still horizon stops redrawing.
+ */
+export function followPose(current: Pose | null, target: Pose, dt: number): Pose {
+  if (!current) return { ...target };
+  const step = (from: number, to: number, epsilon: number) => {
+    const next = approach(from, to, dt, FOLLOW_RATE);
+    return Math.abs(to - next) <= epsilon ? to : next;
+  };
+  return {
+    zoom: step(current.zoom, target.zoom, CHANNEL_EPSILON),
+    pan: step(current.pan, target.pan, CHANNEL_EPSILON),
+    morph: step(current.morph, target.morph, CHANNEL_EPSILON),
+    scroll: step(current.scroll, target.scroll, SCROLL_EPSILON),
+  };
 }
 
 /**
