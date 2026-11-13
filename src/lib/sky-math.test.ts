@@ -1,15 +1,19 @@
 import { describe, expect, test } from "bun:test";
+import gsap from "gsap";
 
 import {
   approach,
   armIntro,
+  arrive,
   clamp,
   COAST,
   coastStep,
   ease,
   introProgress,
+  quadInOut,
   restingLight,
   rise,
+  sineInOut,
   skyDpr,
   trailFrame,
   type Rect,
@@ -75,6 +79,24 @@ describe("restingLight and approach", () => {
   test("approach eases by 1 - e^(-rate*dt)", () => {
     expect(approach(0, 10, 1, 3)).toBeCloseTo(10 * (1 - Math.exp(-3)));
     expect(approach(5, 5, 0.1)).toBe(5);
+  });
+  test("arrive approaches, then lands exactly once within its epsilon", () => {
+    expect(arrive(0, 10, 0.1, 3, 0.5)).toBe(approach(0, 10, 0.1, 3));
+    expect(arrive(9.4, 10, 0.1, 3, 0.5)).toBe(10);
+    let v = 0;
+    for (let i = 0; i < 240; i++) v = arrive(v, 10, 1 / 60, 3, 0.01);
+    expect(v).toBe(10);
+  });
+});
+
+describe("the camera's eases", () => {
+  test("match GSAP's, and reach both ends exactly", () => {
+    for (const [fn, name] of [[quadInOut, "power1.inOut"], [sineInOut, "sine.inOut"]] as const) {
+      const theirs = gsap.parseEase(name);
+      for (let i = 0; i <= 40; i++) expect(fn(i / 40)).toBeCloseTo(theirs(i / 40), 12);
+      expect(fn(0)).toBe(0);
+      expect(fn(1)).toBe(1);
+    }
   });
 });
 

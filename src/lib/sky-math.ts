@@ -57,6 +57,18 @@ export function approach(current: number, target: number, dt: number, rate = 3) 
   return current + (target - current) * (1 - Math.exp(-dt * rate));
 }
 
+/** `approach`, landing on the target once within `epsilon`: it is only asymptotic, and a landed value stops changing the frame. */
+export function arrive(current: number, target: number, dt: number, rate: number, epsilon: number) {
+  const next = approach(current, target, dt, rate);
+  return Math.abs(target - next) <= epsilon ? target : next;
+}
+
+/** GSAP's power1.inOut. */
+export const quadInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) ** 2);
+
+/** GSAP's sine.inOut. */
+export const sineInOut = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
+
 /**
  * The horizon's trail (motion spec §4.1, eclipse spec §5.4): the planet's atmosphere sheds off the
  * rim from early in the camera's descent (`fall`, its zoom), just ahead of the planet losing its

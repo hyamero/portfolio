@@ -2,20 +2,30 @@ import gsap from "gsap";
 import type Lenis from "lenis";
 
 import { liftStep } from "./signal";
-import { approach, clamp, coastStep, restingLight, type Rect } from "./sky-math";
+import { approach, arrive, clamp, coastStep, restingLight, type Rect } from "./sky-math";
 
 export const EMPTY_RECT: Rect = { left: 0, top: 0, width: 0, height: 0 };
 const VELOCITY_MAX = 6000;
 // px in one tick; a 1.2 s glide across the page moves ~250 px in its first tick even at 30fps.
 const JUMP = 400;
 const LIGHT_EPSILON = 0.5;
+const HOVER_RATE = 3;
 const HOVER_EPSILON = 0.002;
+// Most of the way to the scroll in ~80 ms: enough to even out a native scroll's steps, too short to read as lag.
+const FOLLOW_RATE = 12;
+const FOLLOW_EPSILON = 0.5;
 
 export function createFlight() {
   return {
     primed: false,
     scroll: 0,
-    /** px/s */
+    /**
+     * The scroll the sky moves by. iOS hands the page its native scroll in uneven steps, and a sky
+     * drawn straight from them stutters, so this follows `scroll` a few px behind. Lenis eases its
+     * own scrolls, which pass straight through.
+     */
+    smooth: 0,
+    /** `smooth`'s speed, px/s. */
     velocity: 0,
     pointer: { x: 0, y: 0, nx: 0.5, ny: 0.5, active: false },
     /** The eased light in page space, heading for (tx, ty); `hover` fades it in over the pointer. */
@@ -24,11 +34,12 @@ export function createFlight() {
     coast: { v: 0, offset: 0 },
     hero: EMPTY_RECT,
     /**
-     * The hero's camera (spec §4.1): motion.tsx scrubs the channels and the sky reads them. `end` is
-     * the scroll position where the runway ends, written on refresh; until then nothing settles.
-     * `copy` is how much of the hero copy still shows, 1 → 0 as it lifts away; the sky's text mask follows it.
+     * The hero's runway (spec §4.1), which the sky flies its camera along: the scroll positions where
+     * it starts and ends, written by motion.tsx on refresh. Until then the camera stays on the planet
+     * and nothing settles. `copy` is how much of the hero copy still shows, 1 → 0 as it lifts away;
+     * the sky's text mask follows it.
      */
-    camera: { zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 },
+    camera: { start: 0, end: Number.POSITIVE_INFINITY, copy: 1 },
     /**
      * Contact's signal (sky polish spec §5.6): a hovered or focused link's lift on the sun, easing
      * toward `target`, and the last click's time in ms on the tick's clock.
@@ -44,14 +55,22 @@ export type Flight = ReturnType<typeof createFlight>;
 /** The page's shared motion state, read by the sky, the edge light and the scroll helpers. */
 export const flight = createFlight();
 
-/** Advances `s` by one tick: scroll and velocity, the eased light, and the stars' coast. */
-export function advance(s: Flight, scroll: number, scrollX: number, dt: number) {
+/**
+ * Advances `s` by one tick: scroll and velocity, the eased light, and the stars' coast. `eased` says
+ * Lenis is gliding this scroll, so it needs no easing here.
+ */
+export function advance(s: Flight, scroll: number, scrollX: number, dt: number, eased = false) {
   // The first tick only primes: loading mid-page is not a scroll. Nor is a jump (End, a late scroll
   // restore, a hash): Lenis never moves this far in one tick.
   const delta = scroll - s.scroll;
-  s.velocity =
-    s.primed && dt > 0 && Math.abs(delta) <= JUMP ? clamp(delta / dt, -VELOCITY_MAX, VELOCITY_MAX) : 0;
+  const scrolled = s.primed && Math.abs(delta) <= JUMP;
+  // Only a native scroll's steps fall behind; a glide, a jump and reduced motion move `smooth` at once.
+  // What is already behind keeps closing either way, so a glide that takes over mid-scroll doesn't pop.
+  const behind = !s.primed || s.reduced ? 0 : s.scroll - s.smooth + (scrolled && !eased ? delta : 0);
+  const smooth = scroll - arrive(behind, 0, dt, FOLLOW_RATE, FOLLOW_EPSILON);
+  s.velocity = scrolled && dt > 0 ? clamp((smooth - s.smooth) / dt, -VELOCITY_MAX, VELOCITY_MAX) : 0;
   s.scroll = scroll;
+  s.smooth = smooth;
   s.primed = true;
 
   const { light, pointer } = s;
@@ -67,13 +86,12 @@ export function advance(s: Flight, scroll: number, scrollX: number, dt: number) 
   light.x = approach(light.x, light.tx, dt);
   light.y = approach(light.y, light.ty, dt);
   const hoverTarget = pointer.active ? 1 : 0;
-  light.hover = s.reduced ? hoverTarget : approach(light.hover, hoverTarget, dt);
+  light.hover = s.reduced ? hoverTarget : arrive(light.hover, hoverTarget, dt, HOVER_RATE, HOVER_EPSILON);
   // The approach is only asymptotic: land once settled, so a still light stops changing the frame.
   if (Math.hypot(light.tx - light.x, light.ty - light.y) <= LIGHT_EPSILON) {
     light.x = light.tx;
     light.y = light.ty;
   }
-  if (Math.abs(light.hover - hoverTarget) <= HOVER_EPSILON) light.hover = hoverTarget;
 
   s.coast.v = s.reduced ? 0 : coastStep(s.coast.v, s.velocity, dt);
   s.coast.offset += s.coast.v * dt;
@@ -163,7 +181,7 @@ function listen() {
     const now = time * 1000;
     flight.lenis?.raf(now);
     const dt = Math.min(deltaMs / 1000, 0.1);
-    advance(flight, window.scrollY, window.scrollX, dt);
+    advance(flight, window.scrollY, window.scrollX, dt, flight.lenis?.isScrolling === "smooth");
     subscribers.forEach((fn) => fn(now, dt));
   };
   gsap.ticker.lagSmoothing(0);

@@ -12,8 +12,8 @@ const fresh = () => {
 };
 
 describe("flight", () => {
-  test("the hero's camera starts on the planet, with no runway end yet", () => {
-    expect(createFlight().camera).toEqual({ zoom: 0, pan: 0, morph: 0, end: Number.POSITIVE_INFINITY, copy: 1 });
+  test("the hero's runway starts with no end yet, and the copy showing", () => {
+    expect(createFlight().camera).toEqual({ start: 0, end: Number.POSITIVE_INFINITY, copy: 1 });
   });
   test("the signal starts unlit, with no pulse", () => {
     expect(createFlight().signal).toEqual({ lift: 0, target: 0, at: Number.NEGATIVE_INFINITY });
@@ -46,10 +46,10 @@ describe("flight", () => {
   });
   test("velocity is in px/s and clamped", () => {
     const s = fresh();
-    advance(s, 0, 0, DT);
-    advance(s, 10, 0, DT);
+    advance(s, 0, 0, DT, true);
+    advance(s, 10, 0, DT, true);
     expect(s.velocity).toBeCloseTo(600);
-    advance(s, 310, 0, DT);
+    advance(s, 310, 0, DT, true);
     expect(s.velocity).toBe(6000);
   });
   test("scrolling builds a coast that glides on after the scroll stops", () => {
@@ -123,5 +123,62 @@ describe("flight", () => {
     expect(s.coast.v).toBe(0);
     for (let i = 0; i < 30; i++) advance(s, 1200 + (i + 1) * 20, 0, DT);
     expect(s.coast.v).toBeGreaterThan(0);
+  });
+});
+
+describe("the smooth scroll", () => {
+  const at = (y: number) => {
+    const s = fresh();
+    advance(s, y, 0, DT);
+    return s;
+  };
+  test("starts on the scroll, wherever the page loads", () => {
+    expect(at(2400).smooth).toBe(2400);
+  });
+  test("evens out a native scroll's uneven steps", () => {
+    // One tick with no new scroll, then one carrying two ticks' worth: the sky moves both times.
+    const s = at(300);
+    advance(s, 380, 0, DT);
+    const a = s.smooth;
+    advance(s, 380, 0, DT);
+    const b = s.smooth;
+    expect(a).toBeGreaterThan(300);
+    expect(b).toBeGreaterThan(a);
+    expect(b).toBeLessThan(380);
+    expect(s.velocity).toBeCloseTo((b - a) / DT);
+  });
+  test("lands on the scroll once it stops, so a still sky stops redrawing", () => {
+    const s = at(300);
+    advance(s, 380, 0, DT);
+    for (let i = 0; i < 60; i++) advance(s, 380, 0, DT);
+    expect(s.smooth).toBe(380);
+    expect(s.velocity).toBe(0);
+  });
+  test("passes a Lenis glide straight through", () => {
+    const s = at(300);
+    advance(s, 380, 0, DT, true);
+    expect(s.smooth).toBe(380);
+  });
+  test("lands a jump at once", () => {
+    const s = at(300);
+    advance(s, 3000, 0, DT);
+    expect(s.smooth).toBe(3000);
+    expect(s.velocity).toBe(0);
+  });
+  test("keeps closing what it is behind by when a glide or a jump takes over", () => {
+    for (const [to, eased] of [[430, true], [3000, false]] as const) {
+      const s = at(300);
+      advance(s, 380, 0, DT);
+      const behind = s.scroll - s.smooth;
+      advance(s, to, 0, DT, eased);
+      expect(s.scroll - s.smooth).toBeGreaterThan(0);
+      expect(s.scroll - s.smooth).toBeLessThan(behind);
+    }
+  });
+  test("is the scroll itself under reduced motion", () => {
+    const s = at(300);
+    s.reduced = true;
+    advance(s, 380, 0, DT);
+    expect(s.smooth).toBe(380);
   });
 });

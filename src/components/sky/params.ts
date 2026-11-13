@@ -12,6 +12,7 @@ export type SkyInput = {
   /** The viewport, CSS px. */
   W: number;
   H: number;
+  /** flight.smooth: where the viewport's top is drawn on the page. */
   scroll: number;
   /** The stars' virtual scroll: scroll plus the coast's offset. */
   starScroll: number;

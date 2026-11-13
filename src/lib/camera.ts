@@ -1,9 +1,9 @@
-import { approach, clamp, ease, type Rect } from "./sky-math";
+import { clamp, ease, quadInOut, sineInOut, type Rect } from "./sky-math";
 
 /** A point in viewport CSS pixels, y down. */
 export type Vec = readonly [number, number];
 
-/** The hero's camera, each channel 0..1, scrubbed by the timeline in motion.tsx (spec §4.1). */
+/** The hero's camera, each channel 0..1 across the runway (spec §4.1). */
 export type Camera = { zoom: number; pan: number; morph: number };
 
 /** The body: its centre, its radius and the sun at the top of its edge, unseen but where the rim is brightest. */
@@ -53,33 +53,6 @@ export function settleFrame(body: Body, scroll: number, end: number, H: number):
   return { body: { C: [body.C[0], body.C[1] + shift], R: body.R, B: [body.B[0], body.B[1] + shift] }, s };
 }
 
-/** What the horizon is drawn from: the camera's channels and the scroll the settle reads. */
-export type Pose = Camera & { scroll: number };
-
-// Most of the way to its pose in ~80 ms: unseen in the empty runway, and the settle already trails the content.
-const FOLLOW_RATE = 12;
-const CHANNEL_EPSILON = 1e-3;
-const SCROLL_EPSILON = 0.5;
-
-/**
- * One tick of the horizon following its pose on touch. iOS hands the page its native scroll in
- * uneven steps, and a horizon drawn straight from them stutters; wheel scrolls get this from Lenis.
- * Each value lands once close, so a still horizon stops redrawing.
- */
-export function followPose(current: Pose | null, target: Pose, dt: number): Pose {
-  if (!current) return { ...target };
-  const step = (from: number, to: number, epsilon: number) => {
-    const next = approach(from, to, dt, FOLLOW_RATE);
-    return Math.abs(to - next) <= epsilon ? to : next;
-  };
-  return {
-    zoom: step(current.zoom, target.zoom, CHANNEL_EPSILON),
-    pan: step(current.pan, target.pan, CHANNEL_EPSILON),
-    morph: step(current.morph, target.morph, CHANNEL_EPSILON),
-    scroll: step(current.scroll, target.scroll, SCROLL_EPSILON),
-  };
-}
-
 /**
  * Reduced motion has no camera: the planet stays in the hero, in page space, until the viewport's
  * middle passes Work's; then the horizon rests where Contact's horizon ends (spec §5.2).
@@ -112,23 +85,29 @@ export function planetDawn(intro: number) {
   return ease(0.15, 1, intro);
 }
 
-/** Where each camera channel runs on the hero's timeline (0..1), and its ease (spec §4.1). */
+type Key = { start: number; end: number; ease: (t: number) => number };
+
+/** Where each camera channel runs on the runway (0..1), and its ease (spec §4.1). The hold runs from 0.85 to the end. */
 export const CAMERA_KEYS = {
-  zoom: { start: 0, end: 0.85, ease: "power1.inOut" },
-  pan: { start: 0.12, end: 0.85, ease: "sine.inOut" },
-  morph: { start: 0.25, end: 0.85, ease: "power1.inOut" },
-} as const satisfies Record<keyof Camera, { start: number; end: number; ease: string }>;
+  zoom: { start: 0, end: 0.85, ease: quadInOut },
+  pan: { start: 0.12, end: 0.85, ease: sineInOut },
+  morph: { start: 0.25, end: 0.85, ease: quadInOut },
+} as const satisfies Record<keyof Camera, Key>;
 
-/** The copy's exit on the same timeline: gone by 30% of it, 90 px higher (spec §4.1). */
-export const COPY_OUT = { end: 0.3, lift: 90 } as const;
+const channel = (key: Key, progress: number) => key.ease(clamp((progress - key.start) / (key.end - key.start)));
 
-type Timeline = { to(target: object, vars: Record<string, unknown>, position?: number): unknown };
-
-/** Adds the camera's tweens to a timeline whose length is 1, so positions read as its progress. */
-export function addCameraTweens(tl: Timeline, cam: Camera) {
-  for (const [channel, key] of Object.entries(CAMERA_KEYS)) {
-    tl.to(cam, { [channel]: 1, ease: key.ease, duration: key.end - key.start }, key.start);
-  }
-  // Pads the timeline to 1, so the hold runs from 0.85 to the end.
-  tl.to({}, { duration: 1 }, 0);
+/**
+ * The camera at `scroll` on a runway from `start` to `end`. One scroll places every channel, so the
+ * camera never leaves its path. An unmeasured runway ends at infinity, which holds it on the planet.
+ */
+export function cameraAt(scroll: number, start: number, end: number): Camera {
+  const progress = clamp((scroll - start) / Math.max(end - start, 1));
+  return {
+    zoom: channel(CAMERA_KEYS.zoom, progress),
+    pan: channel(CAMERA_KEYS.pan, progress),
+    morph: channel(CAMERA_KEYS.morph, progress),
+  };
 }
+
+/** The copy's exit along the runway: gone by 30% of it, 90 px higher (spec §4.1). */
+export const COPY_OUT = { end: 0.3, lift: 90 } as const;

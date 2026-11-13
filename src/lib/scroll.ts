@@ -1,7 +1,8 @@
 import { flight } from "@/lib/flight";
+import { sineInOut } from "@/lib/sky-math";
 
 /** Ease in and out along a sine: its peak speed is only π/2 the average, so the sky's motion reads throughout. */
-export const glide = (t: number) => (1 - Math.cos(Math.PI * t)) / 2;
+export const glide = sineInOut;
 
 /** Seconds for a glide over `distance` px: slow enough to watch the stars and the camera pass, longer for longer trips. */
 export function glideDuration(distance: number, viewportHeight: number) {

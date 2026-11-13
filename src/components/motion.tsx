@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { useRef } from "react";
 
-import { addCameraTweens, COPY_OUT } from "@/lib/camera";
+import { COPY_OUT } from "@/lib/camera";
 import { flight } from "@/lib/flight";
 import { readProgress, wordBlur, wordOpacity } from "@/lib/statement";
 
@@ -51,7 +51,8 @@ export default function Motion({ children }: { children: React.ReactNode }) {
         }
 
         // 02 Approach: across the runway the copy lifts away while the camera flies down to the planet
-        // (spec §4.1). The sky reads flight.camera each tick and settles the horizon from `end`.
+        // (spec §4.1). The sky flies its own camera along the runway measured here, and settles the
+        // horizon from its end.
         const camera = gsap.timeline({
           scrollTrigger: {
             trigger: "#home",
@@ -59,6 +60,7 @@ export default function Motion({ children }: { children: React.ReactNode }) {
             end: "bottom bottom",
             scrub: true,
             onRefresh: (self) => {
+              flight.camera.start = self.start;
               flight.camera.end = self.end;
             },
           },
@@ -66,7 +68,8 @@ export default function Motion({ children }: { children: React.ReactNode }) {
         camera.to("[data-hero-copy]", { y: -COPY_OUT.lift, opacity: 0, ease: "none", duration: COPY_OUT.end }, 0);
         // The sky's text mask follows the copy out (sky polish spec §3.3).
         camera.to(flight.camera, { copy: 0, ease: "none", duration: COPY_OUT.end }, 0);
-        addCameraTweens(camera, flight.camera);
+        // Pads the timeline to 1, so the copy's exit reads as a share of the runway.
+        camera.to({}, { duration: 1 }, 0);
 
         // 03 Focus: each hairline draws in, then its statement lights up word by word.
         const words: HTMLElement[] = [];

@@ -1,4 +1,4 @@
-import { approach, ease } from "./sky-math";
+import { arrive, ease } from "./sky-math";
 
 /** How long a signal's pulse runs, s: its envelope lands at exactly 0 here (spec §5.6). */
 export const PULSE_S = 3.5;
@@ -8,8 +8,7 @@ const LIFT_EPSILON = 0.002;
 /** One step of a hovered or focused Contact link's lift on the sun. Reduced motion jumps. */
 export function liftStep(lift: number, target: number, dt: number, reduced: boolean) {
   if (reduced) return target;
-  const next = approach(lift, target, dt, LIFT_RATE);
-  return Math.abs(next - target) <= LIFT_EPSILON ? target : next;
+  return arrive(lift, target, dt, LIFT_RATE, LIFT_EPSILON);
 }
 
 /** The pulse's age in s at `now` for a click at `at` (both ms on the tick's clock), or −1 with none running. */

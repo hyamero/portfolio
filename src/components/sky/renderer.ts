@@ -3,7 +3,7 @@ import { effect, frame, surface } from "vgpu";
 import { createMilkyCache } from "./milky-cache";
 import { bandExtent, diffKey, sameKey, skyParams, type BandMap, type SkyInput } from "./params";
 import skySource from "./sky.wgsl";
-import { bodyFrame, endFrame, followPose, settleFrame, startFrame, stillFrame, type Body, type Pose } from "@/lib/camera";
+import { bodyFrame, cameraAt, endFrame, settleFrame, startFrame, stillFrame, type Body } from "@/lib/camera";
 import { anchorRect, EMPTY_RECT, flight, onTick, startFlight, textRect } from "@/lib/flight";
 import { getGpu } from "@/lib/gpu";
 import { meteorInFlight } from "@/lib/meteors";
@@ -14,8 +14,6 @@ const INTRO_DELAY_MS = 250;
 export const SKY_OVERSCAN = 160;
 // The ambient drift (twinkle, the planet's flowing band and sparkles) needs no more than ~30fps.
 const AMBIENT_MS = 33;
-// Touch scrolls natively, without Lenis's smoothing.
-const TOUCH = "(hover: none) and (pointer: coarse)";
 
 type Callbacks = { onFirstFrame: () => void; onFallback: () => void };
 
@@ -75,17 +73,16 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
       let lastKey: number[] = [];
       // What the ground was last drawn from. It holds still on screen, so it ignores the scroll.
       let lastFront: number[] = [];
-      // The horizon's smoothed pose on touch; null lands it at once on the next tick.
-      let pose: Pose | null = null;
-      const touch = window.matchMedia(TOUCH);
 
-      const input = (now: number, dt: number): SkyInput => {
+      const input = (now: number): SkyInput => {
         const { light, pointer, reduced } = flight;
-        const cam = flight.camera;
-        const scrollY = flight.scroll;
+        const runway = flight.camera;
+        // Every part of the sky moves by the one eased scroll, so none stutters against another.
+        const scrollY = flight.smooth;
         const W = cssWidth;
         const H = cssHeight;
         const hasPlanet = planet.width > 0;
+        const cam = cameraAt(scrollY, runway.start, runway.end);
         // The tick only runs while the tab is visible.
         introStart = armIntro(introStart, now + INTRO_DELAY_MS, hasPlanet, true);
         const intro = reduced ? 1 : introStart === null ? 0 : introProgress(now - introStart);
@@ -93,8 +90,6 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
         let morph = 0;
         let foot: number | null = null;
         let settle = 0;
-        let zoom = cam.zoom;
-        if (!hasPlanet || reduced || !touch.matches) pose = null;
         if (hasPlanet && reduced) {
           const still = stillFrame(startFrame(planet, hero.top), { hero, work, contact }, W, H, scrollY);
           body = still.body;
@@ -103,13 +98,10 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           settle = still.morph;
           if (!still.morph) foot = hero.top + hero.height;
         } else if (hasPlanet) {
-          const raw: Pose = { zoom: cam.zoom, pan: cam.pan, morph: cam.morph, scroll: scrollY };
-          const p = touch.matches ? (pose = followPose(pose, raw, dt)) : raw;
-          const settled = settleFrame(bodyFrame(p, startFrame(planet, hero.top), endFrame(W, H)), p.scroll, cam.end, H);
+          const settled = settleFrame(bodyFrame(cam, startFrame(planet, hero.top), endFrame(W, H)), scrollY, runway.end, H);
           body = settled.body;
-          morph = p.morph;
+          morph = cam.morph;
           settle = settled.s;
-          zoom = p.zoom;
         }
         const up = !contact.height ? 0 : reduced ? 1 : rise(scrollY, H, contact);
         return {
@@ -131,19 +123,19 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
           foot,
           settle,
           intro,
-          trail: trailFrame(zoom, settle, up, reduced, work.height > 0),
+          trail: trailFrame(cam.zoom, settle, up, reduced, work.height > 0),
           span: [work.top, contact.height ? contact.top : work.top + work.height],
           text,
-          copy: cam.copy,
+          copy: runway.copy,
           signal: flight.signal,
           band,
           // The ground covers the content from the runway's end on (eclipse spec §5.6).
-          frontOn: !reduced && hasPlanet && scrollY >= cam.end,
+          frontOn: !reduced && hasPlanet && scrollY >= runway.end,
           frontTop,
         };
       };
 
-      const initial = skyParams(input(0, 0)).params;
+      const initial = skyParams(input(0)).params;
       const sky = effect(gpu, skySource, { set: { params: initial, milky: milky.target, milkySampler: milky.sampler } });
       const ground = effect(gpu, skySource, {
         set: { params: { ...initial, layer: 1 }, milky: milky.target, milkySampler: milky.sampler },
@@ -182,9 +174,9 @@ export function mountSky(canvas: HTMLCanvasElement, front: HTMLCanvasElement, { 
         lastFront = [];
       };
 
-      const tick = (now: number, dt: number) => {
+      const tick = (now: number) => {
         if (document.hidden) return;
-        const next = input(now, dt);
+        const next = input(now);
         // The shooting stars' clock runs whenever the tab shows, so they keep their schedule at rest.
         // A hidden tab's gap counts as one frame.
         if (!next.reduced && lastTick) clock += Math.min((now - lastTick) / 1000, 0.1);

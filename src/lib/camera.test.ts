@@ -1,12 +1,10 @@
 import { describe, expect, test } from "bun:test";
-import gsap from "gsap";
 
 import {
-  addCameraTweens,
   bodyFrame,
   CAMERA_KEYS,
+  cameraAt,
   endFrame,
-  followPose,
   planetAppear,
   planetDawn,
   REST,
@@ -14,7 +12,6 @@ import {
   startFrame,
   stillFrame,
   type Camera,
-  type Pose,
   type Vec,
 } from "./camera";
 import type { Rect } from "./sky-math";
@@ -143,40 +140,6 @@ describe("settleFrame", () => {
   });
 });
 
-describe("followPose", () => {
-  const rest: Pose = { zoom: 0.2, pan: 0.1, morph: 0, scroll: 300 };
-  const ahead: Pose = { zoom: 0.6, pan: 0.5, morph: 0.4, scroll: 700 };
-
-  test("lands at once with nothing to follow from", () => {
-    expect(followPose(null, ahead, 1 / 60)).toEqual(ahead);
-  });
-
-  test("eases every value part of the way in a tick", () => {
-    const next = followPose(rest, ahead, 1 / 60);
-    for (const k of ["zoom", "pan", "morph", "scroll"] as const) {
-      expect(next[k]).toBeGreaterThan(rest[k]);
-      expect(next[k]).toBeLessThan(ahead[k]);
-    }
-  });
-
-  test("evens out uneven scroll steps", () => {
-    // One tick with no new scroll, then one carrying two ticks' worth: the follow moves both times.
-    const target = (scroll: number): Pose => ({ ...rest, scroll });
-    const a = followPose(target(300), target(300), 1 / 60);
-    const b = followPose(a, target(300 + 80), 1 / 60);
-    const c = followPose(b, target(300 + 80), 1 / 60);
-    expect(b.scroll - a.scroll).toBeGreaterThan(0);
-    expect(c.scroll - b.scroll).toBeGreaterThan(0);
-    expect(c.scroll - b.scroll).toBeLessThan(b.scroll - a.scroll);
-  });
-
-  test("lands exactly once close, so a still horizon stops redrawing", () => {
-    let pose = rest;
-    for (let i = 0; i < 120; i++) pose = followPose(pose, ahead, 1 / 60);
-    expect(pose).toEqual(ahead);
-  });
-});
-
 describe("stillFrame", () => {
   const W = 1440;
   const H = 900;
@@ -242,43 +205,37 @@ describe("planetAppear", () => {
   });
 });
 
-describe("CAMERA_KEYS", () => {
-  // GSAP keeps its own bookkeeping on a tweened object, so compare the channels by name.
+describe("cameraAt", () => {
   const CHANNELS = ["zoom", "pan", "morph"] as const;
-  const build = () => {
-    const cam: Camera = { zoom: 0, pan: 0, morph: 0 };
-    const tl = gsap.timeline({ paused: true });
-    addCameraTweens(tl, cam);
-    return { cam, tl };
-  };
-  test("make a timeline of length 1", () => {
-    const { tl } = build();
-    expect(tl.duration()).toBeCloseTo(1);
-    tl.kill();
-  });
-  test("put every channel at 0 at the start and at 1 from 0.85 on", () => {
-    const { cam, tl } = build();
-    tl.progress(0);
-    for (const key of CHANNELS) expect(cam[key]).toBe(0);
-    for (const p of [0.85, 1]) {
-      tl.progress(p);
-      for (const key of CHANNELS) expect(cam[key]).toBeCloseTo(1, 9);
+  const START = 120;
+  const END = 1120;
+  const along = (p: number) => cameraAt(START + p * (END - START), START, END);
+
+  test("holds every channel at 0 up to the runway's start, and at 1 from 85% of it on", () => {
+    for (const cam of [cameraAt(0, START, END), along(0)]) for (const key of CHANNELS) expect(cam[key]).toBe(0);
+    for (const cam of [along(0.85), along(1), cameraAt(END + 4000, START, END)]) {
+      for (const key of CHANNELS) expect(cam[key]).toBe(1);
     }
-    tl.kill();
   });
-  test("hold pan and morph at 0 until their start, and never run a channel backwards", () => {
-    const { cam, tl } = build();
+  test("holds pan and morph at 0 until their start, and never runs a channel backwards", () => {
     const last = { zoom: 0, pan: 0, morph: 0 };
     for (let i = 0; i <= 200; i++) {
       const p = i / 200;
-      tl.progress(p);
+      const cam = along(p);
       for (const key of CHANNELS) {
         if (p < CAMERA_KEYS[key].start) expect(cam[key]).toBe(0);
         expect(cam[key]).toBeGreaterThanOrEqual(last[key]);
         last[key] = cam[key];
       }
     }
-    tl.kill();
+  });
+  test("eases each channel across its own run", () => {
+    const half = (key: (typeof CHANNELS)[number]) => (CAMERA_KEYS[key].start + CAMERA_KEYS[key].end) / 2;
+    for (const key of CHANNELS) expect(along(half(key))[key]).toBeCloseTo(0.5, 9);
+    expect(along(0.2125).zoom).toBeCloseTo(0.125, 9);
+  });
+  test("stays on the planet until the runway is measured, or if it has no length", () => {
+    expect(cameraAt(5000, 0, Number.POSITIVE_INFINITY)).toEqual({ zoom: 0, pan: 0, morph: 0 });
+    expect(cameraAt(0, 0, 0)).toEqual({ zoom: 0, pan: 0, morph: 0 });
   });
 });
-
